@@ -108,7 +108,7 @@ private:
 
 	PhysicsSystem* _physicsSystem = nullptr;
 	InputSystem* _input = nullptr;
-	std::shared_ptr<Ragdoll> _ragDoll = nullptr;
+	Ragdoll* _ragDoll = nullptr;
 
 	IkChain _rightChain{};
 	IkChain _leftChain{};

@@ -14,5 +14,5 @@ public:
 	void Update(float deltaTime)override;
 private:
 	InputSystem* _input;
-	std::shared_ptr<Ragdoll> _dragDoll;
+	Ragdoll* _dragDoll = nullptr;
 };

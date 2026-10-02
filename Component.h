@@ -19,10 +19,10 @@ public:
     virtual void Draw(Renderer& renderer) {}
     virtual void Release() {}
 
-    //当たり判定処理
-    virtual void OnCollisionEnter(std::shared_ptr<Collider>& other, const CollisionResult& result) {}
-    virtual void OnCollisionStay(std::shared_ptr<Collider>& other, const CollisionResult& result) {}
-    virtual void OnCollisionExit(std::shared_ptr<Collider>& other, const CollisionResult& result) {}
+    //当たり判定処理(otherは借りるだけ。Colliderの所有者は、相手のGameObject)
+    virtual void OnCollisionEnter(Collider* other, const CollisionResult& result) {}
+    virtual void OnCollisionStay(Collider* other, const CollisionResult& result) {}
+    virtual void OnCollisionExit(Collider* other, const CollisionResult& result) {}
 
     GameObject* GetOwner() const
     {

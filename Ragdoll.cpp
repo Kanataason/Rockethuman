@@ -60,8 +60,8 @@ void Ragdoll::CreateBone(int boneNameIndex)
     bone.parentIndex = parentIndices[boneNameIndex]; // 一旦boneNames上のインデックスのまま保持
     bone.name = boneName;
 
-    bone.rigidBody = std::make_shared<RigidBody>();
-    bone.collider = std::make_shared<CapsuleCollider>();
+    bone.rigidBody = std::make_unique<RigidBody>();
+    bone.collider = std::make_unique<CapsuleCollider>();
     bone.collider->SetOwner(_owner);
     bone.rigidBody->SetIsGravity(false);
     bone.rigidBody->DisableKinematic();
@@ -76,13 +76,17 @@ void Ragdoll::CreateBone(int boneNameIndex)
     }
 
     PhysicsBody body;
-    body.ragdollBone = bone; //move前にコピーしてるのでbone自体はまだ有効
-    body.rigidBody = bone.rigidBody;
-    body.collider = bone.collider;
+    // RagdollBoneの所有権(rigidBody/collider/joint)は持たせず、データだけコピーする
+    // (bone自体の所有は、このあとmoveでRagdoll::_bonesに移る)
+    body.ragdollBone.name = bone.name;
+    body.ragdollBone.nodeIndex = bone.nodeIndex;
+    body.ragdollBone.parentIndex = bone.parentIndex;
+    body.rigidBody = bone.rigidBody.get();
+    body.collider = bone.collider.get();
     body.collider->SetCollisionGroup(1);
     body.rigidBody->SetPosition({ 0, 0, 0 });
 
-    _physicsSystem->AddPhysicsBody(body);
+    _physicsSystem->AddPhysicsBody(std::move(body));
 
     _bones.push_back(std::move(bone));
 }
@@ -144,7 +148,7 @@ void Ragdoll::SetupLeafCapsule(RagdollBone& bone, WorldPose& nodePose, const Vec
     // PhysicsSystem 側のコピーにも、オフセットと「重心が信頼できるか」を反映する
     // 前腕・手・足は、末端でも重力トルクを使う(だらんと下げるため)
     _physicsSystem->UpdateRagdollBoneOffsets(
-        bone.rigidBody, bone.colliderLocalOffset, bone.colliderLocalRotOffset,
+        bone.rigidBody.get(), bone.colliderLocalOffset, bone.colliderLocalRotOffset,
         RagdollTuning::kLeafBoneGravityTorque ||
         bone.name.find("ForeArm") != std::string::npos ||
         bone.name.find("Hand") != std::string::npos ||
@@ -166,7 +170,7 @@ void Ragdoll::SetupParentCapsule(RagdollBone& parent, WorldPose& parentPose,
 
     //ラグドールの情報を更新する
     _physicsSystem->UpdateRagdollBoneOffsets(
-        parent.rigidBody, parent.colliderLocalOffset, parent.colliderLocalRotOffset, true);
+        parent.rigidBody.get(), parent.colliderLocalOffset, parent.colliderLocalRotOffset, true);
 }
 
 //---------------------------- 計算---------------------
@@ -315,9 +319,9 @@ void Ragdoll::ApplyJointStiffness(RagdollBone& child)
 }
 void Ragdoll::CreateHingeJoint(RagdollBone& parentBone, RagdollBone& child, const auto& hingeLimit)
 {
-    child.joint = std::make_shared<HingeJoint>(
-        parentBone.rigidBody,
-        child.rigidBody,
+    child.joint = std::make_unique<HingeJoint>(
+        parentBone.rigidBody.get(),
+        child.rigidBody.get(),
         hingeLimit.axis,
         child.initialRelativeRotation
     );
@@ -326,9 +330,9 @@ void Ragdoll::CreateHingeJoint(RagdollBone& parentBone, RagdollBone& child, cons
 }
 void Ragdoll::CreateBallJoint(RagdollBone& parentBone, RagdollBone& child)
 {
-    child.joint = std::make_shared<BallJoint>(
-        parentBone.rigidBody,
-        child.rigidBody,
+    child.joint = std::make_unique<BallJoint>(
+        parentBone.rigidBody.get(),
+        child.rigidBody.get(),
         child.initialRelativeRotation
     );
     ApplyJointStiffness(child);
@@ -384,7 +388,7 @@ void Ragdoll::CreateJoints()
                 AlignTwistWithOwnBone(boneIndex);
         }
 
-        _physicsSystem->AddJoint(child.joint);
+        _physicsSystem->AddJoint(child.joint.get());
     }
 }
 
@@ -764,14 +768,14 @@ void Ragdoll::ApplyLaunchImpulse(const Vector3& pushDirIn, RagdollBone& hitBone,
             Vector::Cross(leverArm, launchVelocity) * (RagdollTuning::kLaunchSpinScale / body->GetInertia() * body->GetMass()));
     }
 }
-bool Ragdoll::IsPushCollider(const std::shared_ptr<Collider>& other) const
+bool Ragdoll::IsPushCollider(const Collider* other) const
 {
     if (!other) return false;
 
     //地面と自分以外
     return other->GetCollisionGroup() == 2;
 }
-void Ragdoll::OnCollisionEnter(std::shared_ptr<Collider>& other, const CollisionResult& result)
+void Ragdoll::OnCollisionEnter(Collider* other, const CollisionResult& result)
 {
     if (!IsPushCollider(other))
         return;

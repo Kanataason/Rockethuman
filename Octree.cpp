@@ -1,7 +1,7 @@
 ﻿#include "Octree.h"
 
 
-void Octree::Insert(const std::shared_ptr<Collider>& collider)
+void Octree::Insert(Collider* collider)
 {
 
     // すでに分割されているなら
@@ -31,7 +31,7 @@ void Octree::Insert(const std::shared_ptr<Collider>& collider)
     }
 }
 
-void Octree::Query(const XMFLOAT3& min, const XMFLOAT3& max, std::vector<std::shared_ptr<Collider>>& result)
+void Octree::Query(const XMFLOAT3& min, const XMFLOAT3& max, std::vector<Collider*>& result)
 {
     // 範囲外なら探索打ち切り
     if (!Intersects(min, max, _min, _max))
@@ -54,7 +54,7 @@ void Octree::Query(const XMFLOAT3& min, const XMFLOAT3& max, std::vector<std::sh
     }
 }
 
-void Octree::QueryRay(const XMFLOAT3& origin, const XMFLOAT3& direction, std::vector<std::shared_ptr<Collider>>& result)
+void Octree::QueryRay(const XMFLOAT3& origin, const XMFLOAT3& direction, std::vector<Collider*>& result)
 {
     // RayがこのNodeのAABBと交差していない
     if (!IntersectsRay(origin, direction, _min, _max))
@@ -146,7 +146,7 @@ void Octree::Subdivide()
     }
 
     // 既存Colliderを子Nodeへ再配置
-    std::vector<std::shared_ptr<Collider>> remaining;
+    std::vector<Collider*> remaining;
 
     remaining.reserve(_colliders.size());
 

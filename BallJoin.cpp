@@ -37,8 +37,8 @@ namespace
     }
 }
 
-BallJoint::BallJoint(const std::shared_ptr<RigidBody>& bodyA,
-    const std::shared_ptr<RigidBody>& bodyB, Quaternion initRotation) :Joint(bodyA,bodyB)
+BallJoint::BallJoint(RigidBody* bodyA,
+    RigidBody* bodyB, Quaternion initRotation) :Joint(bodyA,bodyB)
 {
     Vector3 parentPosition = bodyA->GetPosition();
     Vector3 childPosition = bodyB->GetPosition();

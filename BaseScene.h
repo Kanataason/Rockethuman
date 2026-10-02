@@ -29,8 +29,8 @@ public:
 
 	virtual void Draw(Renderer& renderer);
 	virtual void DrawUi() {};
+	// 所有しているComponentを解放する(unique_ptrの破棄で、RigidBody/Colliderの登録解除も自動的に行われる)
 	virtual void Release();
-	virtual void Reset();
 
 	//シーン上のオブジェクトを追加
 	void AddObject(std::unique_ptr<GameObject> objectList) ;
@@ -43,9 +43,9 @@ protected:
     PhysicsSystem* _physicsSystem = nullptr;
 	SceneManager* _sceneManager = nullptr;
 
-	std::shared_ptr<Camera>	_camera = nullptr;
+	Camera* _camera = nullptr;
 
-	std::vector<std::shared_ptr<Light>> _lights;
+	std::vector<Light*> _lights;
 	std::vector<std::unique_ptr<GameObject>> _objects;
 
 };

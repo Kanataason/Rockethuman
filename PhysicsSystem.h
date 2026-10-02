@@ -23,10 +23,14 @@ public:
     void FixedUpdate(float deltaTime);
 
     // RigidBody / Collider / Jointの登録
-    void AddPhysicsBody(const PhysicsBody& rigidBody);
-    void RemoveRigidBody(std::shared_ptr<RigidBody> rigidBody) {};
-    void AddJoint(std::shared_ptr<Joint> joint) { _jointList.push_back(joint); };
-    void AddCollider(std::shared_ptr<Collider> collider) { _collisionManager.AddCollider(collider); }
+    // RagdollBoneがunique_ptrを持つためPhysicsBodyはコピーできない。値で受け取り、内部でmoveする
+    void AddPhysicsBody(PhysicsBody body);
+
+    // RigidBodyのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
+    void RemoveRigidBody(RigidBody* rigidBody);
+
+    void AddJoint(Joint* joint) { _jointList.push_back(joint); };
+    void AddCollider(Collider* collider) { _collisionManager.AddCollider(collider); }
 
     CollisionManager* GetCollisionManager() { return &_collisionManager; }
 
@@ -34,15 +38,12 @@ public:
 
     // ragdollのボーンごとの、colliderのずれ(ローカルオフセット・回転オフセット)と、
     // 重心オフセットが信頼できるかどうかを更新する
-    void UpdateRagdollBoneOffsets(std::shared_ptr<RigidBody> rigidBody,
+    void UpdateRagdollBoneOffsets(RigidBody* rigidBody,
         const Vector3& localOffset, const Quaternion& localRotOffset, bool hasReliableComOffset);
 
     void ResetRagdollTimer() { _ragdollElapsedTime = 0.0f; _ragdollSystem.ResetRest(); }
     // 休止(倒れて静止したら止める処理)を使うかを切り替える。吊り下げ中は false にする
     void SetRagdollRestEnabled(bool enabled) { _ragdollSystem.SetRestEnabled(enabled); }
-
-    //シーンから対象のrigidBodyを消す処理
-    void ReleasePhysicsBody(std::shared_ptr<RigidBody> rigidBody, std::shared_ptr<Collider> collider);
 private:
     // ---- FixedUpdate内部で使うステップ処理 ----
 
@@ -102,7 +103,8 @@ private:
 private:
     float _ragdollElapsedTime = 0.0f;
     std::vector<PhysicsBody> _rigidBodies;
-    std::vector<std::shared_ptr<Joint>> _jointList;
+    // 所有者はRagdoll(RagdollBone::joint)。ここでは、解くために参照するだけ
+    std::vector<Joint*> _jointList;
 
     RagdollSystem _ragdollSystem;
     CollisionManager _collisionManager;

@@ -186,6 +186,9 @@
     <ClCompile Include="Collision.cpp">
       <Filter>ソース ファイル\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>ソース ファイルPhysics</Filter>
+    </ClCompile>
     <ClCompile Include="CameraController.cpp">
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>

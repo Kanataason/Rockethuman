@@ -37,15 +37,15 @@ private:
 	// 矢印キーの入力で、Transform を動かして移動する(通常のとき)
 	void MovePlayer(const Vector3& direction,float speed);
 
-	void OnCollisionEnter(std::shared_ptr<Collider>& other, const CollisionResult& result)override;
-	void OnCollisionStay(std::shared_ptr<Collider>& other, const CollisionResult& result)override;
-	void OnCollisionExit(std::shared_ptr<Collider>& other, const CollisionResult& result)override;
+	void OnCollisionEnter(Collider* other, const CollisionResult& result)override;
+	void OnCollisionStay(Collider* other, const CollisionResult& result)override;
+	void OnCollisionExit(Collider* other, const CollisionResult& result)override;
 
 private:
 	InputSystem* _input = nullptr;
-	std::shared_ptr<Ragdoll>_ragdoll = nullptr;
-	std::shared_ptr<RigidBody> _rigidBody = nullptr;
-	std::shared_ptr<Animator> _animator = nullptr;
+	Ragdoll* _ragdoll = nullptr;
+	RigidBody* _rigidBody = nullptr;
+	Animator* _animator = nullptr;
 
 	PlayerState _state = PlayerState::Animation; // 今の状態(最初は通常)
 };

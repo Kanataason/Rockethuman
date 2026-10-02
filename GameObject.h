@@ -14,28 +14,30 @@ class GameObject:public Object
 {
 public :
     // 指定した型のComponentを生成してGameObjectに追加する
+    // Componentの所有者はGameObjectだけ(unique_ptr)。呼び出し側には、借りるだけの生ポインタを返す
     template<class T>
         requires std::is_base_of_v<Component, T>
-    std::shared_ptr<T> AddComponent()
+    T* AddComponent()
     {
-        auto component = std::make_shared<T>();
+        auto component = std::make_unique<T>();
 
         // Componentの所有者を自身に設定
         component->SetOwner(this);
 
-        _components.push_back(component);
+        T* result = component.get();
+        _components.push_back(std::move(component));
 
-        return component;
+        return result;
     }
 
     // 指定した型のComponentを検索して取得する
     template<typename T>
         requires std::is_base_of_v<Component, T>
-    std::shared_ptr<T> GetComponent()
+    T* GetComponent()
     {
         for (auto& component : _components)
         {
-            auto ptr = std::dynamic_pointer_cast<T>(component);
+            T* ptr = dynamic_cast<T*>(component.get());
 
             if (ptr)
                 return ptr;
@@ -48,17 +50,17 @@ public :
 
     // 衝突が開始したときに呼び出される
     void OnCollisionEnter(
-        std::shared_ptr<Collider>& other,
+        Collider* other,
         const CollisionResult& result);
 
     // 衝突が継続している間、毎フレーム呼び出される
     void OnCollisionStay(
-        std::shared_ptr<Collider>& other,
+        Collider* other,
         const CollisionResult& result);
 
     // 衝突しなくなったときに呼び出される
     void OnCollisionExit(
-        std::shared_ptr<Collider>& other,
+        Collider* other,
         const CollisionResult& result);
 
     // ServiceLocatorから各システムを取得して初期化する
@@ -84,8 +86,8 @@ public :
 
 
 private:
-    // GameObjectが所有するComponent
-    std::vector<std::shared_ptr<Component>> _components;
+    // GameObjectが所有するComponent(所有者はGameObjectだけ)
+    std::vector<std::unique_ptr<Component>> _components;
 
     // Rendererによる描画順
     int rendererOrder = 0;

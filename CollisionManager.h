@@ -12,8 +12,8 @@ class Collider;
 namespace 
 {
 	//関数ポインタで宣言
-	using CollisionCheckFunction = bool (*)(std::shared_ptr<Collider>, std::shared_ptr<Collider>);
-	using CollisionResolveFunction = CollisionResult(*)(std::shared_ptr<Collider>, std::shared_ptr<Collider>);
+	using CollisionCheckFunction = bool (*)(Collider*, Collider*);
+	using CollisionResolveFunction = CollisionResult(*)(Collider*, Collider*);
 
 	struct CollisionFunctionPair
 	{
@@ -33,11 +33,11 @@ namespace
 	CollisionFunctionPair MakeCollisionFunctionPair()
 	{
 		return CollisionFunctionPair{
-			[](std::shared_ptr<Collider> colliderA, std::shared_ptr<Collider> colliderB) -> bool
+			[](Collider* colliderA, Collider* colliderB) -> bool
 			{
 				return Collision::CastColliderTypeAndCheckCollision<ColliderTypeA, ColliderTypeB>(colliderA, colliderB);
 			},
-			[](std::shared_ptr<Collider> colliderA, std::shared_ptr<Collider> colliderB) -> CollisionResult
+			[](Collider* colliderA, Collider* colliderB) -> CollisionResult
 			{
 				return Collision::CastColliderTypeAndResolve<ColliderTypeA, ColliderTypeB>(colliderA, colliderB);
 			}
@@ -75,7 +75,7 @@ public :
 	{
 	}
 
-	void AddCollider(std::shared_ptr<Collider> collider);
+	void AddCollider(Collider* collider);
 
 	//Octreeでわけてから衝突判定
 	void Intersects();
@@ -98,7 +98,7 @@ public :
 	void ReleaseCollider(int id);
 
 private:
-	std::shared_ptr<Collider> FindCollider(int id)
+	Collider* FindCollider(int id)
 	{
 		for (auto& collider : _colliderMap)
 		{
@@ -118,7 +118,7 @@ private:
 
 	//既に処理をしたか判定
 	bool CheckShouldCollider(const Collision::Pair& pair,
-		const std::shared_ptr<Collider>& colliderA, const std::shared_ptr<Collider>& colliderB);
+		Collider* colliderA, Collider* colliderB);
 
 	int GetColliderPriority(ColliderType type)
 	{
@@ -137,7 +137,7 @@ private:
 	DebugDraw* _debugDraw = nullptr;
 
 	//衝突判定するコライダー
-	std::unordered_map<int, std::shared_ptr<Collider>> _colliderMap;
+	std::unordered_map<int, Collider*> _colliderMap;
 
 	//処理済みペア
 	std::unordered_set<std::pair<int, int>, PairHash> checkedPairs;

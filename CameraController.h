@@ -22,5 +22,5 @@ private:
 	float _maxAngle = 89.0f;
 
 	InputSystem* _input = nullptr;
-	std::shared_ptr<RigidBody> _rigidBody;
+	RigidBody* _rigidBody = nullptr;
 };

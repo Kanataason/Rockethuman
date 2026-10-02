@@ -12,10 +12,18 @@ using namespace DirectX;
 constexpr const float EPSILON = 0.00001f;
 constexpr const float GRAVITY = -9.8f;
 
+class PhysicsSystem;
+
 class RigidBody :public Component
 {
 public:
 	void Initialize(ServiceLocator& loacator)override;
+
+    // 登録済みのPhysicsSystemがあれば、自動的に登録を解除する(定義はRigidBody.cpp)
+    ~RigidBody() override;
+
+    // 登録先のPhysicsSystemを覚えておく(デストラクタで、自動的に登録解除するため)
+    void SetRegistry(PhysicsSystem* system) { _registry = system; }
 	void FixedUpdate(float deltaTime);
 
     // 並進運動の更新: 重力 → 減衰 → 速度制限 → 位置の積分 の順に行う
@@ -145,4 +153,6 @@ private:
 
     bool _isSleeping = false;
     float _sleepTimer = 0.0f;
+
+    PhysicsSystem* _registry = nullptr;
 };

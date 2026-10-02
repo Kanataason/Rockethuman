@@ -4,8 +4,8 @@
 class HingeJoint :public Joint
 {
 public:
-	HingeJoint(const std::shared_ptr<RigidBody>& bodyA,
-		const std::shared_ptr<RigidBody>& bodyB, const Vector3& hingeAxis,Quaternion initRotation);
+	HingeJoint(RigidBody* bodyA,
+		RigidBody* bodyB, const Vector3& hingeAxis,Quaternion initRotation);
 	
 	//---基底クラスのコメントを参照---------
 

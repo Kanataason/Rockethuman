@@ -1,10 +1,22 @@
 ﻿#include "RigidBody.h"
 #include "GameObject.h"
 #include "Collider.h"
+#include "PhysicsSystem.h"
 
 void RigidBody::Initialize(ServiceLocator& loacator)
 {
     isGravity = true;
+}
+
+// 登録済みのPhysicsSystemがあれば、自動的に登録を解除する
+// (GameObjectがunique_ptrで破棄されるとき、ここで自動的に呼ばれるので、
+//  呼び出し側で手動でRemoveを呼び忘れる心配がなくなる)
+RigidBody::~RigidBody()
+{
+    if (_registry != nullptr)
+    {
+        _registry->RemoveRigidBody(this);
+    }
 }
 
 void RigidBody::FixedUpdate(float deltaTime)

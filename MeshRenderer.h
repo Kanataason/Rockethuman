@@ -17,7 +17,7 @@ public :
 	void SetModel(std::shared_ptr<ModelDatas> model) { _model = model; }
 
 private:
-	std::shared_ptr<Animator> _animator;
+	Animator* _animator = nullptr;
 
 	std::shared_ptr<ModelDatas> _model;
 };

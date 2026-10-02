@@ -26,13 +26,13 @@ public:
 	{
 	}
     //コライダーをツリーに追加する
-	void Insert(const std::shared_ptr<Collider>& collider);
+	void Insert(Collider* collider);
 
     //指定した範囲にあって交差する可能性があるコライダーを取得　レイキャスト用
-	void QueryRay(const XMFLOAT3& origin, const XMFLOAT3& direction, std::vector<std::shared_ptr<Collider>>& result);
+	void QueryRay(const XMFLOAT3& origin, const XMFLOAT3& direction, std::vector<Collider*>& result);
 
     //指定した範囲にあって交差する可能性があるコライダーを取得
-	void Query(const XMFLOAT3& min, const XMFLOAT3& max, std::vector<std::shared_ptr<Collider>>& result);
+	void Query(const XMFLOAT3& min, const XMFLOAT3& max, std::vector<Collider*>& result);
 
     void Clear()
     {
@@ -147,7 +147,7 @@ private:
 	XMFLOAT3 _max;
 	int _depth;
 
-	std::vector<std::shared_ptr<Collider>> _colliders;
+	std::vector<Collider*> _colliders;
 
 	std::unique_ptr<Octree> _children[CHILD_COUNT];
 };

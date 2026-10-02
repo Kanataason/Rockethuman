@@ -7,6 +7,8 @@
 #include "VectorUtility.h"
 using namespace DirectX;
 
+class CollisionManager;
+
 // Colliderの形状種別
 enum ColliderType
 {
@@ -28,6 +30,12 @@ public:
     int GetID() const
     {
         return _id;
+    }
+
+    // 登録先のCollisionManagerを覚えておく(デストラクタで、自動的に登録解除するため)
+    void SetRegistry(CollisionManager* registry)
+    {
+        _registry = registry;
     }
 
     // 同じグループ同士の衝突可否などに使う分類ID
@@ -80,7 +88,8 @@ public:
     virtual XMFLOAT3 GetMin()const = 0;
     virtual XMFLOAT3 GetMax()const = 0;
 
-    virtual ~Collider() = default;
+    // 登録済みのCollisionManagerがあれば、自動的に登録を解除する(定義はCollider.cpp)
+    virtual ~Collider();
 
     // 形状種別を返す(衝突判定の関数テーブルのキーとして使われる)
     virtual ColliderType GetType() const = 0;
@@ -94,6 +103,7 @@ public:
 private:
     int _id = -1;
     int _collisionGroup = 0;
+    CollisionManager* _registry = nullptr;
 protected:
     bool isTrigger = false;
 

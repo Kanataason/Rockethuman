@@ -7,8 +7,8 @@ class BallJoint :public Joint
 {
 public:
     BallJoint(
-        const std::shared_ptr<RigidBody>& bodyA,
-        const std::shared_ptr<RigidBody>& bodyB,Quaternion InitRotation);
+        RigidBody* bodyA,
+        RigidBody* bodyB,Quaternion InitRotation);
 
     //基底クラスのコメントを参照----
     void Solve(float deltaTime) override;

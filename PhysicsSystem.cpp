@@ -86,23 +86,13 @@ static void ApplyBoneContactImpulse(RigidBody& self, RigidBody* other, const Vec
     }
 }
 
-void PhysicsSystem::ReleasePhysicsBody(std::shared_ptr<RigidBody> rigidBody,std::shared_ptr<Collider> collider)
+void PhysicsSystem::RemoveRigidBody(RigidBody* rigidBody)
 {
-    if(rigidBody)
-    {
-        std::erase_if(_rigidBodies, [&](const PhysicsBody& body)
-            {
-                return body.rigidBody == rigidBody;
-            });
-    }
-    if (collider)
-    {
-        std::erase_if(_rigidBodies, [&](const PhysicsBody& body)
-            {
-                return body.collider == collider;
-            });
-        _collisionManager.ReleaseCollider(collider->GetID());
-    }
+    // RigidBodyのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
+    std::erase_if(_rigidBodies, [&](const PhysicsBody& body)
+        {
+            return body.rigidBody == rigidBody;
+        });
 }
 
 void PhysicsSystem::FixedUpdate(float deltaTime)
@@ -293,7 +283,7 @@ void PhysicsSystem::SolveJoints(float subDeltaTime)
     }
 
     // 1つのジョイントを解いて、その結果を即座にボーンの位置へ反映する
-    auto solveJointImmediate = [&](const std::shared_ptr<Joint>& joint)
+    auto solveJointImmediate = [&](Joint* joint)
         {
             if (!joint) return;
 
@@ -436,13 +426,13 @@ void PhysicsSystem::ResolveBoneContact(PhysicsBody& body, const CollisionResult&
 RigidBody* PhysicsSystem::FindOtherRigidBody(PhysicsBody& body, const CollisionResult& result)
 {
     const Collider* otherCollider =
-        (body.collider.get() == result.colliderA) ? result.colliderB : result.colliderA;
+        (body.collider == result.colliderA) ? result.colliderB : result.colliderA;
     for (auto& other : _rigidBodies)
     {
-        if (other.collider.get() == otherCollider && other.rigidBody &&
+        if (other.collider == otherCollider && other.rigidBody &&
             !other.rigidBody->IsKinematic())
         {
-            return other.rigidBody.get();
+            return other.rigidBody;
         }
     }
     return nullptr; // 見つからない
@@ -452,13 +442,13 @@ RigidBody* PhysicsSystem::FindOtherRigidBody(PhysicsBody& body, const CollisionR
 bool PhysicsSystem::TryGetContactInfo(const PhysicsBody& body, const CollisionResult& result,
     Vector3& contactNormal, bool& isGround) const
 {
-    if (body.collider.get() == result.colliderA)
+    if (body.collider == result.colliderA)
     {
         contactNormal = result.normal;
         isGround = (result.colliderB->GetCollisionGroup() == 3);
         return true;
     }
-    if (body.collider.get() == result.colliderB)
+    if (body.collider == result.colliderB)
     {
         contactNormal = -result.normal;
         isGround = (result.colliderA->GetCollisionGroup() == 3);
@@ -517,15 +507,20 @@ bool PhysicsSystem::RayCast(const XMFLOAT3& origin, const XMFLOAT3& direction, c
  return _collisionManager.RayCast(origin, direction, distance, hitPos);
 }
 
-void PhysicsSystem::AddPhysicsBody(const PhysicsBody& Body)
+void PhysicsSystem::AddPhysicsBody(PhysicsBody Body)
 {
-	_rigidBodies.push_back(Body);
+    // 登録先を覚えさせておく。所有者(GameObject)が破棄されてRigidBodyが消えるとき、
+    // デストラクタが自動的にRemoveRigidBodyを呼ぶので、手動の後片付けが不要になる
+    if (Body.rigidBody)
+        Body.rigidBody->SetRegistry(this);
 
     if (Body.collider)
         _collisionManager.AddCollider(Body.collider);
+
+    _rigidBodies.push_back(std::move(Body));
 }
 
-void PhysicsSystem::UpdateRagdollBoneOffsets(std::shared_ptr<RigidBody> rigidBody,
+void PhysicsSystem::UpdateRagdollBoneOffsets(RigidBody* rigidBody,
     const Vector3& localOffset, const Quaternion& localRotOffset, bool hasReliableComOffset)
 {
     //ragdollのボーンごとに更新

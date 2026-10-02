@@ -153,6 +153,7 @@
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="ColliderManager.cpp" />
     <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="Collider.cpp" />
     <ClCompile Include="DebugController.cpp" />
     <ClCompile Include="DebugUtillity.cpp" />
     <ClCompile Include="GameManager.cpp" />

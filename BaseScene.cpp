@@ -54,7 +54,7 @@ void BaseScene::SetObjectInfo(ServiceLocator& context)
 			body.rigidBody = rigid;
 			body.collider = collider;
 
-			_physicsSystem->AddPhysicsBody(body);
+			_physicsSystem->AddPhysicsBody(std::move(body));
 		}
 		
 		if (auto light = obj->GetComponent<Light>())
@@ -79,16 +79,6 @@ void BaseScene::Release()
 		obj->Release();
 	}
 }
-void BaseScene::Reset()
-{
-	for (const auto& obj : _objects)
-	{
-		auto rigid = obj->GetComponent<RigidBody>();
-		auto collider = obj->GetComponent<Collider>();
-		_physicsSystem->ReleasePhysicsBody(rigid, collider);
-	}
-}
-
 void BaseScene::AddObject(std::unique_ptr<GameObject> object)
 {
 	_objects.push_back(std::move(object));

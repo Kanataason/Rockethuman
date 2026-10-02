@@ -219,10 +219,11 @@ struct RagdollBone
     Quaternion colliderLocalRotOffset{};  // RigidBody基準のローカル回転オフセット
     Quaternion initialRelativeRotation{}; // 初期の回転位置
 
-    std::shared_ptr<RigidBody> rigidBody;
-    std::shared_ptr<CapsuleCollider> collider;
+    // 所有者はRagdoll(このボーンを持つRagdollコンポーネント)だけ
+    std::unique_ptr<RigidBody> rigidBody;
+    std::unique_ptr<CapsuleCollider> collider;
 
-    std::shared_ptr<Joint> joint;
+    std::unique_ptr<Joint> joint;
     };
 
 class Ragdoll : public Component
@@ -237,7 +238,7 @@ public:
     void FixedUpdate(float deltaTime);
 
     //あたりはじめだけ処理する
-    void OnCollisionEnter(std::shared_ptr<Collider>& other, const CollisionResult& result) override;
+    void OnCollisionEnter(Collider* other, const CollisionResult& result) override;
 
     //ラグドールの切り替え関数
     bool IsActive() { return _enabled; }
@@ -309,7 +310,7 @@ private:
     void ApplyLaunchImpulse(const Vector3& pushDir, RagdollBone& hitBone, const Vector3& contactPoint);
 
     //押せる物体かの確認関数
-    bool IsPushCollider(const std::shared_ptr<Collider>& other) const;
+    bool IsPushCollider(const Collider* other) const;
 
     //------------------生成-------------------
 
@@ -413,7 +414,7 @@ private:
     std::shared_ptr<Skeleton> _skeleton = nullptr;
 
     GameObject* _owner = nullptr;
-    std::shared_ptr<RigidBody> _hipsRigidBody;
+    RigidBody* _hipsRigidBody = nullptr;
 
     bool _enabled = false;
 

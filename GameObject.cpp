@@ -10,19 +10,19 @@ void GameObject::SetOrder(int order)
 
 }
 
-void GameObject::OnCollisionEnter(std::shared_ptr<Collider>& other,const CollisionResult& result)
+void GameObject::OnCollisionEnter(Collider* other,const CollisionResult& result)
 {
 	for (auto& component : _components)
 	{
 		component->OnCollisionEnter(other, result);
 	}
 }
-void GameObject::OnCollisionStay(std::shared_ptr<Collider>& other,const CollisionResult& result)
+void GameObject::OnCollisionStay(Collider* other,const CollisionResult& result)
 {
 	for (auto& component : _components)
 		component->OnCollisionStay(other, result);
 }
-void GameObject::OnCollisionExit(std::shared_ptr<Collider>& other,const CollisionResult& result)
+void GameObject::OnCollisionExit(Collider* other,const CollisionResult& result)
 {
 	for (auto& component : _components)
 		component->OnCollisionExit(other, result);

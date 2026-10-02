@@ -135,13 +135,13 @@ void PlayerController::MovePlayer(const Vector3& direction,float speed)
 }
 
 //当たった時の通知
-void PlayerController::OnCollisionEnter(std::shared_ptr<Collider>& other, const CollisionResult& result)
+void PlayerController::OnCollisionEnter(Collider* other, const CollisionResult& result)
 {
 }
-void PlayerController::OnCollisionStay(std::shared_ptr<Collider>& other, const CollisionResult& result)
+void PlayerController::OnCollisionStay(Collider* other, const CollisionResult& result)
 {
 
 }
-void PlayerController::OnCollisionExit(std::shared_ptr<Collider>& other, const CollisionResult& result)
+void PlayerController::OnCollisionExit(Collider* other, const CollisionResult& result)
 {
 }

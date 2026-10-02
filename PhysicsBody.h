@@ -5,8 +5,9 @@
 
 struct PhysicsBody
 {
-    std::shared_ptr<RigidBody> rigidBody;
-    std::shared_ptr<Collider> collider;
+    // 所有者はGameObject(RigidBody/Colliderのunique_ptr)。ここでは借りるだけ
+    RigidBody* rigidBody = nullptr;
+    Collider* collider = nullptr;
 
     RagdollBone ragdollBone;
 

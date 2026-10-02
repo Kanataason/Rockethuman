@@ -3,11 +3,12 @@
 #include "GameObject.h"
 #include "DebagUtility.h"
 
-void CollisionManager::AddCollider(std::shared_ptr<Collider> collider)
+void CollisionManager::AddCollider(Collider* collider)
 {
     //Idでだけで探せるようにMapに登録
     collider->SetID(_nextColliderID++);
     _colliderMap[collider->GetID()] = collider;
+    collider->SetRegistry(this);
 }
 
 void CollisionManager::Intersects()
@@ -19,7 +20,7 @@ void CollisionManager::Intersects()
     for (auto& it : _colliderMap)
     {
         auto& collider = it.second;
-        std::vector<std::shared_ptr<Collider>> candidates;
+        std::vector<Collider*> candidates;
 
         _octree.Query(collider->GetMin(),collider->GetMax(),candidates);
 
@@ -67,7 +68,7 @@ void CollisionManager::Intersects()
 
 }
 bool CollisionManager::CheckShouldCollider(
-    const Collision::Pair& pair,const std::shared_ptr<Collider>& colliderA, const std::shared_ptr<Collider>& colliderB)
+    const Collision::Pair& pair,Collider* colliderA, Collider* colliderB)
 {
     //同じコライダーじゃないか
     if (colliderA->GetID() == colliderB->GetID())
@@ -187,7 +188,7 @@ void CollisionManager::InitializePair()
 
 bool CollisionManager::RayCast(const XMFLOAT3& origin, const XMFLOAT3& dir, float maxDistance)
 {
-    std::vector<std::shared_ptr<Collider>> candidates;
+    std::vector<Collider*> candidates;
 
     // Rayに対してOctreeから候補を取得
     _octree.QueryRay(origin, dir, candidates);
@@ -215,7 +216,7 @@ bool CollisionManager::RayCast(const XMFLOAT3& origin, const XMFLOAT3& dir, floa
 bool CollisionManager::RayCast(const XMFLOAT3& origin,
     const XMFLOAT3& direction,const float& maxDistance,XMFLOAT3& hitPosition)
 {
-    std::vector<std::shared_ptr<Collider>> candidates;
+    std::vector<Collider*> candidates;
 
     // Rayに対してOctreeから候補を取得
     _octree.QueryRay(origin, direction, candidates);

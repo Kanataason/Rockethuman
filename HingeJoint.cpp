@@ -1,7 +1,7 @@
 ﻿#include "HingeJoint.h"
 
-HingeJoint::HingeJoint(const std::shared_ptr<RigidBody>& bodyA,
-	const std::shared_ptr<RigidBody>& bodyB, const Vector3& hingeAxis, Quaternion initRotation) :Joint(bodyA, bodyB)
+HingeJoint::HingeJoint(RigidBody* bodyA,
+	RigidBody* bodyB, const Vector3& hingeAxis, Quaternion initRotation) :Joint(bodyA, bodyB)
 {
     //Aから見たBの相対回転
     _initialRelativeRotation = initRotation;

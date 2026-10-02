@@ -70,11 +70,10 @@ public:
     //コライダーコンポーネントを継承しているものじゃないと受け付けないようにする
     template<typename T,typename To>
     requires std::is_base_of_v<Collider, T>&& std::is_base_of_v<Collider, To>
-    static bool CastColliderTypeAndCheckCollision(std::shared_ptr<Collider>& a,
-        std::shared_ptr<Collider>& b)
+    static bool CastColliderTypeAndCheckCollision(Collider* a, Collider* b)
     {
-        auto colliderA = std::dynamic_pointer_cast<T>(a);
-        auto colliderB = std::dynamic_pointer_cast<To>(b);
+        auto colliderA = dynamic_cast<T*>(a);
+        auto colliderB = dynamic_cast<To*>(b);
 
         if (!colliderA || !colliderB)
             return false;
@@ -84,10 +83,10 @@ public:
 
     template<typename T, typename To>
         requires std::is_base_of_v<Collider, T>&& std::is_base_of_v<Collider, To>
-    static CollisionResult CastColliderTypeAndResolve(std::shared_ptr<Collider>& a, std::shared_ptr<Collider>& b)
+    static CollisionResult CastColliderTypeAndResolve(Collider* a, Collider* b)
     {
-        auto colliderA = std::dynamic_pointer_cast<T>(a);
-        auto colliderB = std::dynamic_pointer_cast<To>(b);
+        auto colliderA = dynamic_cast<T*>(a);
+        auto colliderB = dynamic_cast<To*>(b);
 
         if (!colliderA || !colliderB)
             return {};

@@ -8,8 +8,8 @@
 class Joint
 {
 public:
-    Joint(const std::shared_ptr<RigidBody>& bodyA,
-        const std::shared_ptr<RigidBody>& bodyB):_bodyA(bodyA),_bodyB(bodyB)
+    Joint(RigidBody* bodyA,
+        RigidBody* bodyB):_bodyA(bodyA),_bodyB(bodyB)
     {
         Vector3 parentPos = _bodyA->GetPosition();
         Vector3 childPos = _bodyB->GetPosition();
@@ -113,7 +113,7 @@ public:
 
     // アンカー点の速度拘束: 2つのアンカー点(ジョイントでつないだ点)が、同じ速度になるようにする。
     // インパルス(瞬間的な力積)を、並進速度と角速度の両方に加える
-    void SolveAnchorVelocity(const std::shared_ptr<RigidBody>& a, const std::shared_ptr<RigidBody>& b,
+    void SolveAnchorVelocity(RigidBody* a, RigidBody* b,
         Vector3 rA, Vector3 rB, float strength)
     {
         // 逆質量・逆慣性。動かせない(キネマティックな)ボディは0にして、インパルスを受けないようにする。
@@ -189,11 +189,11 @@ public:
 
     virtual void SetTwistDirectionWorld(const Vector3& dir) {}
 
-    const std::shared_ptr<RigidBody>& GetBodyA() { return _bodyA; };
-    const std::shared_ptr<RigidBody>& GetBodyB() { return _bodyB; };
+    RigidBody* GetBodyA() { return _bodyA; };
+    RigidBody* GetBodyB() { return _bodyB; };
 private:
     // 1体のボディを、アンカーが correction の向きへ動くように回す
-    void RotateBodyToMoveAnchor(const std::shared_ptr<RigidBody>& body, const Vector3& localAnchor, const Vector3& correction)
+    void RotateBodyToMoveAnchor(RigidBody* body, const Vector3& localAnchor, const Vector3& correction)
     {
         //各変数の説明はRagdollTuningのほうを参照してください
         constexpr float kAnchorRotationWeight = RagdollTuning::kAnchorRotationWeight;
@@ -246,8 +246,8 @@ private:
     }
 
 protected:
-    std::shared_ptr<RigidBody> _bodyA;
-    std::shared_ptr<RigidBody> _bodyB;
+    RigidBody* _bodyA = nullptr;
+    RigidBody* _bodyB = nullptr;
 
     Vector3 _localAnchorA;
     Vector3 _localAnchorB;

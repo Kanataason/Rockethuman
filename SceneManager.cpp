@@ -50,9 +50,9 @@ void SceneManager::RequestScene()
 	const auto& data = _sceneList.at(_nextScene);
 	_nextScene = SceneName::None;
 
-	//消す前にリセットをしてメモリをリークさせない
+	//消す前にReleaseを呼ぶ(RigidBody/Colliderの登録解除は、デストラクタが自動的に行う)
 	if (_currentScene)
-		_currentScene->Reset();
+		_currentScene->Release();
 
 	_currentScene.reset();
 
