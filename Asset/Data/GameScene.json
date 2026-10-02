@@ -1,0 +1,32 @@
+{
+    "Objects": [
+
+        {
+            "attribute": "Other",
+            "type": "Light"
+        },
+        {
+            "attribute": "Other",
+            "type": "Camera",
+            "position": [ 0, 3, -10 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
+        },
+        {
+            "attribute": "File",
+            "path": "Asset/Prefab/Dancing.fbx",
+            "type": "Player",
+            "animations": [
+                {
+                    "name": "Idle",
+                    "path": "Asset/Animation/Idle.fbx"
+                },
+                {
+                    "name": "Walk",
+                    "path": "Asset/Animation/Walk.fbx"
+                }
+            ],
+            "position": [ -3, 1, 0 ],
+            "scale": [ 0.01, 0.01, 0.01 ]
+        }
+    ]
+}

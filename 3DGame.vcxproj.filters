@@ -1,0 +1,502 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\Data">
+      <UniqueIdentifier>{5e9ed61e-cfd6-4ea4-b395-46363b93864a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Data">
+      <UniqueIdentifier>{9669b068-76e0-4c57-8179-7dbc6fa50c5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{69d3f674-678b-476c-8ea7-5ffeffb166b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Component">
+      <UniqueIdentifier>{8887f3fa-6e67-4ef9-a778-0afcd203bdce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Component">
+      <UniqueIdentifier>{8d5e364a-9c1b-4d9b-b63b-d06bb7e8327c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{b3f0cb23-4886-4f0f-b3fc-d22679c15bc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Data">
+      <UniqueIdentifier>{7d915c22-b297-4d31-beec-558e38b3df9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Prefab">
+      <UniqueIdentifier>{629c320b-493a-43ea-8074-54c767a809dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Material">
+      <UniqueIdentifier>{d50d74c7-6cc9-4dce-a069-952645f9a041}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Texture">
+      <UniqueIdentifier>{8f262be9-ebcd-4f01-9886-50a0418718b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Allocate">
+      <UniqueIdentifier>{e9797baa-b75b-4ec9-8fcc-2b58c27ddfdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Utility">
+      <UniqueIdentifier>{c8944f93-de58-419f-af79-493580d03367}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Player">
+      <UniqueIdentifier>{0883b6f2-1620-41a8-be21-d82ccde8f837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Player">
+      <UniqueIdentifier>{f8b31ab3-087c-4231-92ab-b1279ec38ae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Animation">
+      <UniqueIdentifier>{325812b9-6121-4fe1-bfc0-20497cafd36c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Physics">
+      <UniqueIdentifier>{db0e3dcd-bb4b-40f3-ab8b-2032dbf4c3b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Physics">
+      <UniqueIdentifier>{109b4dd6-23a0-458f-a412-2ed207a6308a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\factory">
+      <UniqueIdentifier>{fa04713e-3535-4875-989e-53b540bfbf1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\factory\Loader">
+      <UniqueIdentifier>{1ce5825c-003b-4615-bc21-42a8ff272ae3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\factory\Manager">
+      <UniqueIdentifier>{1909a082-69f7-42d6-90f5-20d25e71a889}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Struct">
+      <UniqueIdentifier>{2054cb17-d147-440d-b13c-71c8822b23c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Physics\Ragdoll">
+      <UniqueIdentifier>{cac85b34-8eac-45e2-bc6c-2ebb77d2a556}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Animator">
+      <UniqueIdentifier>{8f15c545-410b-4c0b-bbf8-6812d35c25aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Base">
+      <UniqueIdentifier>{136a6d61-0409-4ab9-9d19-b4a3a027cd05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\factory">
+      <UniqueIdentifier>{20c193b9-d75e-47d9-88ca-dcd56c35c153}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\factory\Loader">
+      <UniqueIdentifier>{d8edb34c-aa1f-42da-ac21-57b732e360c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\factory\Manager">
+      <UniqueIdentifier>{e301fd1b-9003-467c-99c6-d6347e6c96ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Utillity">
+      <UniqueIdentifier>{404da757-04b2-4685-84ca-d7137e9dfe28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Base">
+      <UniqueIdentifier>{d548c6eb-12e8-4305-92dd-5ae88bc4fd8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\other">
+      <UniqueIdentifier>{e853aaef-f1ef-4178-9883-d95ef6ea7235}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Scene">
+      <UniqueIdentifier>{7ae932d7-9a44-433b-909a-57c05dc641c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Scene">
+      <UniqueIdentifier>{ba336898-26f4-4b12-8778-822e3f258e64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\UI">
+      <UniqueIdentifier>{8afd6db6-0f50-4302-9fc5-b8c2170214fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\UI">
+      <UniqueIdentifier>{17e3a25a-41c7-4fb2-accc-98e2e0a436e5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Transform.cpp">
+      <Filter>ソース ファイル\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>ソース ファイル\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>ソース ファイル\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshRenderer.cpp">
+      <Filter>ソース ファイル\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBody.cpp">
+      <Filter>ソース ファイル\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
+      <Filter>ソース ファイル\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseSystem.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseSceneLoader.cpp">
+      <Filter>ソース ファイル\factory\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonLoader.cpp">
+      <Filter>ソース ファイル\factory\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>ソース ファイル\factory\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>ソース ファイル\factory\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelManager.cpp">
+      <Filter>ソース ファイル\factory\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialManager.cpp">
+      <Filter>ソース ファイル\factory\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseGameObjectFactory.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem.cpp">
+      <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="RagDollSystem.cpp">
+      <Filter>ソース ファイル\Physics\Ragdoll</Filter>
+    </ClCompile>
+    <ClCompile Include="Ragdoll.cpp">
+      <Filter>ソース ファイル\Physics\Ragdoll</Filter>
+    </ClCompile>
+    <ClCompile Include="HingeJoint.cpp">
+      <Filter>ソース ファイル\Physics\Ragdoll</Filter>
+    </ClCompile>
+    <ClCompile Include="BallJoin.cpp">
+      <Filter>ソース ファイル\Physics\Ragdoll</Filter>
+    </ClCompile>
+    <ClCompile Include="ColliderManager.cpp">
+      <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraController.cpp">
+      <Filter>ソース ファイル\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Animator.cpp">
+      <Filter>ソース ファイル\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>ソース ファイル\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="Octree.cpp">
+      <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseCamera.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseLight.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseScene.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>ソース ファイル\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugUtillity.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugController.cpp">
+      <Filter>ソース ファイル\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Title.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="UIRenderer.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialLoader.cpp">
+      <Filter>ソース ファイル\factory\Loader</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Transform.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectType.h">
+      <Filter>ヘッダー ファイル\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelInfo.h">
+      <Filter>ヘッダー ファイル\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLight.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBufferDatas.h">
+      <Filter>ヘッダー ファイル\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshRenderer.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceLoacator.h">
+      <Filter>ヘッダー ファイル\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="SphereCollider.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxCollider.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="CapsuleCollider.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManager.h">
+      <Filter>ヘッダー ファイル\Allocate</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolAllocator.h">
+      <Filter>ヘッダー ファイル\Allocate</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixUtility.h">
+      <Filter>ヘッダー ファイル\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="MathUtility.h">
+      <Filter>ヘッダー ファイル\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorUtility.h">
+      <Filter>ヘッダー ファイル\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Joint.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="BallJoint.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="HingeJoint.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionResult.h">
+      <Filter>ヘッダー ファイル\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="RagdollData.h">
+      <Filter>ヘッダー ファイル\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsBody.h">
+      <Filter>ヘッダー ファイル\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationLoader.h">
+      <Filter>ヘッダー ファイル\factory\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseGameObjectFactory.h">
+      <Filter>ヘッダー ファイル\factory</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseSceneLoader.h">
+      <Filter>ヘッダー ファイル\factory\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>ヘッダー ファイル\factory\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonLoader.h">
+      <Filter>ヘッダー ファイル\factory\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelManager.h">
+      <Filter>ヘッダー ファイル\factory\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>ヘッダー ファイル\factory\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialLoader.h">
+      <Filter>ヘッダー ファイル\factory\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialManager.h">
+      <Filter>ヘッダー ファイル\factory\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="LightObjectFactory.h">
+      <Filter>ヘッダー ファイル\factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>ヘッダー ファイル\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animator.h">
+      <Filter>ヘッダー ファイル\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleUtility.h">
+      <Filter>ヘッダー ファイル\Utillity</Filter>
+    </ClInclude>
+    <ClInclude Include="DebagUtility.h">
+      <Filter>ヘッダー ファイル\Utillity</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>ヘッダー ファイル\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>ヘッダー ファイル\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCamera.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseSystem.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraController.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Octree.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Ragdoll.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="RagdollSystem.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Skeleton.h">
+      <Filter>ヘッダー ファイル\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\nlohmann\json.hpp">
+      <Filter>ヘッダー ファイル\other</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\nlohmann\json_fwd.hpp">
+      <Filter>ヘッダー ファイル\other</Filter>
+    </ClInclude>
+    <ClInclude Include="IOnCollider.h">
+      <Filter>ヘッダー ファイル\other</Filter>
+    </ClInclude>
+    <ClInclude Include="Inspector.h">
+      <Filter>ヘッダー ファイル\other</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>ヘッダー ファイル\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>ヘッダー ファイル\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>ヘッダー ファイル\other</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugController.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseScene.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Title.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Result.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>ヘッダー ファイル\Utillity</Filter>
+    </ClInclude>
+    <ClInclude Include="UiRenderer.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="DebagVertexShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="DebagPixelShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Asset\Data\TestData.json">
+      <Filter>Assets\Data</Filter>
+    </None>
+    <None Include="Asset\Prefab\Test.fbx">
+      <Filter>Assets\Prefab</Filter>
+    </None>
+    <None Include="Asset\Material\Red.mat">
+      <Filter>Assets\Material</Filter>
+    </None>
+    <None Include="Asset\Material\Blue.mat">
+      <Filter>Assets\Material</Filter>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Asset\Prefab\TestCharacter.fbx">
+      <Filter>Assets\Prefab</Filter>
+    </None>
+    <None Include="Asset\Prefab\Player.fbx">
+      <Filter>Assets\Prefab</Filter>
+    </None>
+    <None Include="Asset\Prefab\kumas.fbx">
+      <Filter>Assets\Prefab</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Asset\Texture\white.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
