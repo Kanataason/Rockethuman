@@ -7,10 +7,10 @@ void ModelManager::SetDevice(ID3D11Device* device)
 
 std::shared_ptr<ModelDatas> ModelManager::CheckModel(const ObjectData& data)
 {
-    // Primitive（三角・四角など）はtypeNameでキャッシュ
+    // Primitive（三角・四角など）は形(shape)でキャッシュ
     if (data.attribute == Attribute::Primitive)
     {
-        auto itr = primitives.find(data.typeName);
+        auto itr = primitives.find(data.shape);
 
         if (itr != primitives.end())
         {
@@ -24,9 +24,9 @@ std::shared_ptr<ModelDatas> ModelManager::CheckModel(const ObjectData& data)
             return copy;
         }
 
-        auto model = _modelLoader.PrimitiveLoadModel(data.typeName);
+        auto model = _modelLoader.PrimitiveLoadModel(data.shape);
 
-        // 未対応のObjectTypeだった場合は失敗として返す
+        // 未対応の形だった場合は失敗として返す
         if (!model)
         {
             OutputDebugStringA("PrimitiveLoadModel failed\n");
@@ -38,7 +38,7 @@ std::shared_ptr<ModelDatas> ModelManager::CheckModel(const ObjectData& data)
             meshData.mesh->CreateMeshInfo(_device);
         }
 
-        primitives[data.typeName] = model;
+        primitives[data.shape] = model;
 
         return model;
     }

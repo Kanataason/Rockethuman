@@ -23,6 +23,7 @@ private:
 
 	//各Jsonから値を取り出す
 	ObjectType LoadObjectType(const json& root)const;
+	PrimitiveShape LoadPrimitiveShape(const json& root)const;
 	Attribute LoadObjectAttribute(const json& root)const;
 	std::string LoadPath(const json& root)const;
 	Transform LoadTransform(const json& root);
@@ -31,6 +32,7 @@ private:
 
 	//取り出した値を変換する
 	ObjectType ToObjectType(const std::string& type)const;
+	PrimitiveShape ToPrimitiveShape(const std::string& shape)const;
 	Attribute ToObjectAttribute(const std::string& attribute)const;
 	SceneName ToSceneName(const std::string& name)const;
 };

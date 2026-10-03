@@ -10,9 +10,10 @@
 #include "Component.h"
 #include "Animation.h"
 #include "Joint.h"
+// RagdollBoneがunique_ptrで持つので、完全な型が必要(破棄のときに中身が要る)
+#include "RigidBody.h"
+#include "CapsuleCollider.h"
 
-class CapsuleCollider;
-class RigidBody;
 class PhysicsSystem;
 class Skeleton;
 class GameObject;

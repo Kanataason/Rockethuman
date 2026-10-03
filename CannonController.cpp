@@ -18,7 +18,7 @@ void CannonController::AddForcePlayer(float deltaTime)
 {
     auto& transform = GetOwner()->GetTransform();
     const Vector3 direction = Vector::fromF3ToV3(transform.GetUp());   // すでに長さ1
-    _ragdoll->Launch(direction, 60.0f);
+    _ragdoll->Launch(direction, 100.0f);
 }
 
 void CannonController::Update(float deltaTime)

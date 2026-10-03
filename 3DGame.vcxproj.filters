@@ -171,6 +171,27 @@
     <ClCompile Include="BaseGameObjectFactory.cpp">
       <Filter>ソース ファイル\factory</Filter>
     </ClCompile>
+    <ClCompile Include="BuildProp.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildPlayer.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildCamera.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildLight.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildCannon.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildScoreObject.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelProvider.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
     <ClCompile Include="PhysicsSystem.cpp">
       <Filter>ソース ファイル\Physics</Filter>
     </ClCompile>
@@ -348,6 +369,12 @@
       <Filter>ヘッダー ファイル\factory\Loader</Filter>
     </ClInclude>
     <ClInclude Include="BaseGameObjectFactory.h">
+      <Filter>ヘッダー ファイル\factory</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectBuilders.h">
+      <Filter>ヘッダー ファイル\factory</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelProvider.h">
       <Filter>ヘッダー ファイル\factory</Filter>
     </ClInclude>
     <ClInclude Include="BaseSceneLoader.h">

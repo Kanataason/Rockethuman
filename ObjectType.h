@@ -5,6 +5,7 @@
 #include <functional>
 #include "Transform.h"
 
+//役割(どのBuild関数で組み立てるか)。形(メッシュ)はPrimitiveShapeで別に指定する
 enum class ObjectType //Jsonでstring->typeに変換する
 {
 	Player,
@@ -12,11 +13,19 @@ enum class ObjectType //Jsonでstring->typeに変換する
 	Ground,
 	Camera,
 	Light,
-	Box,
-	Triangle,
-	Quad,
+	Prop,//見た目と当たり判定だけの置き物
 	Cannon,
 	ScoreObject,
+	None
+};
+
+//Attribute::Primitiveのときの形(Jsonの"shape"。省略するとBox)
+enum class PrimitiveShape
+{
+	Box,
+	BoxBottomPivot,//下端の中央が原点の箱(底を支点に回したい物に使う)
+	Quad,
+	Triangle,
 	None
 };
 enum class Attribute //図形のタイプ
@@ -55,6 +64,7 @@ struct ObjectData
 	Attribute attribute = Attribute::None;
 
 	ObjectType typeName = ObjectType::None;
+	PrimitiveShape shape = PrimitiveShape::Box;
 	std::string modelPath = "";
 	std::string materialName = "";
 	Transform transform = {};

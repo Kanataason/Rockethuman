@@ -1,37 +1,27 @@
 ﻿#pragma once
-#include <unordered_map>
-#include <functional>
-#include <iostream>
+#include <memory>
 
 #include "ModelInfo.h"
 #include "ObjectType.h"
 #include "GameObject.h"
 #include "ModelManager.h"
 #include "MaterialManager.h"
+#include "ModelProvider.h"
 using namespace DirectX;
 
 
+// JSONのデータ(ObjectData)から、GameObjectを1つ作る
+//  1. モデルの用意        -> ModelProvider
+//  2. 役割ごとの組み立て  -> ObjectBuilders(Build〇〇.cpp)
 class GameObjectFactory
 {
 public:
 	GameObjectFactory(ModelManager& modelManager,MaterialManager& materialManager):
-		_modelManager(modelManager),_materialManager(materialManager){}
+		_modelProvider(modelManager, materialManager){}
 
 	//GameObjectを生成する
 	std::unique_ptr<GameObject> CreateObject(const ObjectData& data);
 
-	//モデルを読み取る
-	std::shared_ptr<ModelDatas> PrepareModel(const ObjectData& data);
-
-
-	//関数テーブル用の関数
-	static void BuildBox(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
-	static void BuildPlayer(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
-	static void BuildCamera(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
-	static void BuildLight(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
-	static void BuildCannon(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
-	static void BuildScoreObject(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
 private:
-	ModelManager& _modelManager;
-	MaterialManager& _materialManager;
+	ModelProvider _modelProvider;
 };

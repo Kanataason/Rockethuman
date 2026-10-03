@@ -1,5 +1,5 @@
 {
-    "texture": "Asset/Texture/Background.png",
+    "texture": "Asset/Texture/background.png",
      "unlit": true,
     "color": [ 1, 1, 1, 1 ]
 }

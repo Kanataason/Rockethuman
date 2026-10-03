@@ -24,10 +24,10 @@ public :
 	std::shared_ptr<ModelDatas> FBXLoadModel(const std::string& path);
 
 	//もともと設定してある図形を読み取る
-	std::shared_ptr<ModelDatas> PrimitiveLoadModel(const ObjectType& type);
+	std::shared_ptr<ModelDatas> PrimitiveLoadModel(const PrimitiveShape& shape);
 
 	//Primitivのテーブルでの関数定義で読みやすくするために宣言
-	static std::shared_ptr<Mesh> CreateCannon();
+	static std::shared_ptr<Mesh> CreateBottomPivotBox();
 private:
 
 	// 1メッシュ分の頂点・インデックス・ボーンウェイトをMeshInfoに追加

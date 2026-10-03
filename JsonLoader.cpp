@@ -7,13 +7,21 @@ namespace
 	// JSON上の文字列とObjectTypeの対応表
 	const std::unordered_map<std::string, ObjectType> ObjectTypeTable =
 	{
-		{"Triangle", ObjectType::Triangle},
-		{"Quad",     ObjectType::Quad},
-		{"Box",      ObjectType::Box},
+		{"Prop",     ObjectType::Prop},
 		{"Player",   ObjectType::Player},
 		{"Light",    ObjectType::Light},
 		{"Camera",   ObjectType::Camera},
-		{"Cannon",   ObjectType::Cannon}
+		{"Cannon",   ObjectType::Cannon},
+		{"ScoreObject", ObjectType::ScoreObject}
+	};
+
+	// JSON上の文字列とPrimitiveShapeの対応表
+	const std::unordered_map<std::string, PrimitiveShape> PrimitiveShapeTable =
+	{
+		{"Box",            PrimitiveShape::Box},
+		{"BoxBottomPivot", PrimitiveShape::BoxBottomPivot},
+		{"Quad",           PrimitiveShape::Quad},
+		{"Triangle",       PrimitiveShape::Triangle}
 	};
 
 	// JSON上の文字列とAttributeの対応表
@@ -54,6 +62,16 @@ ObjectType JsonLoader::LoadObjectType(const json& root)const
 	}
 
 	return ToObjectType(root["type"].get<std::string>());
+}
+PrimitiveShape JsonLoader::LoadPrimitiveShape(const json& root)const
+{
+	// 省略したときはBox
+	if (!root.contains("shape") || !root["shape"].is_string())
+	{
+		return PrimitiveShape::Box;
+	}
+
+	return ToPrimitiveShape(root["shape"].get<std::string>());
 }
 Attribute JsonLoader::LoadObjectAttribute(const json& root)const
 {
@@ -146,6 +164,7 @@ ObjectData JsonLoader::LoadGameObjectData(const json& root)
 	ObjectData data = {};
 
 	data.typeName = LoadObjectType(root);
+	data.shape = LoadPrimitiveShape(root);
 	data.attribute = LoadObjectAttribute(root);
 	data.modelPath = LoadPath(root);
 	data.transform = LoadTransform(root);
@@ -183,6 +202,19 @@ ObjectType JsonLoader::ToObjectType(const std::string& type)const
 
 	throw std::runtime_error(
 		"Unknown ObjectType: " + type
+	);
+}
+PrimitiveShape JsonLoader::ToPrimitiveShape(const std::string& shape)const
+{
+	auto it = PrimitiveShapeTable.find(shape);
+
+	if (it != PrimitiveShapeTable.end())
+	{
+		return it->second;
+	}
+
+	throw std::runtime_error(
+		"Unknown PrimitiveShape: " + shape
 	);
 }
 SceneName JsonLoader::ToSceneName(const std::string& name)const

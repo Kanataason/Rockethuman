@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <DirectXMath.h>
 #include "Collider.h"
+#include "DebagUtility.h"
 
 
 using namespace DirectX;

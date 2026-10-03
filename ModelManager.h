@@ -21,7 +21,7 @@ public :
 	std::shared_ptr<ModelDatas> CheckModel(const ObjectData& data);
 
 private :
-	std::unordered_map<ObjectType, std::shared_ptr<ModelDatas>> primitives;
+	std::unordered_map<PrimitiveShape, std::shared_ptr<ModelDatas>> primitives;
 	std::unordered_map<std::string, std::shared_ptr<ModelDatas>> models;
 
 	ID3D11Device* _device = nullptr;

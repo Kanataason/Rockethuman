@@ -440,18 +440,18 @@ void ModelLoader::CollectBones(const aiScene* scene,std::unordered_map<std::stri
     }
 }
 
-std::shared_ptr<ModelDatas> ModelLoader::PrimitiveLoadModel(const ObjectType& type)
+std::shared_ptr<ModelDatas> ModelLoader::PrimitiveLoadModel(const PrimitiveShape& shape)
 {
-    // ObjectTypeごとのメッシュ生成関数
-    static const std::unordered_map<ObjectType, std::function<std::shared_ptr<Mesh>()>> creators =
+    // 形ごとのメッシュ生成関数(役割=ObjectTypeには依存しない)
+    static const std::unordered_map<PrimitiveShape, std::function<std::shared_ptr<Mesh>()>> creators =
     {
-        { ObjectType::Triangle, []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::TriangleMesh>(1.0)); } },
-        { ObjectType::Box,      []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0)); } },
-        { ObjectType::Quad,     []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::QuadMesh>(1.0)); } },
-        { ObjectType::Cannon,   CreateCannon}
+        { PrimitiveShape::Triangle,       []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::TriangleMesh>(1.0)); } },
+        { PrimitiveShape::Box,            []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0)); } },
+        { PrimitiveShape::Quad,           []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::QuadMesh>(1.0)); } },
+        { PrimitiveShape::BoxBottomPivot, CreateBottomPivotBox }
     };
-    //オブジェクトタイプが登録されているかどうか確認
-    auto found = creators.find(type);
+    //形が登録されているかどうか確認
+    auto found = creators.find(shape);
     if (found == creators.end())
         return nullptr;
 
@@ -463,7 +463,7 @@ std::shared_ptr<ModelDatas> ModelLoader::PrimitiveLoadModel(const ObjectType& ty
     data->meshes.push_back(meshData);
     return data;
 }
-std::shared_ptr<Mesh> ModelLoader::CreateCannon()
+std::shared_ptr<Mesh> ModelLoader::CreateBottomPivotBox()
 {
     auto mesh = std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0f));
 

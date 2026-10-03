@@ -146,6 +146,13 @@
     <ClCompile Include="Animator.cpp" />
     <ClCompile Include="BallJoin.cpp" />
     <ClCompile Include="BaseGameObjectFactory.cpp" />
+    <ClCompile Include="BuildProp.cpp" />
+    <ClCompile Include="BuildPlayer.cpp" />
+    <ClCompile Include="BuildCamera.cpp" />
+    <ClCompile Include="BuildLight.cpp" />
+    <ClCompile Include="BuildCannon.cpp" />
+    <ClCompile Include="BuildScoreObject.cpp" />
+    <ClCompile Include="ModelProvider.cpp" />
     <ClCompile Include="BaseCamera.cpp" />
     <ClCompile Include="BaseLight.cpp" />
     <ClCompile Include="BaseScene.cpp" />
@@ -216,6 +223,8 @@
     <ClInclude Include="Joint.h" />
     <ClInclude Include="JsonLoader.h" />
     <ClInclude Include="BaseGameObjectFactory.h" />
+    <ClInclude Include="ObjectBuilders.h" />
+    <ClInclude Include="ModelProvider.h" />
     <ClInclude Include="BaseCamera.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
