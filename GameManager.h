@@ -59,7 +59,7 @@ private:
     PhysicsSystem _physicsSystem;
 
     SceneManager _sceneManager;
-    UIRenderer _uiRenderer;
+    UiRenderer _uiRenderer;
 
     GameObjectFactory _gameObjectFactory;
 };

@@ -273,6 +273,9 @@
     <ClCompile Include="ScoreManager.cpp">
       <Filter>ソース ファイル\Base</Filter>
     </ClCompile>
+    <ClCompile Include="RoundManager.cpp">
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
     <ClCompile Include="ObjectStatus.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
@@ -510,6 +513,12 @@
       <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
     <ClInclude Include="ScoreManager.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="RoundManager.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
       <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
   </ItemGroup>

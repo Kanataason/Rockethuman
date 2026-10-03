@@ -1,4 +1,5 @@
 ﻿#include "ObjectBuilders.h"
+#include "VectorUtility.h"
 
 #include "GameObject.h"
 #include "ObjectStatus.h"
@@ -18,5 +19,14 @@ void ObjectBuilders::BuildScoreObject(GameObject& obj, const ObjectData& data, c
     coll->SetCollisionGroup(CollisionGroup::Target);
     coll->SetPosition(data.transform.Position);
 
-    //obj.AddComponent<RigidBody>();
+    auto rigid = obj.AddComponent<RigidBody>();
+    rigid->DisableKinematic();
+    rigid->SetPosition(Vector::fromF3ToV3(data.transform.Position));
+
+    // 質量が0のままだと、衝突の計算で 1/質量 が無限大になり、NaN(位置が消える)になる
+    // 慣性は、立方体として 質量 × 辺の長さ^2 / 6 で求める
+    constexpr float crateMass = 2.0f;
+    const float edge = data.transform.Scale.x;
+    rigid->SetMass(crateMass);
+    rigid->SetInertia(crateMass * edge * edge / 6.0f);
 }

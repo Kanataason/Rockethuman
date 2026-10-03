@@ -34,6 +34,7 @@ void BaseScene::Draw(Renderer& renderer)
 void BaseScene::Initialize(ServiceLocator& context)//シーンの情報初期化
 {
 	_physicsSystem = context.physicsSystem;
+	_uiRenderer = context.uiRenderer;
 	_sceneManager = context.sceneManager;
 	SetObjectInfo(context);
 }

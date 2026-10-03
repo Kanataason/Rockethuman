@@ -2,7 +2,7 @@
 
 #include "GameObject.h"
 #include "VectorUtility.h"
-#include "PlayerController.h"
+#include "Player.h"
 #include "RigidBody.h"
 #include "Ragdoll.h"
 #include "MeshRenderer.h"
@@ -11,7 +11,7 @@
 // プレイヤー：操作・物理・ラグドール・見た目・アニメーションをまとめて構築
 void ObjectBuilders::BuildPlayer(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model)
 {
-    obj.AddComponent<PlayerController>();
+    obj.AddComponent<Player>();
 
     // 通常時はキネマティックとして扱い、物理演算に押されないようにする
     auto rigi = obj.AddComponent<RigidBody>();

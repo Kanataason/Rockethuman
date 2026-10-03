@@ -11,7 +11,6 @@ using namespace UiInfo;
 void Title::Initialize(ServiceLocator& locator)
 {
 	_input = locator.input;
-	_renderer = locator.uiRenderer;
 	BaseScene::Initialize(locator);
 
 	// W/Sはメニュー選択に使うので、タイトルのカメラは動かさない
@@ -59,7 +58,7 @@ void Title::ConfirmSelected()
 
 void Title::DrawUi()
 {
-	_renderer->Begin();
+	_uiRenderer->Begin();
 	if (_currentPanel == PanelType::None)
 	{
 		for (int i = 0;i < MenuCount;i++)
@@ -69,9 +68,9 @@ void Title::DrawUi()
 	if (_currentPanel != PanelType::None)
 		DrawPanel(_currentPanel);
 
-	_renderer->DrawString(L"ロケットにんげん", 380.0f, 100.0f, 1.0f,
+	_uiRenderer->DrawString(L"ロケットにんげん", 380.0f, 100.0f, 1.0f,
 		DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-	_renderer->End();
+	_uiRenderer->End();
 }
 
 void Title::DrawMenuItem(MenuEntry menu,int index)
@@ -83,11 +82,11 @@ void Title::DrawMenuItem(MenuEntry menu,int index)
 	const auto& buttonData = buttonIterator->second;
 	const auto& textData = textIterator->second;;
 
-	_renderer->DrawFrame(buttonData.left, buttonData.top, buttonData.width, buttonData.height,
+	_uiRenderer->DrawFrame(buttonData.left, buttonData.top, buttonData.width, buttonData.height,
 		buttonData.thickness,
 		index == _selectedIndex ? XMVectorSet(1, 1, 0, 1) : XMLoadFloat4(&buttonData.frameColor));
 
-	_renderer->DrawStringCentered(textData.text, textData.centerX, textData.centerY, textData.scale,
+	_uiRenderer->DrawStringCentered(textData.text, textData.centerX, textData.centerY, textData.scale,
 		XMLoadFloat4(&textData.mainColor), XMLoadFloat4(&textData.outlineColor));
 }
 
@@ -97,9 +96,9 @@ void Title::DrawPanel(PanelType typeIndex)
 	if (it == panelList.end()) return;
 	const PanelData& panel = it->second;
 
-	_renderer->DrawRect(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
+	_uiRenderer->DrawRect(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
 		XMLoadFloat4(&panel.fillColor));
-	_renderer->DrawFrame(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
+	_uiRenderer->DrawFrame(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
 		panel.frame.thickness, XMLoadFloat4(&panel.frame.frameColor));
 
 	for (int i = 0; i < static_cast<int>(panel.items.size()); i++)

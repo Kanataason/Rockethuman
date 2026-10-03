@@ -147,7 +147,7 @@ private:
     Vector3 AngularVelocity{};
     Vector3 Torque{};
 
-	float _mass =0.0f;
+	float _mass =1.0f;//0だと衝突の計算で1/質量が無限大になりNaNになるので、既定値は1
     float forcePower = 5.0f;
     float Inertia = 1.0f;
 

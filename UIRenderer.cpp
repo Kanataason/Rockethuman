@@ -14,7 +14,7 @@ namespace
     }
 }
 
-bool UIRenderer::Initialize(ID3D11Device* device, ID3D11DeviceContext* context,
+bool UiRenderer::Initialize(ID3D11Device* device, ID3D11DeviceContext* context,
     const wchar_t* fontFilePath, float screenWidth, float screenHeight)
 {
     _spriteBatch = std::make_unique<SpriteBatch>(context);
@@ -57,13 +57,13 @@ bool UIRenderer::Initialize(ID3D11Device* device, ID3D11DeviceContext* context,
     return true;
 }
 
-void UIRenderer::OnResize(float screenWidth, float screenHeight)
+void UiRenderer::OnResize(float screenWidth, float screenHeight)
 {
     _screenWidth = screenWidth;
     _screenHeight = screenHeight;
 }
 
-void UIRenderer::Begin()
+void UiRenderer::Begin()
 {
     // 仮想解像度 -> 実際の画面サイズへの拡大縮小
     const XMMATRIX virtualToScreen = XMMatrixScaling(
@@ -73,12 +73,12 @@ void UIRenderer::Begin()
         virtualToScreen);
 }
 
-void UIRenderer::End()
+void UiRenderer::End()
 {
     _spriteBatch->End();
 }
 
-void UIRenderer::DrawRect(float left, float top, float width, float height, FXMVECTOR color)
+void UiRenderer::DrawRect(float left, float top, float width, float height, FXMVECTOR color)
 {
     // 1x1 の白テクスチャを width x height に引き伸ばして描く
     _spriteBatch->Draw(_whiteTexture.Get(), XMFLOAT2(left, top), nullptr,
@@ -86,7 +86,7 @@ void UIRenderer::DrawRect(float left, float top, float width, float height, FXMV
         XMFLOAT2(width, height));
 }
 
-void UIRenderer::DrawFrame(float left, float top, float width, float height,
+void UiRenderer::DrawFrame(float left, float top, float width, float height,
     float thickness, FXMVECTOR color)
 {
     DrawRect(left, top, width, thickness, color);                                       // 上
@@ -96,7 +96,7 @@ void UIRenderer::DrawFrame(float left, float top, float width, float height,
         height - thickness * 2.0f, color);                                         // 右
 }
 
-void UIRenderer::DrawString(const std::wstring& text, float x, float y, float scale,
+void UiRenderer::DrawString(const std::wstring& text, float x, float y, float scale,
     FXMVECTOR color, TextAlign align)
 {
     const XMFLOAT2 textSize = MeasureString(text, scale);
@@ -109,7 +109,7 @@ void UIRenderer::DrawString(const std::wstring& text, float x, float y, float sc
         ToPremultiplied(color), 0.0f, XMFLOAT2(0.0f, 0.0f), scale);
 }
 
-void UIRenderer::DrawStringWithOutline(const std::wstring& text, float x, float y, float scale,
+void UiRenderer::DrawStringWithOutline(const std::wstring& text, float x, float y, float scale,
     FXMVECTOR color, FXMVECTOR outlineColor,
     float outlineThickness, TextAlign align)
 {
@@ -129,7 +129,7 @@ void UIRenderer::DrawStringWithOutline(const std::wstring& text, float x, float 
     DrawString(text, x, y, scale, color, align);
 }
 
-void UIRenderer::DrawStringCentered(const std::wstring& text, float centerX, float centerY,
+void UiRenderer::DrawStringCentered(const std::wstring& text, float centerX, float centerY,
     float scale, FXMVECTOR color, FXMVECTOR outlineColor,
     float outlineThickness)
 {
@@ -147,13 +147,13 @@ void UIRenderer::DrawStringCentered(const std::wstring& text, float centerX, flo
     }
 }
 
-XMFLOAT2 UIRenderer::MeasureString(const std::wstring& text, float scale) const
+XMFLOAT2 UiRenderer::MeasureString(const std::wstring& text, float scale) const
 {
     const XMVECTOR textSize = _font->MeasureString(text.c_str());
     return XMFLOAT2(XMVectorGetX(textSize) * scale, XMVectorGetY(textSize) * scale);
 }
 
-bool UIRenderer::HitTest(float left, float top, float width, float height, const POINT& clientPos) const
+bool UiRenderer::HitTest(float left, float top, float width, float height, const POINT& clientPos) const
 {
     // 実際の画面(ウィンドウ)座標 → 仮想解像度(1280x720)の座標へ変換する
     // (Begin() で使っている virtualToScreen の、ちょうど逆の計算)
@@ -164,7 +164,7 @@ bool UIRenderer::HitTest(float left, float top, float width, float height, const
            virtualY >= top && virtualY <= top + height;
 }
 
-XMFLOAT2 UIRenderer::WorldToScreen(FXMVECTOR worldPosition,
+XMFLOAT2 UiRenderer::WorldToScreen(FXMVECTOR worldPosition,
     const XMMATRIX& view, const XMMATRIX& projection) const
 {
     const XMVECTOR screenPosition = XMVector3Project(

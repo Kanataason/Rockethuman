@@ -5,9 +5,10 @@
 
 #include "PhysicsSystem.h"
 #include "Ragdoll.h"
-#include "PlayerController.h"
+#include "Player.h"
 #include "CannonController.h"
 #include "GameObject.h"
+#include "RoundManager.h"
 #include "InputSystem.h"
 
 void CannonController::Initialize(ServiceLocator& locator)
@@ -27,7 +28,7 @@ void CannonController::Update(float deltaTime)
     if (!_ragdoll)
         return;
 
-    if (_input->GetKeyDown('K'))
+    if (_input->GetKeyDown('K')&&_roundManager&&_roundManager->TryUseShot())
     {
         _ragdoll->StartFall();
         AddForcePlayer(deltaTime);
@@ -54,11 +55,11 @@ void CannonController::RotationCannon(float deltaTime)
     transform.Rotation.z = resultDeg;
 }
 
-void CannonController::SetInitializePlayer(PlayerController* controller)
+void CannonController::SetInitializePlayer(Player* player)
 {
-    if (!controller)
+    if (!player)
         return;
-    _player = controller;
+    _player = player;
     _ragdoll = _player->GetOwner()->GetComponent<Ragdoll>();
 }
 

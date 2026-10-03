@@ -22,5 +22,4 @@ private:
 	PanelType _currentPanel = PanelType::None;
 
 	InputSystem* _input = nullptr;
-	UIRenderer* _renderer;
 };

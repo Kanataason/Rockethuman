@@ -33,7 +33,21 @@
             "type": "ScoreObject",
             "material": "crate",
             "position": [ 10, 2, 10 ],
-            "scale": [ 2, 2, 2 ]
+            "scale": [ 1, 1, 1 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "ScoreObject",
+            "material": "crate",
+            "position": [ 10, 3, 10 ],
+            "scale": [ 1, 1, 1 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "ScoreObject",
+            "material": "crate",
+            "position": [ 11, 2, 10 ],
+            "scale": [ 1, 1, 1 ]
         },
         {
             "attribute": "Primitive",
@@ -53,7 +67,7 @@
             "attribute": "Primitive",
             "type": "Prop",
             "position": [ -20, 1.5, 10 ],
-            "scale": [ 3, 1.3, 2 ]
+            "scale": [ 3, 1.3, 3 ]
         },
         {
             "attribute": "Primitive",

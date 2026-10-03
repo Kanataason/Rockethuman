@@ -14,6 +14,7 @@ class DebugDraw;
 class GameObject;
 class Camera;
 class Light;
+class UiRenderer;
 class SceneManager;
 
 class BaseScene
@@ -50,7 +51,7 @@ private:
 protected:
     PhysicsSystem* _physicsSystem = nullptr;
 	SceneManager* _sceneManager = nullptr;
-
+	UiRenderer* _uiRenderer = nullptr;
 	Camera* _camera = nullptr;
 
 	std::vector<Light*> _lights;

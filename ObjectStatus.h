@@ -12,5 +12,5 @@ public:
 	void OnCollisionEnter(Collider* other, const CollisionResult& result)override;
 private:
 	Vector3 _initializePos;
-	float _score = 0.0f;
+	float _score = 10.0f;
 };

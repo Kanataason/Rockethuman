@@ -8,7 +8,7 @@ class PhysicsSystem;
 class CollisionManager;
 class DebugDraw;
 class GameObjectFactory;
-class UIRenderer;
+class UiRenderer;
 class SceneManager;
 
 /// <summary>
@@ -23,6 +23,6 @@ struct ServiceLocator
     GameObjectFactory* factory = nullptr;
     SceneManager* sceneManager = nullptr;
 
-    UIRenderer* uiRenderer = nullptr;
+    UiRenderer* uiRenderer = nullptr;
     PhysicsSystem* physicsSystem = nullptr;
 };

@@ -18,6 +18,8 @@ enum class TextType
     Select,
     End,
     MouseControll,
+    Score,
+    ShotCount,
     None
 };
 enum class ButtonType
@@ -27,11 +29,14 @@ enum class ButtonType
     End,
     Panel,
     MouseControll,
+    Score,
     None
 };
 enum class PanelType
 {
     Setting,
+    Score,
+    ShotCount,
     None
 };
 
@@ -88,7 +93,11 @@ namespace UiInfo
         {TextType::End,{.text = L"エンド",.centerX = 640.0f,.centerY = 590.0f,.scale = 0.7f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
         {TextType::MouseControll,{.text = L"マウスのかんど",.centerX = 350.0f,.centerY = 200.0f,.scale = 0.7f
-        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}}
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+         {TextType::Score,{.text = L"スコア",.centerX = 90.0f,.centerY = 44.0f,.scale = 0.3f
+        ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+         {TextType::ShotCount,{.text = L"のこり",.centerX = 640.0f,.centerY = 44.0f,.scale = 0.3f
+        ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}}
     };
 
     inline const std::unordered_map<ButtonType, ButtonData> buttonList =
@@ -97,7 +106,7 @@ namespace UiInfo
         {ButtonType::Setting,{.left = 540.0f,.top = 480.0f,.width = 200.0f,.height = 60.0f}},
         {ButtonType::End,{.left = 540.0f,.top = 560.0f,.width = 200.0f,.height = 60.0f}},
         {ButtonType::Panel,{.left = 350.0f,.top = 100.0f,.width = 500.0f,.height = 500.0f}},
-        {ButtonType::MouseControll,{.left = 350.0f,.top = 100.0f,.width = 200.0f,.height = 200.0f}}
+        {ButtonType::MouseControll,{.left = 350.0f,.top = 100.0f,.width = 200.0f,.height = 200.0f}},
     };
 
     inline const std::unordered_map<PanelType, PanelData> panelList =
@@ -107,8 +116,23 @@ namespace UiInfo
                        .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
             .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
             .items = {{TextType::MouseControll, ButtonType::MouseControll},
-            }
-        } }
+            } }
+        },
+        {PanelType::Score, {
+            .frame = {.left = 20.0f, .top = 20.0f, .width = 320.0f, .height = 120.0f,
+                       .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
+            .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
+              .items = {{TextType::Score, ButtonType::None}
+            }}
+        },
+        // 画面の上の中央(1280の中央 640 を、パネルの中心にする)
+        {PanelType::ShotCount, {
+            .frame = {.left = 520.0f, .top = 20.0f, .width = 240.0f, .height = 120.0f,
+                       .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
+            .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
+              .items = {{TextType::ShotCount, ButtonType::None}
+            }}
+        }
     };
 
     const std::array<MenuEntry, 3> MenuEntries =
@@ -125,7 +149,7 @@ namespace UiInfo
 // UI描画をまとめるクラス（DirectXTK の SpriteBatch / SpriteFont を使用）
 // ・座標はすべて 1280x720 の仮想解像度で指定する（Begin() で実際の画面サイズへ拡大縮小）
 // ・色はストレートアルファ (r, g, b, a) で渡せばよい（内部で乗算済みアルファに変換する）
-class UIRenderer
+class UiRenderer
 {
 public:
     static constexpr float VirtualWidth = 1280.0f;

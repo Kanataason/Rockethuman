@@ -188,6 +188,7 @@
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="ScoreManager.cpp" />
+    <ClCompile Include="RoundManager.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -260,6 +261,8 @@
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="ScoreManager.h" />
+    <ClInclude Include="RoundManager.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="ServiceLoacator.h" />
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="SphereCollider.h" />

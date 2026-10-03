@@ -2,8 +2,9 @@
 #include "Component.h"
 
 class InputSystem;
-class PlayerController;
+class Player;
 class Ragdoll;
+class RoundManager;
 
 class CannonController : public Component
 {
@@ -12,14 +13,17 @@ public:
 	void Update(float deltaTime)override;
 
 	void AddForcePlayer(float deltaTime);
-	void SetInitializePlayer(PlayerController* controller);
+	void SetInitializePlayer(Player* player);
+	void SetRoundManager(RoundManager* roundManager) { _roundManager = roundManager; }
+
 private:
 	void SetPlayerPosition();
 	void RotationCannon(float deltaTime);
 private:
 	InputSystem* _input = nullptr;
-	PlayerController* _player = nullptr;
+	Player* _player = nullptr;
 	Ragdoll* _ragdoll = nullptr;
+	RoundManager* _roundManager = nullptr;
 
 	float _swingFrame = 0.0f;//現在の回転値はラジアン
 	float _swingSpeed = 1.0f;
