@@ -45,7 +45,6 @@ private:
 	InputSystem* _input = nullptr;
 	Ragdoll* _ragdoll = nullptr;
 	RigidBody* _rigidBody = nullptr;
-	Animator* _animator = nullptr;
 
 	PlayerState _state = PlayerState::Animation; // 今の状態(最初は通常)
 };

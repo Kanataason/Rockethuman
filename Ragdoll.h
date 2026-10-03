@@ -298,7 +298,9 @@ public:
     //計算結果をスケルトンに反映する
     void UpdateBonesFromPhysics();
 
-
+    //大砲でragDoll全体に初速を入れて飛ばす関数
+    //向きは正規化済み、
+    void Launch(const Vector3& direction,float speed);
 private:
     // ---- 生成・開始姿勢
     void AddRagDoll();

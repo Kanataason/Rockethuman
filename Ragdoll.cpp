@@ -606,7 +606,10 @@ void Ragdoll::WritePhysicsPoseToNodes()
     // オーナーの変換は、ループの中で変わらないので最初に1回だけ求める
     const XMMATRIX ownerWorld = _owner->GetTransform().GetWorldMatrix();
     const XMMATRIX ownerInverseWorld = XMMatrixInverse(nullptr, ownerWorld);
-    const XMVECTOR ownerWorldRotation = XMQuaternionRotationMatrix(ownerWorld);
+    // ownerWorldには拡大縮小(Scale)が入っている。Scaleが入った行列から、直接クォータニオンを取ると
+    // 回転が不正確になる(Rotationが0のときだけ、たまたま合う)ので、Decomposeで回転だけを取り出す
+    XMVECTOR ownerWorldScale, ownerWorldRotation, ownerWorldTranslation;
+    XMMatrixDecompose(&ownerWorldScale, &ownerWorldRotation, &ownerWorldTranslation, ownerWorld);
 
     for (auto& ragdollBone : _bones)
     {
@@ -664,6 +667,46 @@ void Ragdoll::UpdateBonesFromPhysics()
 }
 
 //----------------------押し出し処理------------------
+
+void Ragdoll::Launch(const Vector3& direction,float speed)
+{
+    //寝ているBoneを起こす
+    for (auto& bone : _bones)
+        if (bone.rigidBody)
+            bone.rigidBody->SetSleeping(false);
+
+    //スリープタイマーをリセット
+    if (_physicsSystem)
+        _physicsSystem->ResetRagdollTimer();
+
+    Vector3 launchVelocity = direction * speed;
+
+    Vector3 rootPosition(0.0f, 0.0f, 0.0f);
+    if (!_bones.empty() && _bones[0].rigidBody)
+        rootPosition = _bones[0].rigidBody->GetPosition();
+    Vector3 tumble = Vector::Cross(Vector3(0.0f, 1.0f, 0.0f), direction) * RagdollTuning::kLaunchTumbleSpeed;
+
+    static std::mt19937 rng{ std::random_device{}() };
+    std::uniform_real_distribution<float> flailDist(-1.0f, 1.0f);
+
+    for (auto& bone : _bones)
+    {
+        if (!bone.rigidBody)
+            continue;
+
+        if (_hangingBoneIndex >= 0 && &bone == &_bones[_hangingBoneIndex])
+        {
+            _hangingDriftVelocity = launchVelocity;
+            continue;
+        }
+
+        const Vector3 relative = bone.rigidBody->GetPosition() - rootPosition;
+        bone.rigidBody->SetVelocity(launchVelocity + Vector::Cross(tumble, relative));
+
+        const Vector3 flail(flailDist(rng), flailDist(rng), flailDist(rng));
+        bone.rigidBody->SetAngularVelocity(tumble + flail * RagdollTuning::kLaunchFlailSpeed);
+    }
+}
 
 void Ragdoll::ApplyPushImpulse(const Vector3& pushDirIn, float speed, RagdollBone& hitBone, const Vector3& contactPoint)
 {

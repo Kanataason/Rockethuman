@@ -3,6 +3,8 @@
 #include <DirectXMath.h>
 #include "VectorUtility.h"
 
+#include "PhysicsSystem.h"
+#include "Ragdoll.h"
 #include "PlayerController.h"
 #include "CannonController.h"
 #include "GameObject.h"
@@ -12,12 +14,24 @@ void CannonController::Initialize(ServiceLocator& locator)
 {
 	_input = locator.input;
 }
+void CannonController::AddForcePlayer(float deltaTime)
+{
+    auto& transform = GetOwner()->GetTransform();
+    const Vector3 direction = Vector::fromF3ToV3(transform.GetUp());   // すでに長さ1
+    _ragdoll->Launch(direction, 60.0f);
+}
 
 void CannonController::Update(float deltaTime)
 {
     RotationCannon(deltaTime);
+    if (_input->GetKeyDown('K'))
+    {
+        _ragdoll->StartFall();
+        AddForcePlayer(deltaTime);
+    }
 
     // 砲身が回ったあとの向きに合わせて、Playerの位置も毎フレーム合わせ直す
+    if(!_ragdoll->IsActive())
     SetPlayerPosition();
 }
 void CannonController::RotationCannon(float deltaTime)
@@ -37,16 +51,26 @@ void CannonController::RotationCannon(float deltaTime)
     transform.Rotation.z = resultDeg;
 }
 
+void CannonController::SetInitializePlayer(PlayerController* controller)
+{
+    _player = controller;
+    _ragdoll = _player->GetOwner()->GetComponent<Ragdoll>();
+}
+
 void CannonController::SetPlayerPosition()
 {
     if (!_player)
         return;
 
+    //Playerの場所の割合
+    constexpr float helfSize = 0.28f;
+
     auto& transform = GetOwner()->GetTransform();
 
+    //砲台の向き、砲台の原点と方向を足して長さと割合をかけてplayerの場所を決める
     const Vector3 upDirection = Vector::fromF3ToV3(transform.GetUp());
     const Vector3 center = Vector::fromF3ToV3(transform.Position)
-        + upDirection * (transform.Scale.y * 0.5f);
+        + upDirection * (transform.Scale.y * helfSize);
 
     auto& playerTransform = _player->GetOwner()->GetTransform();
     playerTransform.Position = Vector::fromV3ToF3(center);

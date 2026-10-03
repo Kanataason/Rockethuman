@@ -10,7 +10,6 @@ void PlayerController::Initialize(ServiceLocator& loacator)
 {
 	_input = loacator.input;
 
-	_animator = GetOwner()->GetComponent<Animator>();
 	_rigidBody = GetOwner()->GetComponent<RigidBody>();
 	_ragdoll = GetOwner()->GetComponent<Ragdoll>();
 }

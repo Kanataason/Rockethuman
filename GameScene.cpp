@@ -11,7 +11,7 @@ void GameScene::Initialize(ServiceLocator& locator)
 	auto* player = FindGameObject<PlayerController>();
 
 	if (cannon)
-		cannon->SetPlayer(player);
+		cannon->SetInitializePlayer(player);
 }
 
 void GameScene::Update(float deltaTime)

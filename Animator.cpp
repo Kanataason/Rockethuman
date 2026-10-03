@@ -19,6 +19,7 @@ void Animator::Initialize(ServiceLocator& loacator)
     _physicsSystem = loacator.physicsSystem;
     _ragDoll = GetOwner()->GetComponent<Ragdoll>();
 
+    PlayAnimation("Idle",0.4f);
     SetIk();
 }
 void Animator::SetIk()
