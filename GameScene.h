@@ -4,6 +4,12 @@
 class GameScene : public BaseScene
 {
 public:
-	void Initialize(ServiceLocator& locator)override {};
-	void Update(float deltaTime)override {};
+	void Initialize(ServiceLocator& locator)override
+	{
+		BaseScene::Initialize(locator); 
+	};
+	void Update(float deltaTime)override
+	{
+		BaseScene::Update(deltaTime);
+	};
 };

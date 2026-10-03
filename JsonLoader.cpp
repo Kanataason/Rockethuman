@@ -12,7 +12,8 @@ namespace
 		{"Box",      ObjectType::Box},
 		{"Player",   ObjectType::Player},
 		{"Light",    ObjectType::Light},
-		{"Camera",   ObjectType::Camera}
+		{"Camera",   ObjectType::Camera},
+		{"Cannon",   ObjectType::Cannon}
 	};
 
 	// JSON上の文字列とAttributeの対応表

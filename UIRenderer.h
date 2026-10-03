@@ -1,9 +1,12 @@
 ﻿#pragma once
+#include <memory>
+#include<vector>
+#include <string>
+#include <array>
 #include <d3d11.h>
 #include <wrl/client.h>
+
 #include <DirectXMath.h>
-#include <memory>
-#include <string>
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 
@@ -13,12 +16,30 @@ enum class TextType
     Start,
     Setting,
     Select,
+    End,
+    MouseControll,
     None
 };
 enum class ButtonType
 {
     Box,
+    Setting,
+    End,
+    Panel,
+    MouseControll,
     None
+};
+enum class PanelType
+{
+    Setting,
+    None
+};
+
+// 上から下への並び順。W/Sで選ぶ順番になる
+struct MenuEntry
+{
+    TextType text;
+    ButtonType button;
 };
 
 struct ButtonData
@@ -29,6 +50,7 @@ struct ButtonData
     float width = 0.0f;
     float height = 0.0f;
     float thickness = 2.0f;//枠の太さ
+
     DirectX::XMFLOAT4 frameColor = { 1, 1, 1, 1 };  //枠の色
 };
 
@@ -48,18 +70,56 @@ struct TextData
     float outLineStiffnes = 2.0f;
 };
 
+struct PanelData
+{
+    ButtonData frame;                           // パネルの位置・大きさ・枠の太さ・枠の色
+    DirectX::XMFLOAT4 fillColor = { 0, 0, 0, 0.6f };  // 塗りの色(アルファで透け具合)
+    std::vector<MenuEntry> items;               // ボタン+文字の組
+};
+
 namespace UiInfo
 {
     inline const std::unordered_map<TextType, TextData> textList =
     {
         {TextType::Start,{.text = L"スタート",.centerX = 640.0f,.centerY = 430.0f,.scale = 0.7f
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+        {TextType::Setting,{.text = L"オプション",.centerX = 640.0f,.centerY = 510.0f,.scale = 0.55f
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+        {TextType::End,{.text = L"エンド",.centerX = 640.0f,.centerY = 590.0f,.scale = 0.7f
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+        {TextType::MouseControll,{.text = L"マウスのかんど",.centerX = 350.0f,.centerY = 200.0f,.scale = 0.7f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}}
     };
 
     inline const std::unordered_map<ButtonType, ButtonData> buttonList =
     {
-        {ButtonType::Box,{.left = 540.0f,.top = 400.0f,.width = 200.0f,.height = 60.0f}}
+        {ButtonType::Box,{.left = 540.0f,.top = 400.0f,.width = 200.0f,.height = 60.0f}},
+        {ButtonType::Setting,{.left = 540.0f,.top = 480.0f,.width = 200.0f,.height = 60.0f}},
+        {ButtonType::End,{.left = 540.0f,.top = 560.0f,.width = 200.0f,.height = 60.0f}},
+        {ButtonType::Panel,{.left = 350.0f,.top = 100.0f,.width = 500.0f,.height = 500.0f}},
+        {ButtonType::MouseControll,{.left = 350.0f,.top = 100.0f,.width = 200.0f,.height = 200.0f}}
     };
+
+    inline const std::unordered_map<PanelType, PanelData> panelList =
+    {
+        { PanelType::Setting, {
+            .frame = {.left = 350.0f, .top = 100.0f, .width = 500.0f, .height = 500.0f,
+                       .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
+            .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
+            .items = {{TextType::MouseControll, ButtonType::MouseControll},
+            }
+        } }
+    };
+
+    const std::array<MenuEntry, 3> MenuEntries =
+    { {
+        { TextType::Start,   ButtonType::Box},
+        { TextType::Setting, ButtonType::Setting},
+        { TextType::End,     ButtonType::End}
+    } };
+
+
+    constexpr int MenuCount = static_cast<int>(MenuEntries.size());
 }
 
 // UI描画をまとめるクラス（DirectXTK の SpriteBatch / SpriteFont を使用）

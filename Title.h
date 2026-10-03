@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include "BaseScene.h"
-
+#include "UiRenderer.h"
+#include "Event.h"
 
 class InputSystem;
-class UIRenderer;
 
 class Title : public BaseScene
 {
@@ -12,10 +12,14 @@ public:
 	void Update(float deltaTime)override;
 	void DrawUi()override;
 private:
-	void UpdateStartButton(const POINT& mousePos);
-	void DrawStartButton();
+
+	void ConfirmSelected();
+	void DrawMenuItem(MenuEntry menu, int index);
+	void DrawPanel(PanelType typeIndex);
 private:
-	bool _isStartButtonHovered = false;
+	int _selectedIndex = 0;
+
+	PanelType _currentPanel = PanelType::None;
 
 	InputSystem* _input = nullptr;
 	UIRenderer* _renderer;

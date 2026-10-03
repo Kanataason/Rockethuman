@@ -1,61 +1,107 @@
 ﻿#include "Title.h"
 #include "InputSystem.h"
+#include "GameObject.h"
+#include "CameraController.h"
 #include "UiRenderer.h"
 #include "SceneManager.h"
 
 using namespace UiInfo;
+
 
 void Title::Initialize(ServiceLocator& locator)
 {
 	_input = locator.input;
 	_renderer = locator.uiRenderer;
 	BaseScene::Initialize(locator);
-}	
+
+	// W/Sはメニュー選択に使うので、タイトルのカメラは動かさない
+	for (const auto& object : _objects)
+	{
+		if (auto cameraController = object->GetComponent<CameraController>())
+			cameraController->SetMoveEnabled(false);
+	}
+}
 
 void Title::Update(float deltaTime)
 {
-	UpdateStartButton(_input->GetMouseClientPosition());
+	if (_input->GetKeyDown('W') || _input->GetKeyDown(VK_UP))
+		_selectedIndex = (_selectedIndex + MenuCount - 1) % MenuCount;
 
-	if (_isStartButtonHovered && _input->GetKeyDown(VK_LBUTTON))
+	if (_input->GetKeyDown('S') || _input->GetKeyDown(VK_DOWN))
+		_selectedIndex = (_selectedIndex + 1) % MenuCount;
+
+	else if (_input->GetKeyDown(VK_SPACE))
 	{
-		_sceneManager->ChangeScene(SceneName::GameScene);
-		//押したときの処理
+		ConfirmSelected();
 	}
+
+	if (_input->GetKeyDown(VK_RETURN))
+		_currentPanel = PanelType::None;
+
 	BaseScene::Update(deltaTime);
 }
-void Title::UpdateStartButton(const POINT& mousePos)
+
+
+void Title::ConfirmSelected()
 {
-	auto buttonIterator = buttonList.find(ButtonType::Box);
-	if (buttonIterator == buttonList.end()) return;
-
-	const auto& buttonData = buttonIterator->second;
-	_isStartButtonHovered = _renderer->HitTest(buttonData.left, buttonData.top,
-		buttonData.width, buttonData.height, mousePos);
-
+	switch (MenuEntries[_selectedIndex].text)
+	{
+	case TextType::Start:
+		_sceneManager->ChangeScene(SceneName::GameScene);
+		break;
+	case TextType::Setting:
+		_currentPanel = PanelType::Setting;
+		break;
+	default:
+		break;
+	}
 }
 
 void Title::DrawUi()
 {
 	_renderer->Begin();
-	DrawStartButton();
-	_renderer->DrawString(L"あいうえお", 500.0f, 100.0f, 1.0f,
+	if (_currentPanel == PanelType::None)
+	{
+		for (int i = 0;i < MenuCount;i++)
+			DrawMenuItem(MenuEntries[i], i);
+	}
+
+	if (_currentPanel != PanelType::None)
+		DrawPanel(_currentPanel);
+
+	_renderer->DrawString(L"ロケットにんげん", 380.0f, 100.0f, 1.0f,
 		DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 	_renderer->End();
 }
 
-void Title::DrawStartButton()
+void Title::DrawMenuItem(MenuEntry menu,int index)
 {
-	auto buttonIterator = buttonList.find(ButtonType::Box);
-	auto textIterator = textList.find(TextType::Start);
+	auto buttonIterator = buttonList.find(menu.button);
+	auto textIterator = textList.find(menu.text);
 	if (buttonIterator == buttonList.end() || textIterator == textList.end()) return;
 
 	const auto& buttonData = buttonIterator->second;
-	const auto& textData = textIterator->second;
+	const auto& textData = textIterator->second;;
 
 	_renderer->DrawFrame(buttonData.left, buttonData.top, buttonData.width, buttonData.height,
 		buttonData.thickness,
-		_isStartButtonHovered ? XMVectorSet(1, 1, 0, 1) : XMLoadFloat4(&buttonData.frameColor));
+		index == _selectedIndex ? XMVectorSet(1, 1, 0, 1) : XMLoadFloat4(&buttonData.frameColor));
 
 	_renderer->DrawStringCentered(textData.text, textData.centerX, textData.centerY, textData.scale,
 		XMLoadFloat4(&textData.mainColor), XMLoadFloat4(&textData.outlineColor));
+}
+
+void Title::DrawPanel(PanelType typeIndex)
+{
+	auto it = panelList.find(typeIndex);
+	if (it == panelList.end()) return;
+	const PanelData& panel = it->second;
+
+	_renderer->DrawRect(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
+		XMLoadFloat4(&panel.fillColor));
+	_renderer->DrawFrame(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
+		panel.frame.thickness, XMLoadFloat4(&panel.frame.frameColor));
+
+	for (int i = 0; i < static_cast<int>(panel.items.size()); i++)
+		DrawMenuItem(panel.items[i], i);
 }

@@ -7,7 +7,7 @@
 #include "VectorUtility.h"
 using namespace DirectX;
 
-class CollisionManager;
+class PhysicsSystem;
 
 // Colliderの形状種別
 enum ColliderType
@@ -32,8 +32,8 @@ public:
         return _id;
     }
 
-    // 登録先のCollisionManagerを覚えておく(デストラクタで、自動的に登録解除するため)
-    void SetRegistry(CollisionManager* registry)
+    // 登録先のPhysicsSystemを覚えておく(デストラクタで、自動的に登録解除するため)
+    void SetRegistry(PhysicsSystem* registry)
     {
         _registry = registry;
     }
@@ -103,7 +103,7 @@ public:
 private:
     int _id = -1;
     int _collisionGroup = 0;
-    CollisionManager* _registry = nullptr;
+    PhysicsSystem* _registry = nullptr;
 protected:
     bool isTrigger = false;
 

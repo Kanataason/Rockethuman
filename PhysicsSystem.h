@@ -29,8 +29,12 @@ public:
     // RigidBodyのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
     void RemoveRigidBody(RigidBody* rigidBody);
 
+    // Colliderのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
+    // CollisionManager側の登録解除と、_rigidBodies内の参照の後始末を両方行う
+    void RemoveCollider(Collider* collider);
+
     void AddJoint(Joint* joint) { _jointList.push_back(joint); };
-    void AddCollider(Collider* collider) { _collisionManager.AddCollider(collider); }
+    void AddCollider(Collider* collider) { collider->SetRegistry(this); _collisionManager.AddCollider(collider); }
 
     CollisionManager* GetCollisionManager() { return &_collisionManager; }
 

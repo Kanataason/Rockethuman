@@ -15,6 +15,7 @@ enum class ObjectType //Jsonでstring->typeに変換する
 	Box,
 	Triangle,
 	Quad,
+	Cannon,
 	None
 };
 enum class Attribute //図形のタイプ

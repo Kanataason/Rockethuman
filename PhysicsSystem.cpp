@@ -95,6 +95,19 @@ void PhysicsSystem::RemoveRigidBody(RigidBody* rigidBody)
         });
 }
 
+void PhysicsSystem::RemoveCollider(Collider* collider)
+{
+    // Colliderのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
+    // _rigidBodiesの中に、このColliderを指しているエントリが残っていると、
+    // SyncStaticColliders等が破棄済みのColliderを触ってクラッシュするので、先に消す
+    std::erase_if(_rigidBodies, [&](const PhysicsBody& body)
+        {
+            return body.collider == collider;
+        });
+
+    _collisionManager.ReleaseCollider(collider->GetID());
+}
+
 void PhysicsSystem::FixedUpdate(float deltaTime)
 {
 
@@ -515,7 +528,10 @@ void PhysicsSystem::AddPhysicsBody(PhysicsBody Body)
         Body.rigidBody->SetRegistry(this);
 
     if (Body.collider)
+    {
+        Body.collider->SetRegistry(this);
         _collisionManager.AddCollider(Body.collider);
+    }
 
     _rigidBodies.push_back(std::move(Body));
 }

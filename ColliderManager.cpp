@@ -8,7 +8,6 @@ void CollisionManager::AddCollider(Collider* collider)
     //Idでだけで探せるようにMapに登録
     collider->SetID(_nextColliderID++);
     _colliderMap[collider->GetID()] = collider;
-    collider->SetRegistry(this);
 }
 
 void CollisionManager::Intersects()
@@ -159,10 +158,14 @@ void CollisionManager::DebugCollider()
         it.second->DrawDebug(_debugDraw);
     }
 }
-    void CollisionManager::ReleaseCollider(int id)
-    {
-        _colliderMap.erase(id);
-    }
+void CollisionManager::ReleaseCollider(int id)
+{
+    _colliderMap.erase(id);
+
+    // Octreeは次のIntersects()まで前回の生ポインタを持ち続けるので、
+    // 破棄済みのColliderをRayCastが触らないように空にしておく(次のInsertOctreeで再構築される)
+    _octree.Clear();
+}
 
 void CollisionManager::InsertOctree()
 {

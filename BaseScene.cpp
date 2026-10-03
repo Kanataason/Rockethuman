@@ -81,5 +81,10 @@ void BaseScene::Release()
 }
 void BaseScene::AddObject(std::unique_ptr<GameObject> object)
 {
+	// 生成に失敗したObject(モデルの読み込みエラーなど)は、nullptrで返ってくる。
+	// そのまま入れると、Initialize/Update/Drawで全オブジェクトを回すときに落ちる
+	if (!object)
+		return;
+
 	_objects.push_back(std::move(object));
 }

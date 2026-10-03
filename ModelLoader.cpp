@@ -448,6 +448,7 @@ std::shared_ptr<ModelDatas> ModelLoader::PrimitiveLoadModel(const ObjectType& ty
         { ObjectType::Triangle, []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::TriangleMesh>(1.0)); } },
         { ObjectType::Box,      []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0)); } },
         { ObjectType::Quad,     []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::QuadMesh>(1.0)); } },
+        {ObjectType::Cannon, [](){return std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0));  }}
     };
     //オブジェクトタイプが登録されているかどうか確認
     auto found = creators.find(type);

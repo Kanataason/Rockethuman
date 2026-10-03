@@ -14,6 +14,9 @@ void CameraController::Initialize(ServiceLocator& loacator)
 }
 void CameraController::Update(float deltaTime)
 {
+    if (!_moveEnabled)
+        return;
+
     float speed = _moveSpeed * deltaTime;
     auto forward = GetOwner()->GetTransform().GetForward();
     auto right = GetOwner()->GetTransform().GetRight();
