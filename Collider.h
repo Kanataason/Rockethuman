@@ -16,6 +16,13 @@ enum ColliderType
     BoxColliderType,
     SphereColliderType
 };
+enum class CollisionGroup
+{
+    None = 0,
+    Ragdoll = 1,
+    Camera = 2,
+    Ground = 3
+};
 
 
 class Collider : public Component
@@ -39,12 +46,12 @@ public:
     }
 
     // 同じグループ同士の衝突可否などに使う分類ID
-    void SetCollisionGroup(int group)
+    void SetCollisionGroup(CollisionGroup group)
     {
         _collisionGroup = group;
     }
 
-    int GetCollisionGroup() const
+    CollisionGroup GetCollisionGroup() const
     {
         return _collisionGroup;
     }
@@ -102,7 +109,7 @@ public:
         XMFLOAT3& hitPosition) = 0;
 private:
     int _id = -1;
-    int _collisionGroup = 0;
+    CollisionGroup _collisionGroup = CollisionGroup::None;
     PhysicsSystem* _registry = nullptr;
 protected:
     bool isTrigger = false;

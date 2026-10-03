@@ -274,7 +274,9 @@ void PhysicsSystem::IntegrateDynamics(float subDeltaTime)
                 RagdollTuning::kGravityTorqueWhenGrounded &&
                 (!isExtremity || RagdollTuning::kExtremityGravityTorqueWhenGrounded);
 
-            if (body.ragdollBone.hasReliableComOffset &&
+            // 発射されて飛んでいる間は、重力トルクを止める(Ragdoll::Launchが切り替える)
+            if (body.rigidBody->GetUseGravityTorque() &&
+                body.ragdollBone.hasReliableComOffset &&
                 (torqueWhenGrounded || !body.rigidBody->IsGrounded()))
             {
                 body.rigidBody->ApplyGravityTorque(
@@ -458,13 +460,13 @@ bool PhysicsSystem::TryGetContactInfo(const PhysicsBody& body, const CollisionRe
     if (body.collider == result.colliderA)
     {
         contactNormal = result.normal;
-        isGround = (result.colliderB->GetCollisionGroup() == 3);
+        isGround = (result.colliderB->GetCollisionGroup() == CollisionGroup::Ground);
         return true;
     }
     if (body.collider == result.colliderB)
     {
         contactNormal = -result.normal;
-        isGround = (result.colliderA->GetCollisionGroup() == 3);
+        isGround = (result.colliderA->GetCollisionGroup() == CollisionGroup::Ground);
         return true;
     }
     return false; // このbodyは今回のペアと無関係

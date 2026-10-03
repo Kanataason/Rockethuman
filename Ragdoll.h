@@ -237,6 +237,9 @@ public:
 
     void FixedUpdate(float deltaTime);
 
+    // 飛んでいる最中に、どれかのボーンが地面に着いたら、飛行中を終える
+    void Update(float deltaTime) override;
+
     //あたりはじめだけ処理する
     void OnCollisionEnter(Collider* other, const CollisionResult& result) override;
 
@@ -301,7 +304,13 @@ public:
     //大砲でragDoll全体に初速を入れて飛ばす関数
     //向きは正規化済み、
     void Launch(const Vector3& direction,float speed);
+
+    // 発射されて、まだ着地していないか
+    bool IsFlying() const { return _isFlying; }
 private:
+    // 飛行中の切り替え。飛んでいる間は重力トルクを止め、着地したら戻す
+    void SetFlying(bool flying);
+
     // ---- 生成・開始姿勢
     void AddRagDoll();
 
@@ -419,6 +428,7 @@ private:
     RigidBody* _hipsRigidBody = nullptr;
 
     bool _enabled = false;
+    bool _isFlying = false;
 
     // ---- 吊り下げモード ----
     int _hangingBoneIndex = -1;            // 吊る骨(_bones の番号) -1 = まだ始めていない

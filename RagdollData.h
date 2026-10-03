@@ -134,7 +134,7 @@ namespace RagdollTuning
     constexpr float kBoneContactMaxPush = 0.03f;
 
     // ボーン同士の摩擦係数(接触1回あたり、サブステップ単位)
-    constexpr float kBoneFriction = 0.3f;
+    constexpr float kBoneFriction = 0.2f;
 
     // 左右の脚ボーン同士の衝突を無視する
     // 脚同士が交差した際に押し合って、腰が持ち上がるのを防ぐ

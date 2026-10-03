@@ -83,7 +83,7 @@ void Ragdoll::CreateBone(int boneNameIndex)
     body.ragdollBone.parentIndex = bone.parentIndex;
     body.rigidBody = bone.rigidBody.get();
     body.collider = bone.collider.get();
-    body.collider->SetCollisionGroup(1);
+    body.collider->SetCollisionGroup(CollisionGroup::Ragdoll);
     body.rigidBody->SetPosition({ 0, 0, 0 });
 
     _physicsSystem->AddPhysicsBody(std::move(body));
@@ -444,6 +444,7 @@ void Ragdoll::StartFall()
     }
 
     // 重力を入れて、ラグドールを有効にする。全身が重力で地面に倒れる
+    SetFlying(false);
     Enable();
 }
 
@@ -582,6 +583,7 @@ void Ragdoll::StopRagdoll(bool includeHeight)
     }
 
     // ラグドールを止める。全ボーンが寝て、速度と角速度が 0 に戻る
+    SetFlying(false);
     Disable();
 }
 
@@ -668,8 +670,36 @@ void Ragdoll::UpdateBonesFromPhysics()
 
 //----------------------押し出し処理------------------
 
+void Ragdoll::SetFlying(bool flying)
+{
+    _isFlying = flying;
+
+    // 自由落下中は重力がトルクを生まないので、飛んでいる間だけ止める(止めないと体がくの字に折れる)
+    for (auto& bone : _bones)
+        if (bone.rigidBody)
+            bone.rigidBody->SetUseGravityTorque(!flying);
+}
+
+void Ragdoll::Update(float deltaTime)
+{
+    if (!_isFlying)
+        return;
+
+    // どれかのボーンが地面に着いたら、飛行を終える(あとは今までどおり重力で倒れる)
+    for (const auto& bone : _bones)
+    {
+        if (bone.rigidBody && bone.rigidBody->IsGrounded())
+        {
+            SetFlying(false);
+            return;
+        }
+    }
+}
+
 void Ragdoll::Launch(const Vector3& direction,float speed)
 {
+    SetFlying(true);
+
     //寝ているBoneを起こす
     for (auto& bone : _bones)
         if (bone.rigidBody)
@@ -684,7 +714,9 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
     Vector3 rootPosition(0.0f, 0.0f, 0.0f);
     if (!_bones.empty() && _bones[0].rigidBody)
         rootPosition = _bones[0].rigidBody->GetPosition();
-    Vector3 tumble = Vector::Cross(Vector3(0.0f, 1.0f, 0.0f), direction) * RagdollTuning::kLaunchTumbleSpeed;
+    // 飛ぶ向き(右なら前転、左なら逆回り)に合わせる
+    const float spinDirection = (direction.x >= 0.0f) ? -1.0f : 1.0f;
+    Vector3 tumble(0.0f, 0.0f, spinDirection * RagdollTuning::kLaunchTumbleSpeed);
 
     static std::mt19937 rng{ std::random_device{}() };
     std::uniform_real_distribution<float> flailDist(-1.0f, 1.0f);
@@ -816,7 +848,7 @@ bool Ragdoll::IsPushCollider(const Collider* other) const
     if (!other) return false;
 
     //地面と自分以外
-    return other->GetCollisionGroup() == 2;
+    return other->GetCollisionGroup() == CollisionGroup::Camera;
 }
 void Ragdoll::OnCollisionEnter(Collider* other, const CollisionResult& result)
 {

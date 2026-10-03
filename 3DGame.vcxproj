@@ -179,6 +179,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="ScoreManager.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="ObjectStatus.h" />
     <ClInclude Include="PhysicsBody.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="PlayerController.h" />
@@ -247,6 +249,7 @@
     <ClInclude Include="Result.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="ServiceLoacator.h" />
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="SphereCollider.h" />

@@ -83,6 +83,11 @@ public:
 	void SetIsGravity(bool useGravity) { isGravity = useGravity; }
 	bool GetUseGravity()const { return isGravity; }
 
+    // 重力トルク(重心が関節からずれているぶん、重い側を下に向ける力)を使うかの設定
+    // 自由落下している間は、重力は回転を生まないので、falseにする
+    void SetUseGravityTorque(bool use) { useGravityTorque = use; }
+    bool GetUseGravityTorque() const { return useGravityTorque; }
+
     //回転と場所設定関数
     void SetPosition(const Vector3& position) { Position = position; }
     void SetRotation(const Quaternion& rotation) { Rotation = rotation; }
@@ -148,6 +153,7 @@ private:
 
     bool isGrounded = false;
 	bool isGravity = false;
+    bool useGravityTorque = true;
 	bool isKinematic = false;
 
 

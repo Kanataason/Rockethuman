@@ -115,6 +115,9 @@
     <Filter Include="ソース ファイル\UI">
       <UniqueIdentifier>{17e3a25a-41c7-4fb2-accc-98e2e0a436e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Object">
+      <UniqueIdentifier>{ad0bde95-35ff-4be7-8d58-0b80d66a4eed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Transform.cpp">
@@ -242,6 +245,9 @@
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
       <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreManager.cpp">
+      <Filter>ソース ファイル\Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -466,6 +472,12 @@
     </ClInclude>
     <ClInclude Include="CannonController.h">
       <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectStatus.h">
+      <Filter>ヘッダー ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreManager.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

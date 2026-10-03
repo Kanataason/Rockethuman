@@ -24,6 +24,9 @@ void CannonController::AddForcePlayer(float deltaTime)
 void CannonController::Update(float deltaTime)
 {
     RotationCannon(deltaTime);
+    if (!_ragdoll)
+        return;
+
     if (_input->GetKeyDown('K'))
     {
         _ragdoll->StartFall();
@@ -53,6 +56,8 @@ void CannonController::RotationCannon(float deltaTime)
 
 void CannonController::SetInitializePlayer(PlayerController* controller)
 {
+    if (!controller)
+        return;
     _player = controller;
     _ragdoll = _player->GetOwner()->GetComponent<Ragdoll>();
 }

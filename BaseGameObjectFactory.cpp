@@ -107,7 +107,7 @@ void GameObjectFactory::BuildBox(GameObject& obj, const ObjectData& data, const 
 
     auto coll = obj.AddComponent<BoxCollider>();
     coll->SetSize(data.transform.Scale);
-    coll->SetCollisionGroup(3);
+    coll->SetCollisionGroup(CollisionGroup::Ground);
     coll->SetPosition(data.transform.Position);
 }
 
