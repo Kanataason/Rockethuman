@@ -138,7 +138,7 @@ void Animator::UpdateIk(const IkChain& chain)
     footPos.y += 0.2f; // レイの開始位置を少し浮かせる
 
     // 足元に地面があるかレイキャストで確認
-    if (_physicsSystem->RayCast(footPos, { 0.0f, -1.0f, 0.0f }, 2.0f, hitPos))
+    if (_physicsSystem->RayCast(footPos, { 0.0f, -1.0f, 0.0f }, 1.0f, hitPos))
     {
         XMFLOAT4X4 root, middle, end;
         XMStoreFloat4x4(&root, XMMatrixMultiply(XMLoadFloat4x4(&nodes[chain.rootNode].GlobalTransform), pos));

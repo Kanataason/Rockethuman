@@ -57,3 +57,13 @@ DirectX::XMFLOAT3 Transform::GetRight() const
     XMStoreFloat3(&result, right);
     return result;
 }
+DirectX::XMFLOAT3 Transform::GetUp()const
+{
+    XMMATRIX rot = MakeRotationMatrix(Rotation);
+
+    XMVECTOR forward = XMVector3TransformNormal(XMVectorSet(0,1, 0, 0), rot);
+
+    XMFLOAT3 result;
+    XMStoreFloat3(&result, forward);
+    return result;
+}

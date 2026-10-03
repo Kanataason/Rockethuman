@@ -42,7 +42,7 @@ void CameraController::Update(float deltaTime)
     if (_input->GetKeyDown('R'))
         _rigidBody->EnableKinematic();
 
-    RotationCamera(_input->GetMouseDelta());
+  //  RotationCamera(_input->GetMouseDelta());
 }
 void CameraController::RotationCamera(const POINT& delta)
 {

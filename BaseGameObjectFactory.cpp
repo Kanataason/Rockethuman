@@ -138,16 +138,16 @@ void GameObjectFactory::BuildPlayer(GameObject& obj, const ObjectData& data, con
 void GameObjectFactory::BuildCamera(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& /*model*/)
 {
     obj.AddComponent<Camera>();
- //  obj.AddComponent<CameraController>();
+   //obj.AddComponent<CameraController>();
 
-    //auto coll = obj.AddComponent<SphereCollider>();
-    //coll->SetCollisionGroup(2);
-    //coll->SetPosition(data.transform.Position);
+   // auto coll = obj.AddComponent<SphereCollider>();
+   // coll->SetCollisionGroup(2);
+   // coll->SetPosition(data.transform.Position);
 
-    //// カメラは物理挙動で動かすためキネマティックにはしない
-    //auto rigi = obj.AddComponent<RigidBody>();
-    //rigi->DisableKinematic();
-    //rigi->SetPosition(Vector::fromF3ToV3(data.transform.Position));
+   // //// カメラは物理挙動で動かすためキネマティックにはしない
+   // auto rigi = obj.AddComponent<RigidBody>();
+   // rigi->DisableKinematic();
+   // rigi->SetPosition(Vector::fromF3ToV3(data.transform.Position));
 }
 
 // ライト：平行光源を追加するだけ

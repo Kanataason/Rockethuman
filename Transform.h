@@ -13,6 +13,9 @@ struct Transform
     //現在の回転から前方向ベクトルを算出
     DirectX::XMFLOAT3 GetForward() const;
 
-    //現在の開店から右方向ベクトルを算出
+    //現在の回転から右方向ベクトルを算出
     DirectX::XMFLOAT3 GetRight() const;
+
+    //現在の回転から上方向ベクトルを算出
+    DirectX::XMFLOAT3 GetUp()const;
 };

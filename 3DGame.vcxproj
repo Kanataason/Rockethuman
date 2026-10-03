@@ -159,6 +159,7 @@
     <ClCompile Include="DebugUtillity.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="HingeJoint.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="JsonLoader.cpp" />

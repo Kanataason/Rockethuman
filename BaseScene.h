@@ -20,13 +20,10 @@ class BaseScene
 {
 public:
 	BaseScene() = default;
-
 	virtual ~BaseScene() = default;
 
 	virtual void Initialize(ServiceLocator& context);
-
 	virtual void Update(float deltaTime);
-
 	virtual void Draw(Renderer& renderer);
 	virtual void DrawUi() {};
 	// 所有しているComponentを解放する(unique_ptrの破棄で、RigidBody/Colliderの登録解除も自動的に行われる)
@@ -34,6 +31,17 @@ public:
 
 	//シーン上のオブジェクトを追加
 	void AddObject(std::unique_ptr<GameObject> objectList) ;
+
+	//シーン上にあるオブジェクトを比べて指定したオブジェクトを返す
+	//とても重いのでInitializeとかでしか使用しない
+	template<typename T>
+	T* FindGameObject()const
+	{
+		for (const auto& object : _objects)
+			if (auto* component = object->GetComponent<T>())
+				return component;
+		return nullptr;
+	}
 
 	const virtual std::vector<std::unique_ptr<GameObject>>& GetObjectList() const { return _objects; };
 private:
