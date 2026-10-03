@@ -39,7 +39,7 @@
             "attribute": "Primitive",
             "type": "Cannon",
             "position": [ 0, 4.6, 0 ],
-            "scale": [ 1, 1, 1 ]
+            "scale": [ 1, 2, 1 ]
         },
         {
             "attribute": "Primitive",

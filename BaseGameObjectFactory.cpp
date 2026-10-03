@@ -14,6 +14,7 @@
 #include "PlayerController.h"
 #include "CapsuleCollider.h"
 #include "Ragdoll.h"
+#include "CannonController.h"
 
 // ObjectTypeごとのコンポーネント構築処理をまとめた関数テーブル
 // 新しいObjectTypeを追加する場合はBuild関数を実装し、ここに登録するだけでよい
@@ -157,6 +158,7 @@ void GameObjectFactory::BuildLight(GameObject& obj, const ObjectData& /*data*/, 
 
 void GameObjectFactory::BuildCannon(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model)
 {
+    obj.AddComponent<CannonController>();
     auto meshRenderer = obj.AddComponent<MeshRenderer>();
     meshRenderer->SetModel(model);
 }

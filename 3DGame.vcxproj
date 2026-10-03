@@ -151,6 +151,7 @@
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSceneLoader.cpp" />
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="CannonController.cpp" />
     <ClCompile Include="ColliderManager.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Collider.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="CannonController.h" />
     <ClInclude Include="CapsuleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Collision.h" />

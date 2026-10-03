@@ -186,9 +186,6 @@
     <ClCompile Include="Collision.cpp">
       <Filter>ソース ファイル\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Collider.cpp">
-      <Filter>ソース ファイルPhysics</Filter>
-    </ClCompile>
     <ClCompile Include="CameraController.cpp">
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
@@ -236,6 +233,12 @@
     </ClCompile>
     <ClCompile Include="MaterialLoader.cpp">
       <Filter>ソース ファイル\factory\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="CannonController.cpp">
+      <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -457,6 +460,9 @@
     </ClInclude>
     <ClInclude Include="UiRenderer.h">
       <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="CannonController.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

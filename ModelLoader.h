@@ -26,9 +26,10 @@ public :
 	//もともと設定してある図形を読み取る
 	std::shared_ptr<ModelDatas> PrimitiveLoadModel(const ObjectType& type);
 
-
-
+	//Primitivのテーブルでの関数定義で読みやすくするために宣言
+	static std::shared_ptr<Mesh> CreateCannon();
 private:
+
 	// 1メッシュ分の頂点・インデックス・ボーンウェイトをMeshInfoに追加
 	void GetFbxObjectData(MeshInfo& mesh, const aiMesh* aimesh, const std::unordered_map<std::string, int>& boneMap);
 

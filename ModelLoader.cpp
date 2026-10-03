@@ -448,7 +448,7 @@ std::shared_ptr<ModelDatas> ModelLoader::PrimitiveLoadModel(const ObjectType& ty
         { ObjectType::Triangle, []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::TriangleMesh>(1.0)); } },
         { ObjectType::Box,      []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0)); } },
         { ObjectType::Quad,     []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::QuadMesh>(1.0)); } },
-        {ObjectType::Cannon, [](){return std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0));  }}
+        { ObjectType::Cannon,   CreateCannon}
     };
     //オブジェクトタイプが登録されているかどうか確認
     auto found = creators.find(type);
@@ -462,4 +462,14 @@ std::shared_ptr<ModelDatas> ModelLoader::PrimitiveLoadModel(const ObjectType& ty
 
     data->meshes.push_back(meshData);
     return data;
+}
+std::shared_ptr<Mesh> ModelLoader::CreateCannon()
+{
+    auto mesh = std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0f));
+
+    // 箱の頂点は、中心が原点(Yが -0.5～0.5)。上に0.5ずらして、下端(Y=0)を原点にする
+    for (auto& vertex : mesh->GetMeshInfos().vertices)
+        vertex.Position.y += 0.5f;
+
+    return mesh;
 }
