@@ -9,7 +9,7 @@ public:
 	Event<float> OnSendScore;
 
 	void SetScore(float score) { _score = score; }
-	void OnCollisionEnter(Collider* other, const CollisionResult& result)override { OnSendScore.Invoke(_score); };
+	void OnCollisionEnter(Collider* other, const CollisionResult& result)override;
 private:
 	Vector3 _initializePos;
 	float _score = 0.0f;

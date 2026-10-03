@@ -3,5 +3,5 @@
 
 void ScoreManager::SubScribeEvent(ObjectStatus* status)
 {
-	status->OnSendScore.Subscribe([this](float score) {SetScore(score);});
+	status->OnSendScore.Subscribe([this](float score) {AddScore(score);});
 }

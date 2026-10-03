@@ -30,6 +30,7 @@ public:
 	static void BuildCamera(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
 	static void BuildLight(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
 	static void BuildCannon(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
+	static void BuildScoreObject(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
 private:
 	ModelManager& _modelManager;
 	MaterialManager& _materialManager;

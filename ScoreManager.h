@@ -11,7 +11,8 @@ public:
 	void SubScribeEvent(ObjectStatus* object);
 	float GetScore()const { return _totalScore; }
 private:
-	void SetScore(float score) { _totalScore = score; }
+	void AddScore(float score)
+	{ _totalScore += score; }
 private:
 	float _totalScore = 0.0f;
 };

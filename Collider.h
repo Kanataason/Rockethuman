@@ -21,7 +21,8 @@ enum class CollisionGroup
     None = 0,
     Ragdoll = 1,
     Camera = 2,
-    Ground = 3
+    Ground = 3,
+    Target = 4
 };
 
 

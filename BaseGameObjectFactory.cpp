@@ -15,6 +15,7 @@
 #include "CapsuleCollider.h"
 #include "Ragdoll.h"
 #include "CannonController.h"
+#include "ObjectStatus.h"
 
 // ObjectTypeごとのコンポーネント構築処理をまとめた関数テーブル
 // 新しいObjectTypeを追加する場合はBuild関数を実装し、ここに登録するだけでよい
@@ -26,7 +27,8 @@ static const std::unordered_map<ObjectType, ObjectBuilder> _objectBuilders =
     { ObjectType::Player, &GameObjectFactory::BuildPlayer },
     { ObjectType::Camera, &GameObjectFactory::BuildCamera },
     { ObjectType::Light,  &GameObjectFactory::BuildLight },
-    { ObjectType::Cannon, &GameObjectFactory::BuildCannon}
+    { ObjectType::Cannon, &GameObjectFactory::BuildCannon},
+    {ObjectType::ScoreObject, &GameObjectFactory::BuildScoreObject}
 };
 
 // モデルを取得し、各メッシュにマテリアル/テクスチャを割り当てる
@@ -159,6 +161,12 @@ void GameObjectFactory::BuildLight(GameObject& obj, const ObjectData& /*data*/, 
 void GameObjectFactory::BuildCannon(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model)
 {
     obj.AddComponent<CannonController>();
+    auto meshRenderer = obj.AddComponent<MeshRenderer>();
+    meshRenderer->SetModel(model);
+}
+void GameObjectFactory::BuildScoreObject(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model)
+{
+    obj.AddComponent<ObjectStatus>();
     auto meshRenderer = obj.AddComponent<MeshRenderer>();
     meshRenderer->SetModel(model);
 }

@@ -100,9 +100,6 @@
     <Filter Include="ヘッダー ファイル\Base">
       <UniqueIdentifier>{d548c6eb-12e8-4305-92dd-5ae88bc4fd8b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\other">
-      <UniqueIdentifier>{e853aaef-f1ef-4178-9883-d95ef6ea7235}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\Scene">
       <UniqueIdentifier>{7ae932d7-9a44-433b-909a-57c05dc641c8}</UniqueIdentifier>
     </Filter>
@@ -117,6 +114,12 @@
     </Filter>
     <Filter Include="ヘッダー ファイル\Object">
       <UniqueIdentifier>{ad0bde95-35ff-4be7-8d58-0b80d66a4eed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Object">
+      <UniqueIdentifier>{0c946371-772b-4508-92ef-b496cb149afe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Object\other">
+      <UniqueIdentifier>{e853aaef-f1ef-4178-9883-d95ef6ea7235}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -248,6 +251,9 @@
     </ClCompile>
     <ClCompile Include="ScoreManager.cpp">
       <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectStatus.cpp">
+      <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -411,16 +417,16 @@
       <Filter>ヘッダー ファイル\Animation</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\nlohmann\json.hpp">
-      <Filter>ヘッダー ファイル\other</Filter>
+      <Filter>ヘッダー ファイル\Object\other</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\nlohmann\json_fwd.hpp">
-      <Filter>ヘッダー ファイル\other</Filter>
+      <Filter>ヘッダー ファイル\Object\other</Filter>
     </ClInclude>
     <ClInclude Include="IOnCollider.h">
-      <Filter>ヘッダー ファイル\other</Filter>
+      <Filter>ヘッダー ファイル\Object\other</Filter>
     </ClInclude>
     <ClInclude Include="Inspector.h">
-      <Filter>ヘッダー ファイル\other</Filter>
+      <Filter>ヘッダー ファイル\Object\other</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>ヘッダー ファイル\Animation</Filter>
@@ -444,7 +450,7 @@
       <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
     <ClInclude Include="StateMachine.h">
-      <Filter>ヘッダー ファイル\other</Filter>
+      <Filter>ヘッダー ファイル\Object\other</Filter>
     </ClInclude>
     <ClInclude Include="DebugController.h">
       <Filter>ヘッダー ファイル\Player</Filter>
