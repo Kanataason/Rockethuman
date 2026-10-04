@@ -106,6 +106,10 @@ public:
     void SetUseGravityTorque(bool use) { useGravityTorque = use; }
     bool GetUseGravityTorque() const { return useGravityTorque; }
 
+    // 線形速度の上限(発散を防ぐ安全弁)。発射のときだけ上げて、終わったら戻す
+    void SetMaxSpeed(float maxSpeed) { _maxSpeed = maxSpeed; }
+    void ResetMaxSpeed() { _maxSpeed = RagdollTuning::maxVelocitySpeed; }
+
     //回転と場所設定関数
     void SetPosition(const Vector3& position) { Position = position; }
     void SetRotation(const Quaternion& rotation) { Rotation = rotation; }
@@ -172,6 +176,7 @@ private:
     bool isGrounded = false;
 	bool isGravity = false;
     bool useGravityTorque = true;
+    float _maxSpeed = RagdollTuning::maxVelocitySpeed;
 	bool isKinematic = false;
 
     std::array<std::optional<float>, 3> _lockedAxis;

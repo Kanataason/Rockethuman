@@ -19,7 +19,9 @@ void CannonController::AddForcePlayer(float deltaTime)
 {
     auto& transform = GetOwner()->GetTransform();
     const Vector3 direction = Vector::fromF3ToV3(transform.GetUp());   // すでに長さ1
-    _ragdoll->Launch(direction, 200.0f);
+    // 発射の速さ(m/s)。速度の上限(kLaunchMaxVelocitySpeed)より小さくする
+    constexpr float launchSpeed = 28.0f;
+    _ragdoll->Launch(direction, launchSpeed);
 }
 
 void CannonController::Update(float deltaTime)

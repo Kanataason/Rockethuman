@@ -37,7 +37,7 @@ void RigidBody::UpdateGravity(float deltaTime)
 
     // 速度の上限。ジョイントや衝突の補正で速度が発散したときに、
     // ラグドールが吹き飛んだり、1フレームで壁をすり抜けたりするのを防ぐ安全弁。
-    constexpr float maxSpeed = RagdollTuning::maxVelocitySpeed;
+    const float maxSpeed = _maxSpeed;
     if (Vector::SqMagnitude(Velocity) > maxSpeed * maxSpeed)
     {
         // 上限を超えたときだけNormalizeする。

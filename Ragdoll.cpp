@@ -436,7 +436,10 @@ void Ragdoll::StartFall()
     for (auto& bone : _bones)
     {
         if (bone.rigidBody)
+        {
             SetLockZ(false);
+            bone.rigidBody->ResetMaxSpeed();
+        }
     }
     // ボーンを今のアニメーションのポーズに合わせて、ジョイントを作り(すでにあれば作らない)、少し押す
     InitializePhysicsTransform();
@@ -562,7 +565,10 @@ void Ragdoll::StopRagdoll(bool includeHeight)
     for (auto& bone : _bones)
     {
         if (bone.rigidBody)
+        {
             SetLockZ(false);
+            bone.rigidBody->ResetMaxSpeed();
+        }
     }
     // ラグドール中は、プレイヤーの Transform を動かしていない(ボーンは世界座標で動く)。
     // アニメーションに戻すと、体は Transform の位置に描かれるので、Hips が動いた分だけ Transform を動かして、
@@ -739,29 +745,46 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
     _isWaitingSettle = true;
     _settleElapsed = 0.0f;
 
-    //寝ているBoneを起こす
+    //寝ているBoneを起こす。飛んでいる間は、速度の上限を上げる(通常の上限だと、初速が頭打ちになる)
     for (auto& bone : _bones)
         if (bone.rigidBody)
         {
-            SetLockZ(true);
             bone.rigidBody->SetSleeping(false);
+            bone.rigidBody->SetMaxSpeed(RagdollTuning::kLaunchMaxVelocitySpeed);
         }
+
+    // 各ボーンを、今のZで固定する(2D)。全ボーン分を1回で設定する
+    SetLockZ(true);
 
     //スリープタイマーをリセット
     if (_physicsSystem)
         _physicsSystem->ResetRagdollTimer();
 
-    Vector3 launchVelocity = direction * speed;
+    static std::mt19937 rng{ std::random_device{}() };
+    std::uniform_real_distribution<float> unit(-1.0f, 1.0f);   // -1～1
+    std::uniform_real_distribution<float> chance(0.0f, 1.0f);  // 0～1
+
+    // ---- 発射の向きと速さを、少しずらす(XY平面の中で) ----
+    const float angleJitter = DirectX::XMConvertToRadians(RagdollTuning::kLaunchAngleJitterDeg) * unit(rng);
+    const float cosJitter = std::cos(angleJitter);
+    const float sinJitter = std::sin(angleJitter);
+    const Vector3 launchDirection(
+        direction.x * cosJitter - direction.y * sinJitter,
+        direction.x * sinJitter + direction.y * cosJitter,
+        direction.z);
+    const float launchSpeed = speed * (1.0f + RagdollTuning::kLaunchSpeedJitter * unit(rng));
+    Vector3 launchVelocity = launchDirection * launchSpeed;
 
     Vector3 rootPosition(0.0f, 0.0f, 0.0f);
     if (!_bones.empty() && _bones[0].rigidBody)
         rootPosition = _bones[0].rigidBody->GetPosition();
-    // 飛ぶ向き(右なら前転、左なら逆回り)に合わせる
-    const float spinDirection = (direction.x >= 0.0f) ? -1.0f : 1.0f;
-    Vector3 tumble(0.0f, 0.0f, spinDirection * RagdollTuning::kLaunchTumbleSpeed);
 
-    static std::mt19937 rng{ std::random_device{}() };
-    std::uniform_real_distribution<float> flailDist(-1.0f, 1.0f);
+    // ---- 全身の回転: 飛ぶ向き(右なら前転)に合わせるが、たまに逆回り。速さも毎回変わる ----
+    float spinDirection = (launchDirection.x >= 0.0f) ? -1.0f : 1.0f;
+    if (chance(rng) < RagdollTuning::kLaunchSpinReverseChance)
+        spinDirection = -spinDirection;
+    const float tumbleSpeed = RagdollTuning::kLaunchTumbleSpeed * (1.0f + RagdollTuning::kLaunchTumbleJitter * unit(rng));
+    Vector3 tumble(0.0f, 0.0f, spinDirection * tumbleSpeed);
 
     for (auto& bone : _bones)
     {
@@ -774,21 +797,37 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
             continue;
         }
 
+        // 全身の回転ぶんの速度(腰から離れているほど、速く動く)
         const Vector3 relative = bone.rigidBody->GetPosition() - rootPosition;
-        bone.rigidBody->SetVelocity(launchVelocity + Vector::Cross(tumble, relative));
+        Vector3 velocity = launchVelocity + Vector::Cross(tumble, relative);
 
-        const Vector3 flail(flailDist(rng), flailDist(rng), flailDist(rng));
+        // ボーンごとのランダムな速度。腰(ルート)は動かさず、手足や頭は大きく散らす
+        const bool isRoot = bone.parentIndex < 0;
+        if (!isRoot)
+        {
+            const bool isExtremity =
+                bone.name.find("Hand") != std::string::npos ||
+                bone.name.find("Foot") != std::string::npos ||
+                bone.name.find("Head") != std::string::npos ||
+                bone.name.find("ForeArm") != std::string::npos;
+            const float scatterScale = RagdollTuning::kLaunchScatterSpeed *
+                (isExtremity ? RagdollTuning::kLaunchExtremityScatterScale : 1.0f);
+
+            velocity = velocity + Vector3(unit(rng), unit(rng), 0.0f) * scatterScale;
+        }
+        bone.rigidBody->SetVelocity(velocity);
+
+        // ボーンごとのランダムな回転(Zまわり)
+        const Vector3 flail(0.0f, 0.0f, unit(rng));
         bone.rigidBody->SetAngularVelocity(tumble + flail * RagdollTuning::kLaunchFlailSpeed);
     }
 }
 void Ragdoll::SetLockZ(bool lock)
 {
-    const float z = (!_bones.empty() && _bones[0].rigidBody) ? _bones[0].rigidBody->GetPosition().z : 0.0f;
-
     for (auto& bone : _bones)
     {
         if (!bone.rigidBody) continue;
-        if (lock) bone.rigidBody->SetLockStatus(Axis::Z, z);
+        if (lock) bone.rigidBody->SetLockStatus(Axis::Z, bone.rigidBody->GetPosition().z);
         else      bone.rigidBody->ClearAxisLock(Axis::Z);
     }
 }

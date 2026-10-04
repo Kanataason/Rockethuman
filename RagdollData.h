@@ -83,6 +83,10 @@ namespace RagdollTuning
     // 線形速度の上限
     constexpr float maxVelocitySpeed = 20.0f;
 
+    // 大砲で発射して飛んでいる間だけ使う、線形速度の上限。
+    // 通常の上限(maxVelocitySpeed)のままだと、発射の初速がそこで頭打ちになる
+    constexpr float kLaunchMaxVelocitySpeed = 40.0f;
+
 
     //重力トルク
 
@@ -117,6 +121,13 @@ namespace RagdollTuning
 
     // 地面の摩擦係数(接触1回あたり、サブステップ単位)。1 = 即座に滑りを止める。
     constexpr float kGroundFriction = 0.4f;
+
+    // 地面でのバウンド
+    // 反発係数。0 = 跳ねない、1 = ぶつかったときと同じ速さで跳ね返る。
+    constexpr float kGroundRestitution = 0.65f;
+    // これより遅い接触(m/s)では跳ねない。止まりかけの小さな震えを防ぐ。
+    // 超えた分だけ跳ねるので、遅くなるほど自然に跳ねなくなる。
+    constexpr float kGroundBounceMinSpeed = 1.5f;
 
 
     //ボーン同士の接触(PhysicsSystem)
@@ -171,7 +182,16 @@ namespace RagdollTuning
     constexpr float kLaunchTumbleSpeed = 6.0f; // 吹き飛んでいる間の全身の回転速度(rad/s)
 
     // ボーンごとに追加するランダムな回転速度(rad/s)。手足をばたつかせるために使用する。
-    constexpr float kLaunchFlailSpeed = 3.0f;
+    constexpr float kLaunchFlailSpeed = 6.0f;
+
+    // ---- 大砲で発射するときの、ランダム性(ぐちゃぐちゃ度) ----
+    // 値を大きくするほど、毎回の飛び方がばらつく。0にすると、そのランダム性は無くなる
+    constexpr float kLaunchSpeedJitter = 0.05f;            // 初速の±割合(0.05 = ±5%)
+    constexpr float kLaunchAngleJitterDeg = 3.0f;          // 発射の向きの±度
+    constexpr float kLaunchTumbleJitter = 0.5f;            // 全身の回転速度の±割合(0.5 = 0.5倍～1.5倍)
+    constexpr float kLaunchSpinReverseChance = 0.25f;      // 回転が逆向きになる確率(0～1)
+    constexpr float kLaunchScatterSpeed = 2.5f;            // ボーンごとに足す、ランダムな速度(m/s)
+    constexpr float kLaunchExtremityScatterScale = 2.0f;   // 頭・手・足を、何倍に散らすか
 
 
     // 休止(ragdollが倒れて静止したら止める)(RagdollSystem)

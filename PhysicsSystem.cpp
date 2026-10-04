@@ -27,7 +27,10 @@ static void ApplyGroundContactImpulse(RigidBody& body, const Vector3& contactPoi
     if (effectiveInverseMass <= 0.0f)
         return;
 
-    const float impulseMagnitude = -approachSpeed / effectiveInverseMass; // no bounce
+    // 跳ね返る速さ。しきい値を超えた分だけ、反発係数をかける(遅い接触は跳ねない)
+    const float bounceSpeed = RagdollTuning::kGroundRestitution *
+        std::max(0.0f, -approachSpeed - RagdollTuning::kGroundBounceMinSpeed);
+    const float impulseMagnitude = (-approachSpeed + bounceSpeed) / effectiveInverseMass;
     // 線形速度は法線方向に、角速度は (腕 x 法線) 方向に変化する
     body.SetVelocity(linearVelocity + normal * (impulseMagnitude * inverseMass));
     body.SetAngularVelocity(angularVelocity + armCrossNormal * (impulseMagnitude * inverseInertia));
@@ -168,12 +171,11 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
         //疑似速度をrigidBodyに反映
         ApplyPseudoVelocityToPositions(subDeltaTime);
 
+        //軸を固定するか見る
+        LockRigidBodyAxis();
 
         // 次のサブステップのために、Colliderを最新にする
         SyncCollidersFromRigidBodies();
-
-        //軸を固定するか見る
-        LockRigidBodyAxis();
     }
 
 
@@ -396,12 +398,6 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
 {
     RigidBody& rigidBody = *body.rigidBody;
 
-    //下向き(-Y)の速度だけを消す(平らな地面の前提)
-    Vector3 velocity = rigidBody.GetVelocity();
-    if (velocity.y < 0.0f)
-        velocity.y = 0.0f;
-    rigidBody.SetVelocity(velocity);
-
     constexpr float penetrationCorrectionRate = RagdollTuning::penetrationCorrectionRate;
     constexpr float penetrationSlop = RagdollTuning::penetrationSlop;
     const float correctedPenetration = std::max(0.0f, result.penetration - penetrationSlop);
@@ -415,7 +411,17 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
         std::pow(RagdollTuning::kGroundAngularDampPerFrame, subDeltaTime / deltaTime);
     rigidBody.SetAngularVelocity(rigidBody.GetAngularVelocity() * groundAngularDamp);
 
+    // 先に衝突のインパルスを加える(ここで跳ね返る速度が決まる)。
+    // 先に下向きの速度を消すと、ぶつかった速さが分からなくなり、跳ねなくなる
     ApplyGroundContactImpulse(rigidBody, result.contactPoint, contactNormal);
+
+    // 回転のせいで、まだ地面に沈む向きの速度が残っているときだけ、消す(平らな地面の前提)
+    Vector3 velocity = rigidBody.GetVelocity();
+    if (velocity.y < 0.0f)
+    {
+        velocity.y = 0.0f;
+        rigidBody.SetVelocity(velocity);
+    }
 }
 
 void PhysicsSystem::ResolveBoneContact(PhysicsBody& body, const CollisionResult& result,
