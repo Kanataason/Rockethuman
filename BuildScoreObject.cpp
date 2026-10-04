@@ -10,7 +10,8 @@
 // 点数が入る物(的)：状態 + 見た目 + 衝突用のBoxCollider
 void ObjectBuilders::BuildScoreObject(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model)
 {
-    obj.AddComponent<ObjectStatus>();
+    auto status = obj.AddComponent<ObjectStatus>();
+    status->SetScore(data.score);   // JSONの"score"(省略時は100)
     auto meshRenderer = obj.AddComponent<MeshRenderer>();
     meshRenderer->SetModel(model);
 

@@ -15,7 +15,6 @@ public:
 	// 追いかける相手(借りるだけ。所有者はシーンのGameObject)
 	void SetTarget(Ragdoll* target) { _target = target; }
 
-
 	void StartFollow();
 
 	void ReturnToStart();
@@ -32,6 +31,8 @@ private:
 	float _lockX = 0.5f;//どこを基準にして追いかけるか
 	float _followYRatio = 0.5f;//Y軸方向の追いかけ度
 	float _returnFinishDistance = 0.05f;//戻るときの判定
+	float _pullBackScale = 1.8f;//最大で何倍まで引くか
+	float _pullBackFullSpeed = 25.0f;//この速さ(m/s)で、最大まで引く。遅いほど、引き具合も小さくなる
 
 	Ragdoll* _target = nullptr;
 	Mode _mode = Mode::Idle;

@@ -1,4 +1,5 @@
-﻿#include <cmath>
+﻿#include <algorithm>
+#include <cmath>
 
 #include "CameraFollow.h"
 #include "GameObject.h"
@@ -40,9 +41,15 @@ void CameraFollow::Update(float deltaTime)
 
 		const auto root = _target->GetRootPosition();
 
-		// 奥行き(Z)は固定。横(X)は腰の少し先、縦(Y)は動いた分の一部だけ追う
+		// 奥行きは速さによって拡大縮小。横は腰の少し先、縦は動いた分の一部だけ追う
 		goal.x = root.x + _lockX;
 		goal.y = _startPosition.y + (root.y - _startRootY) *_followYRatio;
+
+		// 今のラグドールの速さに応じて、なめらかに引く
+		const float speed = _target->GetRootVelocity().Length();
+		const float pullBackRatio = std::clamp(speed / _pullBackFullSpeed, 0.0f, 1.0f);
+		goal.z = _startPosition.z * (1.0f + (_pullBackScale - 1.0f) * pullBackRatio);
+
 		sharpness = _followSharpness;
 	}
 

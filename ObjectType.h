@@ -69,6 +69,7 @@ struct ObjectData
 	std::string materialName = "";
 	Transform transform = {};
 	DirectX::XMFLOAT3 direction = { 0,0,0 };
+	float score = 100.0f;   // 的の基本点(Jsonの"score"。省略時は100)
 
 	std::vector<AnimationData> animationDatas;
 };

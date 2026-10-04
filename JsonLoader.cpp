@@ -169,6 +169,7 @@ ObjectData JsonLoader::LoadGameObjectData(const json& root)
 	data.modelPath = LoadPath(root);
 	data.transform = LoadTransform(root);
 	data.materialName = LoadMaterial(root);
+	data.score = root.value("score", data.score);
 	
 	LoadAnimationPath(root,data.animationDatas);
 

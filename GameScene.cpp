@@ -1,12 +1,32 @@
 ﻿#include "GameScene.h"
 
+#include <algorithm>
+#include <cmath>
+
 #include "CannonController.h"
 #include "Player.h"
 #include "Ragdoll.h"
 #include "CameraFollow.h"
+#include "BaseCamera.h"
 #include "ObjectStatus.h"
 
 using namespace UiInfo;
+
+namespace
+{
+	// ---- 点が入ったときの演出の調整値 ----
+	constexpr float kPopupLifetime = 1.3f;       // 「+500」が消えるまでの秒数
+	constexpr float kPopupRisePixels = 90.0f;    // 浮き上がる高さ(1280x720基準のピクセル)
+	constexpr float kPopupBaseScale = 0.45f;     // 文字の大きさ
+	constexpr float kPopupPopSeconds = 0.25f;    // 出た瞬間に弾む時間
+	constexpr float kPopupFadeStart = 0.6f;      // 寿命のここから先で、だんだん透明になる(0～1)
+
+	// COMBO表示(スコアのパネルの下)
+	constexpr float kComboCenterX = 180.0f;
+	constexpr float kComboCenterY = 172.0f;
+	constexpr float kComboScale = 0.5f;
+	constexpr float kComboPopSeconds = 0.3f;
+}
 
 void GameScene::Initialize(ServiceLocator& locator)
 {
@@ -43,12 +63,26 @@ void GameScene::SubscribeEvents()
 	if (_cameraFollow)
 		_cameraFollow->SetTarget(_ragdoll);
 
+	// 点が入ったら、当たった場所に500を出す
+	_scoreManager.OnScoreGained.Subscribe([this](ScoreGain gain) { AddScorePopup(gain); });
+
 	_roundManager.OnShotFired.Subscribe([this]()
 		{
+			// 発射した位置を覚えておく(止まったときの飛距離の採点に使う)
+			if (_ragdoll)
+				_launchRootX = _ragdoll->GetRootPosition().x;
 			if (_cameraFollow)
 				_cameraFollow->StartFollow();
 		});
-	_roundManager.OnShotSettled.Subscribe([this]() { _shotCountPop.Start(0.5f); });
+	_roundManager.OnShotSettled.Subscribe([this]()
+		{
+			_shotCountPop.Start(0.5f);
+
+			// 1発が終わったら、飛んだ距離を点にして、コンボを途切れさせる
+			if (_ragdoll)
+				_scoreManager.AddDistanceBonus(std::abs(_ragdoll->GetRootPosition().x - _launchRootX));
+			_scoreManager.ResetCombo();
+		});
 	_roundManager.OnReadyNextShot.Subscribe([this]()
 		{
 			if (_ragdoll)
@@ -63,7 +97,9 @@ void GameScene::Update(float deltaTime)
 	BaseScene::Update(deltaTime);
 
 	_roundManager.Update(deltaTime);
+	_scoreManager.Update(deltaTime);
 	_shotCountPop.Update(deltaTime);
+	UpdateScoreEffects(deltaTime);
 }
 void GameScene::DrawUi()
 {
@@ -76,8 +112,82 @@ void GameScene::DrawUi()
 
 	UpdateScorePanel(panel);
 	DrawShotCountPanel();
+	DrawComboText();
+	DrawScorePopups();
 
 	_uiRenderer->End();
+}
+
+void GameScene::AddScorePopup(const ScoreGain& gain)
+{
+	ScorePopup popup;
+	popup.worldPosition = gain.position;
+	popup.isHead = gain.isHead;
+
+	const std::wstring points = L"+" + FormatWithComma(static_cast<int>(gain.points));
+	popup.text = gain.isHead ? L"頭ヒット! " + points : points;
+
+	_scorePopups.push_back(popup);
+}
+
+void GameScene::UpdateScoreEffects(float deltaTime)
+{
+	for (auto& popup : _scorePopups)
+		popup.age += deltaTime;
+
+	std::erase_if(_scorePopups, [](const ScorePopup& popup) { return popup.age >= kPopupLifetime; });
+
+	// コンボが増えた瞬間に、COMBOの文字を弾ませる
+	const int combo = _scoreManager.GetCombo();
+	if (combo > _lastCombo)
+		_comboPop.Start(kComboPopSeconds);
+	_lastCombo = combo;
+	_comboPop.Update(deltaTime);
+}
+
+// 当たった場所から浮き上がって、消える文字。当たった場所は世界座標なので、カメラが動いても場所についていく
+void GameScene::DrawScorePopups()
+{
+	if (!_camera)
+		return;
+
+	const DirectX::XMMATRIX view = _camera->GetViewMatrix();
+	const DirectX::XMMATRIX projection = _camera->GetProjectionMatrix();
+
+	for (const auto& popup : _scorePopups)
+	{
+		const float t = popup.age / kPopupLifetime;
+
+		const DirectX::XMVECTOR world = DirectX::XMVectorSet(
+			popup.worldPosition.x, popup.worldPosition.y, popup.worldPosition.z, 1.0f);
+		const DirectX::XMFLOAT2 screen = _uiRenderer->WorldToScreen(world, view, projection);
+
+		const float rise = kPopupRisePixels * EaseOutCubic(t);
+		const float alpha = t < kPopupFadeStart ? 1.0f : 1.0f - (t - kPopupFadeStart) / (1.0f - kPopupFadeStart);
+
+		// 出た瞬間に大きく弾んで、元の大きさに戻る。頭ヒットは、さらに大きくて金色
+		const float popT = (std::min)(popup.age / kPopupPopSeconds, 1.0f);
+		const float scale = kPopupBaseScale * (popup.isHead ? 1.3f : 1.0f) * (1.0f + 0.5f * (1.0f - EaseOutBack(popT)));
+
+		const DirectX::XMVECTOR color = popup.isHead
+			? DirectX::XMVectorSet(1.0f, 0.8f, 0.2f, alpha)
+			: DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, alpha);
+
+		_uiRenderer->DrawStringCentered(popup.text, screen.x, screen.y - rise, scale,
+			color, DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, alpha));
+	}
+}
+
+// 「COMBO x3」(2コンボ以上のときだけ)
+void GameScene::DrawComboText()
+{
+	const int combo = _scoreManager.GetCombo();
+	if (combo < 2)
+		return;
+
+	const float pop = 1.0f + 0.5f * (1.0f - EaseOutBack(_comboPop.T()));
+	_uiRenderer->DrawStringCentered(L"COMBO x" + std::to_wstring(combo), kComboCenterX, kComboCenterY,
+		kComboScale * pop, DirectX::XMVectorSet(1.0f, 0.55f, 0.2f, 1.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
 // パネルの塗り・枠・見出しの文字を描く(スコアと残りの数で共通)

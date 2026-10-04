@@ -26,6 +26,13 @@ struct Tween
 	float T() const { return duration > 0.0f ? time / duration : 1.0f; }
 };
 
+// 最初が速く、だんだん遅くなる動き。t=0で0、t=1で1
+inline float EaseOutCubic(float t)
+{
+	const float u = 1.0f - t;
+	return 1.0f - u * u * u;
+}
+
 // 少し行き過ぎてから戻る動き(ポンッとした弾み)。t=0で0、t=1で1
 inline float EaseOutBack(float t)
 {

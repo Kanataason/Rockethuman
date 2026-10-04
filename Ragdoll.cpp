@@ -705,6 +705,23 @@ Vector3 Ragdoll::GetRootPosition() const
 
     return Vector::fromF3ToV3(_owner->GetTransform().Position);
 }
+Vector3 Ragdoll::GetRootVelocity()const
+{
+    if (_enabled && !_bones.empty() && _bones[0].rigidBody)
+        return _bones[0].rigidBody->GetVelocity();
+
+    return Vector3(0.0f, 0.0f, 0.0f);
+}
+
+std::string Ragdoll::GetBoneName(const Collider* collider) const
+{
+    for (const auto& bone : _bones)
+    {
+        if (bone.collider.get() == collider)
+            return bone.name;
+    }
+    return std::string();
+}
 
 bool Ragdoll::AllBonesSleeping() const
 {

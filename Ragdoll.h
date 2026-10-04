@@ -319,6 +319,12 @@ public:
     // 体の中心(腰)の世界座標。ラグドール中は物理のボーンの位置、そうでなければPlayerのTransformの位置
     // (ラグドール中はTransformを動かさないので、カメラの追従などは、これを見る)
     Vector3 GetRootPosition() const;
+
+    //CameraFollowでカメラの引き具合を決めるためにrootの速さをとる
+    Vector3 GetRootVelocity() const;
+
+    // コライダーに対応するボーンの名前。このラグドールのコライダーでなければ、空文字
+    std::string GetBoneName(const Collider* collider) const;
 private:
 
     void SetLockZ(bool lock);
