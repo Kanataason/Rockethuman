@@ -29,4 +29,8 @@ private:
 	float _swingSpeed = 1.0f;
 	float _swingMinAngle = -80.0f;
 	float _swingMaxAngle = 80.0f;
+
+	// 威力ゲージが0のときと、1のときの、発射の速さ(m/s)。速度の上限(kLaunchMaxVelocitySpeed)より小さくする
+	float _minLaunchSpeed = 12.0f;
+	float _maxLaunchSpeed = 34.0f;
 };

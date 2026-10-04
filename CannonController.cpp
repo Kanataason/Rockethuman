@@ -19,21 +19,40 @@ void CannonController::AddForcePlayer(float deltaTime)
 {
     auto& transform = GetOwner()->GetTransform();
     const Vector3 direction = Vector::fromF3ToV3(transform.GetUp());   // すでに長さ1
-    // 発射の速さ(m/s)。速度の上限(kLaunchMaxVelocitySpeed)より小さくする
-    constexpr float launchSpeed = 28.0f;
+
+    // 威力ゲージの量(0～1)で、最小～最大の間の速さを決める
+    const float power = _roundManager ? _roundManager->GetPowerAmount() : 1.0f;
+    const float launchSpeed = _minLaunchSpeed + (_maxLaunchSpeed - _minLaunchSpeed) * power;
     _ragdoll->Launch(direction, launchSpeed);
 }
 
 void CannonController::Update(float deltaTime)
 {
-    RotationCannon(deltaTime);
-    if (!_ragdoll)
+    if (!_ragdoll || !_roundManager)
         return;
 
-    if (_input->GetKeyDown('K')&&_roundManager&&_roundManager->TryUseShot())
+    // スペースキーで、2段階に止める: 角度(揺れている大砲)-> 威力(ゲージ)で発射
+    const bool pressed = _input->GetKeyDown(VK_SPACE);
+
+    switch (_roundManager->GetState())
     {
-        _ragdoll->StartFall();
-        AddForcePlayer(deltaTime);
+    case RoundState::AimAngle:
+        RotationCannon(deltaTime);
+        if (pressed)
+            _roundManager->ConfirmAngle();
+        break;
+
+    case RoundState::AimPower:
+        // 角度は止まったまま。威力のゲージを止めたら、発射する
+        if (pressed && _roundManager->TryUseShot())
+        {
+            _ragdoll->StartFall();
+            AddForcePlayer(deltaTime);
+        }
+        break;
+
+    default:
+        break;
     }
 
     // 砲身が回ったあとの向きに合わせて、Playerの位置も毎フレーム合わせ直す

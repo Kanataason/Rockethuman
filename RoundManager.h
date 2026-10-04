@@ -2,11 +2,15 @@
 #include "ServiceLoacator.h"
 #include "Event.h"
 
-// 1発ごとの流れ:  Aiming(狙う) -> Flying(飛んでいる) -> Result(止まって、結果を見せる) -> Aiming...
+// 1発ごとの流れ:
+//   AimAngle(揺れている大砲を止めて、角度を決める)
+//   -> AimPower(ゲージを止めて、威力を決めて発射)
+//   -> Flying(飛んでいる) -> Result(止まって、結果を見せる) -> AimAngle...
 // 玉が尽きたら Finished
 enum class RoundState
 {
-	Aiming,
+	AimAngle,
+	AimPower,
 	Flying,
 	Result,
 	Finished
@@ -27,8 +31,15 @@ public:
 	void Initialize(ServiceLocator& locator);
 	void Update(float deltaTime);
 
-	// 狙っているときだけ撃てる。撃てたらtrue
+	// 角度を決める。角度を狙っているときだけ受け付けて、威力のゲージに進む。進めたらtrue
+	bool ConfirmAngle();
+
+	// 威力を決めて撃つ。威力のゲージを動かしているときだけ撃てる。撃てたらtrue
 	bool TryUseShot();
+
+	// 威力ゲージの今の量(0～1)。ゲージを動かす側(GameScene)が毎フレーム書き、大砲が撃つときに読む
+	void SetPowerAmount(float amount) { _powerAmount = amount; }
+	float GetPowerAmount()const { return _powerAmount; }
 
 	// ラグドールが止まったことを伝える(飛んでいるときだけ受け付ける)
 	void NotifySettled();
@@ -40,6 +51,7 @@ private:
 	static constexpr float kResultSeconds = 1.5f;
 
 	int _shotCount = 3;
-	RoundState _state = RoundState::Aiming;
+	RoundState _state = RoundState::AimAngle;
 	float _resultTimer = 0.0f;
+	float _powerAmount = 0.0f;
 };

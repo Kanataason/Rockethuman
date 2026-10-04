@@ -114,8 +114,10 @@ void GameScene::Update(float deltaTime)
 	_roundManager.Update(deltaTime);
 	_scoreManager.Update(deltaTime);
 	_shotCountPop.Update(deltaTime);
+	UpdateGauge(deltaTime);
 	UpdateScoreEffects(deltaTime);
 }
+
 void GameScene::DrawUi()
 {
 	// Begin～Endの間でreturnすると、Endが呼ばれず描画の状態が壊れるので、先に探しておく
@@ -129,9 +131,88 @@ void GameScene::DrawUi()
 	DrawShotCountPanel();
 	DrawComboText();
 	DrawScorePopups();
+	DrawGauge();
+	DrawAimHint();
 
 	_uiRenderer->End();
 }
+
+// 画面の下に、いま何を決めるのかを出す(角度 -> 威力の2段階)
+void GameScene::DrawAimHint()
+{
+	std::wstring hint;
+	switch (_roundManager.GetState())
+	{
+	case RoundState::AimAngle:
+		hint = L"スペースキーで かくどを きめる";
+		break;
+	case RoundState::AimPower:
+		hint = L"スペースキーで いりょくを きめる";
+		break;
+	default:
+		return;
+	}
+
+	_uiRenderer->DrawStringCentered(hint, 640.0f, 600.0f, 0.4f,
+		DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
+}
+
+void GameScene::DrawGauge()
+{
+	auto it = panelList.find(PanelType::CannonGauge);
+	if (it == panelList.end())
+		return;
+
+	auto& panelData = it->second.frame;
+
+	// 背景
+	_uiRenderer->DrawRect(panelData.left, panelData.top, panelData.width,
+		panelData.height, DirectX::XMVectorSet(0, 0, 0, 0.6f));
+
+	// 中身: 量に応じて、下端から上へ伸びる。色の帯ごとに区切って塗る
+	// 帯の位置は固定で、量が増えるほど、上の帯まで色が出てくる
+	float zoneStart = 0.0f;
+	for (const auto& zone : _gaugeZones)
+	{
+		const float filledEnd = (std::min)(_gaugeAmmount, zone.upTo);
+		if (filledEnd > zoneStart)
+		{
+			const float segmentHeight = panelData.height * (filledEnd - zoneStart);
+			const float segmentTop = panelData.top + panelData.height * (1.0f - filledEnd);
+			_uiRenderer->DrawRect(panelData.left, segmentTop, panelData.width, segmentHeight,
+				XMLoadFloat4(&zone.color));
+		}
+		zoneStart = zone.upTo;
+	}
+	_uiRenderer->DrawFrame(panelData.left, panelData.top, panelData.width, 
+		panelData.height, 2.0f, DirectX::XMVectorSet(1, 1, 1, 1));
+
+}
+
+void GameScene::UpdateGauge(float deltaTime)
+{
+	switch (_roundManager.GetState())
+	{
+	case RoundState::AimAngle:
+		// 角度を決めている間は、ゲージを空にして待つ(次の1発も、毎回0から動き出す)
+		_gaugeFrame = 0.0f;
+		_gaugeAmmount = 0.0f;
+		break;
+
+	case RoundState::AimPower:
+		_gaugeFrame += _gaugeSpeed * deltaTime;
+		_gaugeAmmount = std::abs(std::sin(_gaugeFrame));
+		break;
+
+	default:
+		// 発射したあとは、止めた量のまま表示しておく
+		break;
+	}
+
+	// 大砲が撃つときに読めるように、今の量を渡しておく
+	_roundManager.SetPowerAmount(_gaugeAmmount);
+}
+
 
 void GameScene::AddScorePopup(const ScoreGain& gain)
 {

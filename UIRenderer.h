@@ -37,6 +37,7 @@ enum class PanelType
     Setting,
     Score,
     ShotCount,
+    CannonGauge,
     None
 };
 
@@ -131,6 +132,13 @@ namespace UiInfo
                        .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
             .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
               .items = {{TextType::ShotCount, ButtonType::None}
+            }}
+        },
+           {PanelType::CannonGauge, {
+            .frame = {.left = 80.0f, .top = 200.0f, .width = 30.0f, .height = 200.0f,
+                       .thickness = 2.0f, .frameColor = { 0, 1, 0, 1 } },
+            .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
+              .items = {{TextType::None, ButtonType::None}
             }}
         }
     };
