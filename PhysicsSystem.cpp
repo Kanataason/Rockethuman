@@ -27,10 +27,8 @@ static void ApplyGroundContactImpulse(RigidBody& body, const Vector3& contactPoi
     if (effectiveInverseMass <= 0.0f)
         return;
 
-    // 跳ね返る速さ。しきい値を超えた分だけ、反発係数をかける(遅い接触は跳ねない)
-    const float bounceSpeed = RagdollTuning::kGroundRestitution *
-        std::max(0.0f, -approachSpeed - RagdollTuning::kGroundBounceMinSpeed);
-    const float impulseMagnitude = (-approachSpeed + bounceSpeed) / effectiveInverseMass;
+    // ここでは、地面に向かう速さを消すだけ(バウンドは、ResolveGroundContactで別に足す)
+    const float impulseMagnitude = -approachSpeed / effectiveInverseMass;
     // 線形速度は法線方向に、角速度は (腕 x 法線) 方向に変化する
     body.SetVelocity(linearVelocity + normal * (impulseMagnitude * inverseMass));
     body.SetAngularVelocity(angularVelocity + armCrossNormal * (impulseMagnitude * inverseInertia));
@@ -398,6 +396,9 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
 {
     RigidBody& rigidBody = *body.rigidBody;
 
+    // ぶつかる前の、地面に向かう速さ(中心の速度の法線成分)。バウンドの強さは、これで決める
+    const float impactSpeed = -Vector::Dot(rigidBody.GetVelocity(), contactNormal);
+
     constexpr float penetrationCorrectionRate = RagdollTuning::penetrationCorrectionRate;
     constexpr float penetrationSlop = RagdollTuning::penetrationSlop;
     const float correctedPenetration = std::max(0.0f, result.penetration - penetrationSlop);
@@ -422,6 +423,14 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
         velocity.y = 0.0f;
         rigidBody.SetVelocity(velocity);
     }
+
+    // バウンド: しきい値を超えた分だけ、反発係数をかけて、地面から離れる向きの速度を足す。
+    // 接触点のインパルスだけでは、当たった位置のずれのぶんが回転に逃げて、ほとんど跳ねないので、
+    // ボーンの中心の速度に、直接足している
+    const float bounceSpeed = RagdollTuning::kGroundRestitution *
+        std::max(0.0f, impactSpeed - RagdollTuning::kGroundBounceMinSpeed);
+    if (bounceSpeed > 0.0f)
+        rigidBody.SetVelocity(rigidBody.GetVelocity() + contactNormal * bounceSpeed);
 }
 
 void PhysicsSystem::ResolveBoneContact(PhysicsBody& body, const CollisionResult& result,

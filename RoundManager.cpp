@@ -33,6 +33,7 @@ bool RoundManager::TryUseShot()
 		return false;
 
 	_state = RoundState::Flying;
+	OnShotFired.Invoke();
 	return true;
 }
 

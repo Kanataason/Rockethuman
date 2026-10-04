@@ -15,6 +15,8 @@ enum class RoundState
 class RoundManager
 {
 public:
+	// 発射した瞬間(カメラが追いかけ始めるのに使う)
+	Event<> OnShotFired;
 	// ラグドールが止まった瞬間(UIのアニメーションを始めるのに使う)
 	Event<> OnShotSettled;
 	// 結果を見せ終わって、次の1発に進めるとき(ラグドールを大砲に戻すのに使う)

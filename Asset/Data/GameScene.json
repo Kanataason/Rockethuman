@@ -54,7 +54,7 @@
             "type": "Prop",
             "material": "background",
             "position": [ 0, 10, 20 ],
-            "scale": [ 100, 60, 0.1 ]
+            "scale": [ 150, 60, 0.1 ]
         },
         {
             "attribute": "Primitive",
@@ -74,7 +74,7 @@
             "type": "Prop",
             "material": "ground",
             "position": [ 1, -1, 10 ],
-            "scale": [ 100, 3, 30 ]
+            "scale": [ 150, 3, 30 ]
         }
     ]
 }

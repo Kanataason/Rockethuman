@@ -315,6 +315,10 @@ public:
 
     // 発射してから、全ボーンが静止する(スリープする)まで待っている間はtrue
     bool IsWaitingSettle() const { return _isWaitingSettle; }
+
+    // 体の中心(腰)の世界座標。ラグドール中は物理のボーンの位置、そうでなければPlayerのTransformの位置
+    // (ラグドール中はTransformを動かさないので、カメラの追従などは、これを見る)
+    Vector3 GetRootPosition() const;
 private:
 
     void SetLockZ(bool lock);

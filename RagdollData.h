@@ -124,7 +124,7 @@ namespace RagdollTuning
 
     // 地面でのバウンド
     // 反発係数。0 = 跳ねない、1 = ぶつかったときと同じ速さで跳ね返る。
-    constexpr float kGroundRestitution = 0.65f;
+    constexpr float kGroundRestitution = 1.0f;
     // これより遅い接触(m/s)では跳ねない。止まりかけの小さな震えを防ぐ。
     // 超えた分だけ跳ねるので、遅くなるほど自然に跳ねなくなる。
     constexpr float kGroundBounceMinSpeed = 1.5f;

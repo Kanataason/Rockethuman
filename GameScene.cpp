@@ -3,6 +3,7 @@
 #include "CannonController.h"
 #include "Player.h"
 #include "Ragdoll.h"
+#include "CameraFollow.h"
 #include "ObjectStatus.h"
 
 using namespace UiInfo;
@@ -26,6 +27,10 @@ void GameScene::Initialize(ServiceLocator& locator)
 			_scoreManager.SubScribeEvent(component);
 	}
 
+	SubscribeEvents();
+}
+void GameScene::SubscribeEvents()
+{
 	// ラグドールが止まったら、1発ぶんの流れを進める
 	//   止まった瞬間 -> 残りの玉数のアニメーション
 	//   少し待つ     -> ラグドールを大砲に戻して、次の1発へ
@@ -33,11 +38,23 @@ void GameScene::Initialize(ServiceLocator& locator)
 	if (_ragdoll)
 		_ragdoll->OnSettled.Subscribe([this]() { _roundManager.NotifySettled(); });
 
+	// カメラ: 発射したらラグドールを追いかけ、次の1発の準備ができたら最初の位置へ戻る
+	_cameraFollow = FindGameObject<CameraFollow>();
+	if (_cameraFollow)
+		_cameraFollow->SetTarget(_ragdoll);
+
+	_roundManager.OnShotFired.Subscribe([this]()
+		{
+			if (_cameraFollow)
+				_cameraFollow->StartFollow();
+		});
 	_roundManager.OnShotSettled.Subscribe([this]() { _shotCountPop.Start(0.5f); });
 	_roundManager.OnReadyNextShot.Subscribe([this]()
 		{
 			if (_ragdoll)
 				_ragdoll->StopRagdoll(false);
+			if (_cameraFollow)
+				_cameraFollow->ReturnToStart();
 		});
 }
 

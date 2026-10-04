@@ -698,6 +698,14 @@ void Ragdoll::SetFlying(bool flying)
             bone.rigidBody->SetUseGravityTorque(!flying);
 }
 
+Vector3 Ragdoll::GetRootPosition() const
+{
+    if (_enabled && !_bones.empty() && _bones[0].rigidBody)
+        return _bones[0].rigidBody->GetPosition();
+
+    return Vector::fromF3ToV3(_owner->GetTransform().Position);
+}
+
 bool Ragdoll::AllBonesSleeping() const
 {
     for (const auto& bone : _bones)

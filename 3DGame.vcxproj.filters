@@ -216,6 +216,9 @@
     <ClCompile Include="CameraController.cpp">
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
+    <ClCompile Include="CameraFollow.cpp">
+      <Filter>ソース ファイル\Player</Filter>
+    </ClCompile>
     <ClCompile Include="Animator.cpp">
       <Filter>ソース ファイル\Animator</Filter>
     </ClCompile>
@@ -429,6 +432,9 @@
       <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
     <ClInclude Include="CameraController.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraFollow.h">
       <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
     <ClInclude Include="CollisionManager.h">
