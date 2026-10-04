@@ -107,6 +107,44 @@ void PhysicsSystem::RemoveCollider(Collider* collider)
         });
 
     _collisionManager.ReleaseCollider(collider->GetID());
+
+    // 消えた物を支えにしていた箱が、眠ったまま浮かないように、起こして、落ち着き直させる
+    WakeSleepingBodies();
+}
+
+void PhysicsSystem::UpdateBodySleep(float deltaTime)
+{
+    for (auto& body : _rigidBodies)
+    {
+        // ラグドールのボーンは対象外。箱などの、ほかの動く物だけを眠らせる
+        if (!body.rigidBody || body.ragdollBone.nodeIndex >= 0)
+            continue;
+        if (body.rigidBody->IsKinematic() || body.rigidBody->IsSleeping())
+            continue;
+
+        if (Vector::SqMagnitude(body.rigidBody->GetVelocity()) < _sleepSpeed * _sleepSpeed)
+        {
+            body.rigidBody->AddRestTime(deltaTime);
+            if (body.rigidBody->GetRestTime() >= _sleepSeconds)
+                body.rigidBody->SetSleeping(true);
+        }
+        else
+        {
+            body.rigidBody->ResetRestTime();
+        }
+    }
+}
+
+void PhysicsSystem::WakeSleepingBodies()
+{
+    for (auto& body : _rigidBodies)
+    {
+        if (!body.rigidBody || body.ragdollBone.nodeIndex >= 0)
+            continue;
+
+        if (body.rigidBody->IsSleeping() && !body.rigidBody->IsKinematic())
+            body.rigidBody->SetSleeping(false);
+    }
 }
 
 void PhysicsSystem::FixedUpdate(float deltaTime)
@@ -176,6 +214,9 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
         SyncCollidersFromRigidBodies();
     }
 
+
+    // 箱などが、ほぼ静止したらスリープさせる(積分・接触の解決を飛ばして、軽くする)
+    UpdateBodySleep(deltaTime);
 
     // ragdollが倒れて、ほぼ静止したらスリープさせて凍結する
     _ragdollSystem.UpdateRest(_rigidBodies, deltaTime);
@@ -251,6 +292,9 @@ void PhysicsSystem::SyncCollidersFromRigidBodies()
 
             body.collider->SetPosition(Vector::fromV3ToF3(colliderPos));
             body.collider->SetRotation(colliderRot);
+
+            // 衝突の検出で、「動いている物だけ」が相手を探すために、今の状態を伝えておく
+            body.collider->SetMoving(!body.rigidBody->IsKinematic() && !body.rigidBody->IsSleeping());
         }
     }
 
@@ -461,8 +505,9 @@ RigidBody* PhysicsSystem::FindOtherRigidBody(PhysicsBody& body, const CollisionR
         (body.collider == result.colliderA) ? result.colliderB : result.colliderA;
     for (auto& other : _rigidBodies)
     {
+        // 眠っている相手は、動かない物として扱う(押し戻しを、動くほうが全部引き受ける)
         if (other.collider == otherCollider && other.rigidBody &&
-            !other.rigidBody->IsKinematic())
+            !other.rigidBody->IsKinematic() && !other.rigidBody->IsSleeping())
         {
             return other.rigidBody;
         }

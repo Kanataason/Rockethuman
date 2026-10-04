@@ -57,6 +57,12 @@ public:
         return _collisionGroup;
     }
 
+    // 今、動いているか(動く物で、眠っていない)。動いていない物は、自分から相手を探しに行かない
+    // (動いている相手が、動かない物を見つけてくれるので、組み合わせは漏れない)
+    // PhysicsSystemが、毎サブステップ更新する。RigidBodyのない物(床など)は、いつもfalse
+    void SetMoving(bool moving) { _isMoving = moving; }
+    bool IsMoving() const { return _isMoving; }
+
     // トリガー化する(当たり判定はするが物理的な押し出しをしない)
     void OnTrigger() { isTrigger = true; }
     void OffTrigger() { isTrigger = false; }
@@ -112,6 +118,7 @@ private:
     int _id = -1;
     CollisionGroup _collisionGroup = CollisionGroup::None;
     PhysicsSystem* _registry = nullptr;
+    bool _isMoving = false;
 protected:
     bool isTrigger = false;
 

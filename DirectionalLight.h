@@ -22,5 +22,5 @@ public:
     }
 
 private:
-    DirectX::XMFLOAT3 m_Direction = { 0.0,-1.0,0.0 };
+    DirectX::XMFLOAT3 m_Direction = { 0.0f,-1.0f,0.0f };
 };

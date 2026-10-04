@@ -6,5 +6,6 @@
 // ライト：平行光源を追加するだけ
 void ObjectBuilders::BuildLight(GameObject& obj, const ObjectData& /*data*/, const std::shared_ptr<ModelDatas>& /*model*/)
 {
-    obj.AddComponent<DirectionalLight>();
+   auto* light = obj.AddComponent<DirectionalLight>();
+   light->SetDirection({ 0.0f, -0.7f, 0.6f });
 }

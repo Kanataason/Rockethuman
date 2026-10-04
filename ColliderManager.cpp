@@ -19,6 +19,12 @@ void CollisionManager::Intersects()
     for (auto& it : _colliderMap)
     {
         auto& collider = it.second;
+
+        // 動いていない物(床・眠っている箱など)は、自分から相手を探さない。
+        // Octreeには入っているので、動いている相手が見つけてくれる(動かない物どうしは、調べなくて済む)
+        if (!collider->IsMoving())
+            continue;
+
         std::vector<Collider*> candidates;
 
         _octree.Query(collider->GetMin(),collider->GetMax(),candidates);

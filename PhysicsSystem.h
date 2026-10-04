@@ -105,7 +105,16 @@ private:
         const Vector3& contactNormal, float velocityAlongNormalBefore);
 
     void LockRigidBodyAxis();
+
+    // ほとんど動いていない箱などを、スリープさせる(ラグドールのボーンは、RagdollSystemが眠らせる)
+    void UpdateBodySleep(float deltaTime);
+
+    // 眠っている箱などを、すべて起こす(下の箱が消えて、上の箱が落ちるときなどに使う)
+    void WakeSleepingBodies();
 private:
+    float _sleepSpeed = 0.2f;     // この速さ(m/s)より遅い間は、「動いていない」とみなす
+    float _sleepSeconds = 0.5f;   // 動いていない状態が、この秒数続いたら、スリープさせる
+
     float _ragdollElapsedTime = 0.0f;
     std::vector<PhysicsBody> _rigidBodies;
     // 所有者はRagdoll(RagdollBone::joint)。ここでは、解くために参照するだけ

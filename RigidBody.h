@@ -143,6 +143,11 @@ public:
     //めり込み時の速度取得関数
     Vector3 GetPseudoVelocity() const { return PseudoVelocity; }
 
+    // 動いていない時間(秒)。箱など、ラグドール以外の物を眠らせる判定に使う(SetSleepingで0に戻る)
+    float GetRestTime() const { return _sleepTimer; }
+    void AddRestTime(float seconds) { _sleepTimer += seconds; }
+    void ResetRestTime() { _sleepTimer = 0.0f; }
+
     //ラグドール時の物理演算無効設定関数
     bool IsSleeping() const { return _isSleeping; }
     void SetSleeping(bool sleeping)
