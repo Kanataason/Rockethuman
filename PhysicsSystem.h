@@ -104,6 +104,7 @@ private:
     void ApplyBoneImpactAngularImpulse(PhysicsBody& body, const CollisionResult& result,
         const Vector3& contactNormal, float velocityAlongNormalBefore);
 
+    void LockRigidBodyAxis();
 private:
     float _ragdollElapsedTime = 0.0f;
     std::vector<PhysicsBody> _rigidBodies;

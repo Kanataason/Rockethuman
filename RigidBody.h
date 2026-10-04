@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <DirectXMath.h>
 #include <iostream>
+#include <array>
+#include <optional>
 #include <string>
 
 #include "Component.h"
@@ -11,6 +13,9 @@ using namespace DirectX;
 
 constexpr const float EPSILON = 0.00001f;
 constexpr const float GRAVITY = -9.8f;
+
+// 固定する軸を指す番号
+enum class Axis { X = 0, Y = 1, Z = 2 };
 
 class PhysicsSystem;
 
@@ -71,9 +76,22 @@ public:
     //めり込み時の速度追加関数
     void AddPseudoVelocity(const Vector3& velocity) { PseudoVelocity += velocity; }
 
+    void ApplyAxisLock()
+    {
+        if (_lockedAxis[0]) { Velocity.x = 0.0f; PseudoVelocity.x = 0.0f; Position.x = *_lockedAxis[0]; }
+        if (_lockedAxis[1]) { Velocity.y = 0.0f; PseudoVelocity.y = 0.0f; Position.y = *_lockedAxis[1]; }
+        if (_lockedAxis[2]) { Velocity.z = 0.0f; PseudoVelocity.z = 0.0f; Position.z = *_lockedAxis[2]; }
+    }
 
+    //ここからはゲッターとセッター [0]=X, [1]=Y, [2]=Z
+    void SetLockStatus(Axis axis, float value)
+    {
+        _lockedAxis[static_cast<int>(axis)] = value;
+    }
 
-    //ここからはゲッターとセッター
+    // 固定を外す
+    void ClearAxisLock(Axis axis) { _lockedAxis[static_cast<int>(axis)].reset(); }
+    void ClearAllAxisLock() { _lockedAxis.fill(std::nullopt); }
 
     //地面判定フラグ設定関数
     void SetGrounded(bool grounded) {isGrounded = grounded; }
@@ -156,6 +174,7 @@ private:
     bool useGravityTorque = true;
 	bool isKinematic = false;
 
+    std::array<std::optional<float>, 3> _lockedAxis;
 
     bool _isSleeping = false;
     float _sleepTimer = 0.0f;

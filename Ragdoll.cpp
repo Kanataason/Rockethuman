@@ -433,6 +433,11 @@ void Ragdoll::InitializePhysicsTransform()
 //--------------ラグドールの開始・終了と、吊り下げ(体全体を浮かせて移動させる)--------------------
 void Ragdoll::StartFall()
 {
+    for (auto& bone : _bones)
+    {
+        if (bone.rigidBody)
+            SetLockZ(false);
+    }
     // ボーンを今のアニメーションのポーズに合わせて、ジョイントを作り(すでにあれば作らない)、少し押す
     InitializePhysicsTransform();
 
@@ -445,6 +450,7 @@ void Ragdoll::StartFall()
 
     // 重力を入れて、ラグドールを有効にする。全身が重力で地面に倒れる
     SetFlying(false);
+    _isWaitingSettle = false;
     Enable();
 }
 
@@ -553,6 +559,11 @@ void Ragdoll::UpdateHanging(float deltaTime)
 
 void Ragdoll::StopRagdoll(bool includeHeight)
 {
+    for (auto& bone : _bones)
+    {
+        if (bone.rigidBody)
+            SetLockZ(false);
+    }
     // ラグドール中は、プレイヤーの Transform を動かしていない(ボーンは世界座標で動く)。
     // アニメーションに戻すと、体は Transform の位置に描かれるので、Hips が動いた分だけ Transform を動かして、
     // アニメーションの体を、ラグドールの体があった位置に移す
@@ -584,6 +595,7 @@ void Ragdoll::StopRagdoll(bool includeHeight)
 
     // ラグドールを止める。全ボーンが寝て、速度と角速度が 0 に戻る
     SetFlying(false);
+    _isWaitingSettle = false;
     Disable();
 }
 
@@ -680,19 +692,43 @@ void Ragdoll::SetFlying(bool flying)
             bone.rigidBody->SetUseGravityTorque(!flying);
 }
 
-void Ragdoll::Update(float deltaTime)
+bool Ragdoll::AllBonesSleeping() const
 {
-    if (!_isFlying)
-        return;
-
-    // どれかのボーンが地面に着いたら、飛行を終える(あとは今までどおり重力で倒れる)
     for (const auto& bone : _bones)
     {
-        if (bone.rigidBody && bone.rigidBody->IsGrounded())
+        if (bone.rigidBody && !bone.rigidBody->IsSleeping())
+            return false;
+    }
+    return true;
+}
+
+void Ragdoll::Update(float deltaTime)
+{
+    // どれかのボーンが地面に着いたら、飛行を終える(あとは今までどおり重力で倒れる)
+    if (_isFlying)
+    {
+        for (const auto& bone : _bones)
         {
-            SetFlying(false);
-            return;
+            if (bone.rigidBody && bone.rigidBody->IsGrounded())
+            {
+                SetFlying(false);
+                break;
+            }
         }
+    }
+
+    // 発射したあと、全ボーンが静止(スリープ)したら、1回だけ通知する
+    if (!_isWaitingSettle)
+        return;
+
+    _settleElapsed += deltaTime;
+
+    // 静止しないままのとき(揺れ続けるなど)に、ゲームが進まなくなるのを防ぐ保険
+    constexpr float maxWaitSeconds = 20.0f;
+    if (AllBonesSleeping() || _settleElapsed >= maxWaitSeconds)
+    {
+        _isWaitingSettle = false;
+        OnSettled.Invoke();
     }
 }
 
@@ -700,10 +736,16 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
 {
     SetFlying(true);
 
+    _isWaitingSettle = true;
+    _settleElapsed = 0.0f;
+
     //寝ているBoneを起こす
     for (auto& bone : _bones)
         if (bone.rigidBody)
+        {
+            SetLockZ(true);
             bone.rigidBody->SetSleeping(false);
+        }
 
     //スリープタイマーをリセット
     if (_physicsSystem)
@@ -737,6 +779,17 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
 
         const Vector3 flail(flailDist(rng), flailDist(rng), flailDist(rng));
         bone.rigidBody->SetAngularVelocity(tumble + flail * RagdollTuning::kLaunchFlailSpeed);
+    }
+}
+void Ragdoll::SetLockZ(bool lock)
+{
+    const float z = (!_bones.empty() && _bones[0].rigidBody) ? _bones[0].rigidBody->GetPosition().z : 0.0f;
+
+    for (auto& bone : _bones)
+    {
+        if (!bone.rigidBody) continue;
+        if (lock) bone.rigidBody->SetLockStatus(Axis::Z, z);
+        else      bone.rigidBody->ClearAxisLock(Axis::Z);
     }
 }
 

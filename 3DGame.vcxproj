@@ -262,6 +262,7 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="RoundManager.h" />
+    <ClInclude Include="UiTween.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="ServiceLoacator.h" />
     <ClInclude Include="Skeleton.h" />

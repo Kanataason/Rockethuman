@@ -3,6 +3,9 @@
 #include "ScoreManager.h"
 #include "RoundManager.h"
 #include "UIRenderer.h"
+#include "UiTween.h"
+
+class Ragdoll;
 
 class GameScene : public BaseScene
 {
@@ -17,4 +20,9 @@ private:
 private:
 	RoundManager _roundManager;
 	ScoreManager _scoreManager;
+
+	Ragdoll* _ragdoll = nullptr;
+
+	// 残りの玉数が、ポンと弾むアニメーション(ラグドールが止まったとき)
+	Tween _shotCountPop;
 };

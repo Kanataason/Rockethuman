@@ -172,6 +172,8 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
         // 次のサブステップのために、Colliderを最新にする
         SyncCollidersFromRigidBodies();
 
+        //軸を固定するか見る
+        LockRigidBodyAxis();
     }
 
 
@@ -552,4 +554,10 @@ void PhysicsSystem::UpdateRagdollBoneOffsets(RigidBody* rigidBody,
             return;
         }
     }
+}
+void PhysicsSystem::LockRigidBodyAxis()
+{
+    for (auto& body : _rigidBodies)
+        if (body.rigidBody)
+            body.rigidBody->ApplyAxisLock();
 }

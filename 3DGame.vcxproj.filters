@@ -518,6 +518,9 @@
     <ClInclude Include="RoundManager.h">
       <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
+    <ClInclude Include="UiTween.h">
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>

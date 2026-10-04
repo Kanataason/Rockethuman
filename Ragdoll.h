@@ -13,6 +13,7 @@
 // RagdollBoneがunique_ptrで持つので、完全な型が必要(破棄のときに中身が要る)
 #include "RigidBody.h"
 #include "CapsuleCollider.h"
+#include "Event.h"
 
 class PhysicsSystem;
 class Skeleton;
@@ -230,6 +231,9 @@ struct RagdollBone
 class Ragdoll : public Component
 {
 public:
+    // 発射して、静止したときに1回だけ呼ばれる
+    Event<> OnSettled;
+
     Ragdoll() = default;
     void SetSkeleton(std::shared_ptr<Skeleton> skeleton) { _skeleton = skeleton; }
     void SetParent(GameObject& owner) { _owner = &owner; }
@@ -308,9 +312,18 @@ public:
 
     // 発射されて、まだ着地していないか
     bool IsFlying() const { return _isFlying; }
+
+    // 発射してから、全ボーンが静止する(スリープする)まで待っている間はtrue
+    bool IsWaitingSettle() const { return _isWaitingSettle; }
 private:
+
+    void SetLockZ(bool lock);
+
     // 飛行中の切り替え。飛んでいる間は重力トルクを止め、着地したら戻す
     void SetFlying(bool flying);
+
+    // 全ボーンがスリープしているか
+    bool AllBonesSleeping() const;
 
     // ---- 生成・開始姿勢
     void AddRagDoll();
@@ -430,6 +443,8 @@ private:
 
     bool _enabled = false;
     bool _isFlying = false;
+    bool _isWaitingSettle = false;   // 発射して、静止するのを待っているか
+    float _settleElapsed = 0.0f;     // 発射してからの経過時間(止まらない場合の保険に使う)
 
     // ---- 吊り下げモード ----
     int _hangingBoneIndex = -1;            // 吊る骨(_bones の番号) -1 = まだ始めていない
