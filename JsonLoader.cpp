@@ -170,10 +170,60 @@ ObjectData JsonLoader::LoadGameObjectData(const json& root)
 	data.transform = LoadTransform(root);
 	data.materialName = LoadMaterial(root);
 	data.score = root.value("score", data.score);
+	LoadRepeat(root, data);
 	
 	LoadAnimationPath(root,data.animationDatas);
 
 	return data;
+}
+
+void JsonLoader::LoadRepeat(const json& root, ObjectData& data)const
+{
+	// 省略したときの間隔は、大きさと同じ(箱を、すき間なく並べられる)
+	data.repeatStep = data.transform.Scale;
+
+	// "count": [横, 縦, 奥行き] 。0以下は1にそろえる
+	if (root.contains("count") && root["count"].is_array() && root["count"].size() >= 3)
+	{
+		data.repeatCount.x = (std::max)(1, root["count"][0].get<int>());
+		data.repeatCount.y = (std::max)(1, root["count"][1].get<int>());
+		data.repeatCount.z = (std::max)(1, root["count"][2].get<int>());
+	}
+
+	// "step": [x, y, z] 1個ごとの間隔
+	if (root.contains("step") && root["step"].is_array() && root["step"].size() >= 3)
+	{
+		data.repeatStep.x = root["step"][0].get<float>();
+		data.repeatStep.y = root["step"][1].get<float>();
+		data.repeatStep.z = root["step"][2].get<float>();
+	}
+}
+
+std::vector<ObjectData> JsonLoader::ExpandRepeat(const ObjectData& base)const
+{
+	// 指定を間違えても、ゲームが固まらないようにする上限
+	constexpr int maxTotalCount = 500;
+
+	std::vector<ObjectData> list;
+
+	for (int z = 0; z < base.repeatCount.z; ++z)
+	{
+		for (int y = 0; y < base.repeatCount.y; ++y)
+		{
+			for (int x = 0; x < base.repeatCount.x; ++x)
+			{
+				if (static_cast<int>(list.size()) >= maxTotalCount)
+					return list;
+
+				ObjectData one = base;
+				one.transform.Position.x += base.repeatStep.x * static_cast<float>(x);
+				one.transform.Position.y += base.repeatStep.y * static_cast<float>(y);
+				one.transform.Position.z += base.repeatStep.z * static_cast<float>(z);
+				list.push_back(one);
+			}
+		}
+	}
+	return list;
 }
 
 //分ける

@@ -9,28 +9,31 @@
 #include "CameraFollow.h"
 #include "BaseCamera.h"
 #include "ObjectStatus.h"
+#include "TimeScale.h"
 
 using namespace UiInfo;
 
 namespace
 {
 	// ---- 点が入ったときの演出の調整値 ----
-	constexpr float kPopupLifetime = 1.3f;       // 「+500」が消えるまでの秒数
-	constexpr float kPopupRisePixels = 90.0f;    // 浮き上がる高さ(1280x720基準のピクセル)
-	constexpr float kPopupBaseScale = 0.45f;     // 文字の大きさ
-	constexpr float kPopupPopSeconds = 0.25f;    // 出た瞬間に弾む時間
-	constexpr float kPopupFadeStart = 0.6f;      // 寿命のここから先で、だんだん透明になる(0～1)
+	constexpr float popupLifetime = 1.3f;       // 「+500」が消えるまでの秒数
+	constexpr float popupRisePixels = 90.0f;    // 浮き上がる高さ(1280x720基準のピクセル)
+	constexpr float popupBaseScale = 0.45f;     // 文字の大きさ
+	constexpr float popupPopSeconds = 0.25f;    // 出た瞬間に弾む時間
+	constexpr float popupFadeStart = 0.6f;      // 寿命のここから先で、だんだん透明になる(0～1)
 
 	// COMBO表示(スコアのパネルの下)
-	constexpr float kComboCenterX = 180.0f;
-	constexpr float kComboCenterY = 172.0f;
-	constexpr float kComboScale = 0.5f;
-	constexpr float kComboPopSeconds = 0.3f;
+	constexpr float comboCenterX = 180.0f;
+	constexpr float comboCenterY = 172.0f;
+	constexpr float comboScale = 0.5f;
+	constexpr float comboPopSeconds = 0.3f;
 }
 
 void GameScene::Initialize(ServiceLocator& locator)
 {
 	BaseScene::Initialize(locator);
+
+	_timeScale = locator.timeScale;
 
 	auto* cannon = FindGameObject<CannonController>();
 	auto* player = FindGameObject<Player>();
@@ -64,7 +67,19 @@ void GameScene::SubscribeEvents()
 		_cameraFollow->SetTarget(_ragdoll);
 
 	// 点が入ったら、当たった場所に500を出す
-	_scoreManager.OnScoreGained.Subscribe([this](ScoreGain gain) { AddScorePopup(gain); });
+	_scoreManager.OnScoreGained.Subscribe([this](ScoreGain gain)
+		{
+			AddScorePopup(gain);
+
+			// 当たった瞬間に、少し遅くする(頭ヒットは、もっと遅く)
+			if (_timeScale)
+			{
+				if (gain.isHead)
+					_timeScale->Request(_headSlowScale, _headSlowSeconds);
+				else
+					_timeScale->Request(_hitSlowScale, _hitSlowSeconds);
+			}
+		});
 
 	_roundManager.OnShotFired.Subscribe([this]()
 		{
@@ -135,12 +150,12 @@ void GameScene::UpdateScoreEffects(float deltaTime)
 	for (auto& popup : _scorePopups)
 		popup.age += deltaTime;
 
-	std::erase_if(_scorePopups, [](const ScorePopup& popup) { return popup.age >= kPopupLifetime; });
+	std::erase_if(_scorePopups, [](const ScorePopup& popup) { return popup.age >= popupLifetime; });
 
 	// コンボが増えた瞬間に、COMBOの文字を弾ませる
 	const int combo = _scoreManager.GetCombo();
 	if (combo > _lastCombo)
-		_comboPop.Start(kComboPopSeconds);
+		_comboPop.Start(comboPopSeconds);
 	_lastCombo = combo;
 	_comboPop.Update(deltaTime);
 }
@@ -156,18 +171,18 @@ void GameScene::DrawScorePopups()
 
 	for (const auto& popup : _scorePopups)
 	{
-		const float t = popup.age / kPopupLifetime;
+		const float t = popup.age / popupLifetime;
 
 		const DirectX::XMVECTOR world = DirectX::XMVectorSet(
 			popup.worldPosition.x, popup.worldPosition.y, popup.worldPosition.z, 1.0f);
 		const DirectX::XMFLOAT2 screen = _uiRenderer->WorldToScreen(world, view, projection);
 
-		const float rise = kPopupRisePixels * EaseOutCubic(t);
-		const float alpha = t < kPopupFadeStart ? 1.0f : 1.0f - (t - kPopupFadeStart) / (1.0f - kPopupFadeStart);
+		const float rise = popupRisePixels * EaseOutCubic(t);
+		const float alpha = t < popupFadeStart ? 1.0f : 1.0f - (t - popupFadeStart) / (1.0f - popupFadeStart);
 
 		// 出た瞬間に大きく弾んで、元の大きさに戻る。頭ヒットは、さらに大きくて金色
-		const float popT = (std::min)(popup.age / kPopupPopSeconds, 1.0f);
-		const float scale = kPopupBaseScale * (popup.isHead ? 1.3f : 1.0f) * (1.0f + 0.5f * (1.0f - EaseOutBack(popT)));
+		const float popT = (std::min)(popup.age / popupPopSeconds, 1.0f);
+		const float scale = popupBaseScale * (popup.isHead ? 1.3f : 1.0f) * (1.0f + 0.5f * (1.0f - EaseOutBack(popT)));
 
 		const DirectX::XMVECTOR color = popup.isHead
 			? DirectX::XMVectorSet(1.0f, 0.8f, 0.2f, alpha)
@@ -186,8 +201,8 @@ void GameScene::DrawComboText()
 		return;
 
 	const float pop = 1.0f + 0.5f * (1.0f - EaseOutBack(_comboPop.T()));
-	_uiRenderer->DrawStringCentered(L"COMBO x" + std::to_wstring(combo), kComboCenterX, kComboCenterY,
-		kComboScale * pop, DirectX::XMVectorSet(1.0f, 0.55f, 0.2f, 1.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
+	_uiRenderer->DrawStringCentered(L"COMBO x" + std::to_wstring(combo), comboCenterX, comboCenterY,
+		comboScale * pop, DirectX::XMVectorSet(1.0f, 0.55f, 0.2f, 1.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
 // パネルの塗り・枠・見出しの文字を描く(スコアと残りの数で共通)

@@ -17,6 +17,7 @@
 
 #include "PhysicsSystem.h"
 #include "Timer.h"
+#include "TimeScale.h"
 
 class GameManager
 {
@@ -45,6 +46,7 @@ private:
     BaseSystem _baseSystem;
     Renderer _renderer;
     Timer _timer;
+    TimeScale _timeScale;   // スローモーションなどの、時間の倍率
 
     TextureManager _textureManager;
 

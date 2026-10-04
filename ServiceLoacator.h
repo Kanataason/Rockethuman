@@ -10,6 +10,7 @@ class DebugDraw;
 class GameObjectFactory;
 class UiRenderer;
 class SceneManager;
+class TimeScale;
 
 /// <summary>
 /// 他のコンポーネントでも必要となる物を入れる構造体
@@ -23,6 +24,7 @@ struct ServiceLocator
     GameObjectFactory* factory = nullptr;
     SceneManager* sceneManager = nullptr;
 
+    TimeScale* timeScale = nullptr;
     UiRenderer* uiRenderer = nullptr;
     PhysicsSystem* physicsSystem = nullptr;
 };

@@ -18,7 +18,8 @@ void SceneLoader::LoadObjects(BaseScene& scene,std::string& loadPath,GameObjectF
 	{
 		auto data = _jsonLoader.LoadGameObjectData(object);
 
-		scene.AddObject(factory.CreateObject(data));
+		for (const auto& one : _jsonLoader.ExpandRepeat(data))
+			scene.AddObject(factory.CreateObject(one));
 	}
 
 }
@@ -32,6 +33,8 @@ void SceneLoader::LoadSceneGameObject(BaseScene* scene,const std::string& path,
 	{
 		auto data = loader.LoadGameObjectData(obj);
 
-		scene->AddObject(factory.CreateObject(data));
+		// "count"で並べる指定があれば、その個数ぶん作る(なければ1個)
+		for (const auto& one : loader.ExpandRepeat(data))
+			scene->AddObject(factory.CreateObject(one));
 	}
 }

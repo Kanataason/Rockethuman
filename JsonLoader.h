@@ -18,6 +18,9 @@ public :
 
 	ObjectData LoadGameObjectData(const json& root);
 
+	// "count"で並べる指定があるとき、並べたぶんのObjectDataに増やして返す(指定がなければ、1個だけ)
+	std::vector<ObjectData> ExpandRepeat(const ObjectData& base)const;
+
 	SceneData LoadSceneData(const json& root)const;
 private:
 
@@ -29,6 +32,7 @@ private:
 	Transform LoadTransform(const json& root);
 	std::string LoadMaterial(const json& root)const;
 	void LoadAnimationPath(const json& root, std::vector<AnimationData>& animationPaths);
+	void LoadRepeat(const json& root, ObjectData& data)const;
 
 	//取り出した値を変換する
 	ObjectType ToObjectType(const std::string& type)const;

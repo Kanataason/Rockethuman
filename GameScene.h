@@ -10,6 +10,7 @@
 
 class Ragdoll;
 class CameraFollow;
+class TimeScale;
 
 class GameScene : public BaseScene
 {
@@ -52,4 +53,11 @@ private:
 	std::vector<ScorePopup> _scorePopups;
 	Tween _comboPop;       // コンボが増えたときの弾み
 	int _lastCombo = 0;    // 前のフレームのコンボ数(増えたのを見つけるため)
+
+	// 的に当たったときのスローモーション(倍率と、元の速さに戻るまでの実時間)
+	TimeScale* _timeScale = nullptr;
+	float _hitSlowScale = 0.35f;
+	float _hitSlowSeconds = 1.25f;
+	float _headSlowScale = 0.2f;     // 頭ヒットは、もっと遅く、長く
+	float _headSlowSeconds = 1.45f;
 };

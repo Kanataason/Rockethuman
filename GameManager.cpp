@@ -45,7 +45,10 @@ void GameManager::Update()
 {
     _baseSystem.ClearScreen();//画面の初期化
 
-    float deltaTime = _timer.Tick();
+    // 実際に経った時間で、スローモーションの戻りを進め、倍率をかけた時間をゲームの更新に使う
+    const float realDeltaTime = _timer.Tick();
+    _timeScale.Update(realDeltaTime);
+    const float deltaTime = realDeltaTime * _timeScale.Get();
 
     _input->Update();
 
@@ -86,6 +89,7 @@ ServiceLocator GameManager::CreateServiceLocator()
     context.uiRenderer = &_uiRenderer;
     context.factory = &_gameObjectFactory;
     context.sceneManager = &_sceneManager;
+    context.timeScale = &_timeScale;
 
     return context;
 }

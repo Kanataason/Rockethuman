@@ -71,5 +71,9 @@ struct ObjectData
 	DirectX::XMFLOAT3 direction = { 0,0,0 };
 	float score = 100.0f;   // 的の基本点(Jsonの"score"。省略時は100)
 
+	// 同じ物を並べる指定(Jsonの"count"と"step")。XYZの各方向に、何個ずつ、どれだけ離して並べるか
+	DirectX::XMINT3 repeatCount = { 1, 1, 1 };
+	DirectX::XMFLOAT3 repeatStep = { 0, 0, 0 };   // 省略すると、大きさ(scale)と同じ間隔(ぴったり並ぶ)
+
 	std::vector<AnimationData> animationDatas;
 };
