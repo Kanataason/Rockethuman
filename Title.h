@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "BaseScene.h"
 #include "UiRenderer.h"
+#include "UiLayout.h"
 #include "Event.h"
 
 class InputSystem;

@@ -6,6 +6,7 @@
 #include "ScoreManager.h"
 #include "RoundManager.h"
 #include "UIRenderer.h"
+#include "UiLayout.h"
 #include "UiTween.h"
 
 class Ragdoll;
@@ -33,6 +34,7 @@ private:
 	void DrawComboText();
 	void DrawGauge();
 	void DrawAimHint();
+	void DrawResultPanel();
 private:
 	// 的に当たった場所に出す、浮き上がって消える文字
 	struct ScorePopup

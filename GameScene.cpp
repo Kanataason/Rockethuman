@@ -19,9 +19,9 @@ namespace
 	// ---- 点が入ったときの演出の調整値 ----
 	constexpr float popupLifetime = 1.3f;       // 「+500」が消えるまでの秒数
 	constexpr float popupRisePixels = 90.0f;    // 浮き上がる高さ(1280x720基準のピクセル)
-	constexpr float popupBaseScale = 0.45f;     // 文字の大きさ
+	constexpr float popupBaseScale = 0.55f;     // 文字の大きさ
 	constexpr float popupPopSeconds = 0.25f;    // 出た瞬間に弾む時間
-	constexpr float popupFadeStart = 0.6f;      // 寿命のここから先で、だんだん透明になる(0～1)
+	constexpr float popupFadeStart = 0.5f;      // 寿命のここから先で、だんだん透明になる(0～1)
 
 	// COMBO表示(スコアのパネルの下)
 	constexpr float comboCenterX = 180.0f;
@@ -139,27 +139,40 @@ void GameScene::DrawUi()
 	DrawScorePopups();
 	DrawGauge();
 	DrawAimHint();
+	DrawResultPanel();
 
 	_uiRenderer->End();
+}
+void GameScene::DrawResultPanel()
+{
+	if (_roundManager.GetState() != RoundState::Finished)return;
+
+	auto it = panelList.find(PanelType::Result);
+	if (it == panelList.end())
+		return;
+
+	const auto& panelData = it->second;
+
+	DrawPanelBase(panelData);
 }
 
 // 画面の下に、いま何を決めるのかを出す(角度 -> 威力の2段階)
 void GameScene::DrawAimHint()
 {
-	std::wstring hint;
+	std::wstring text;
 	switch (_roundManager.GetState())
 	{
 	case RoundState::AimAngle:
-		hint = L"スペースキーで かくどを きめる";
+		text = L"スペースキーで かくどを きめる";
 		break;
 	case RoundState::AimPower:
-		hint = L"スペースキーで いりょくを きめる";
+		text = L"スペースキーで いりょくを きめる";
 		break;
 	default:
 		return;
 	}
 
-	_uiRenderer->DrawStringCentered(hint, 640.0f, 600.0f, 0.4f,
+	_uiRenderer->DrawStringCentered(text, 640.0f, 600.0f, 0.4f,
 		DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
 }
 

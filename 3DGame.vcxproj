@@ -197,6 +197,7 @@
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UIRenderer.cpp" />
+    <ClCompile Include="UiLayout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationLoader.h" />
@@ -281,6 +282,7 @@
     <ClInclude Include="Title.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UiRenderer.h" />
+    <ClInclude Include="UiLayout.h" />
     <ClInclude Include="VectorUtility.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
