@@ -10,6 +10,7 @@
 #include "GameObject.h"
 #include "RoundManager.h"
 #include "InputSystem.h"
+#include "PowerZone.h"
 
 void CannonController::Initialize(ServiceLocator& locator)
 {
@@ -20,9 +21,9 @@ void CannonController::AddForcePlayer(float deltaTime)
     auto& transform = GetOwner()->GetTransform();
     const Vector3 direction = Vector::fromF3ToV3(transform.GetUp());   // すでに長さ1
 
-    // 威力ゲージの量(0～1)で、最小～最大の間の速さを決める
+    // 威力ゲージの量(0～1)から、速さを決める。緑は弱く、黄色は中くらい、赤は強い(PowerZone.hの表)
     const float power = _roundManager ? _roundManager->GetPowerAmount() : 1.0f;
-    const float launchSpeed = _minLaunchSpeed + (_maxLaunchSpeed - _minLaunchSpeed) * power;
+    const float launchSpeed = PowerZone::SpeedFromPower(power);
     _ragdoll->Launch(direction, launchSpeed);
 }
 

@@ -62,19 +62,7 @@ private:
 	float _gaugeFrame = 0.0f;
 	float _gaugeAmmount = 0.0f;
 
-	// ゲージを区切る色の帯。下から順に、upToまでの範囲(0～1)をその色にする。最後のupToは1にすること
-	struct GaugeZone
-	{
-		float upTo;
-		DirectX::XMFLOAT4 color;
-	};
-	std::vector<GaugeZone> _gaugeZones =
-	{
-		{ 0.33f, { 0.0f, 1.0f, 0.0f, 1.0f } },    // 弱い: 黄色
-		{ 0.8f, { 1.0f, 0.55f, 0.1f, 1.0f } },   // 中くらい: 橙色
-		{ 1.0f,  { 1.0f, 0.15f, 0.1f, 1.0f } },   // 強い: 赤
-	};
-
+	// ゲージの色の帯は、発射の速さと同じ表(PowerZone.h)を使う
 	// 的に当たったときのスローモーション(倍率と、元の速さに戻るまでの実時間)
 	TimeScale* _timeScale = nullptr;
 	float _hitSlowScale = 0.35f;

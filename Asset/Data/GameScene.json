@@ -76,7 +76,15 @@
             "material": "crate",
             "position": [ 5, 9, 10 ],
             "scale": [ 1, 1, 1 ],
-            "count": [ 4, 4, 1 ]
+            "count": [ 3, 3, 1 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "ScoreObject",
+            "material": "goldCrate",
+            "position": [ 1, 9, 10 ],
+            "scale": [ 1, 1, 1 ],
+            "score": 500
         }
     ]
 }

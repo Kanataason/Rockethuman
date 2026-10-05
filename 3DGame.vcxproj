@@ -209,6 +209,7 @@
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="CameraFollow.h" />
     <ClInclude Include="CannonController.h" />
+    <ClInclude Include="PowerZone.h" />
     <ClInclude Include="CapsuleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Collision.h" />
@@ -320,6 +321,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Asset\Texture\Mock\goldCrate.png" />
     <Image Include="Asset\Texture\white.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -579,5 +579,8 @@
     <Image Include="Asset\Texture\white.png">
       <Filter>リソース ファイル</Filter>
     </Image>
+    <Image Include="Asset\Texture\Mock\goldCrate.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
   </ItemGroup>
 </Project>
