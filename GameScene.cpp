@@ -12,6 +12,7 @@
 #include "TimeScale.h"
 #include "PowerZone.h"
 #include "SceneManager.h"
+#include "SoundManager.h"
 
 using namespace UiInfo;
 
@@ -51,6 +52,9 @@ void GameScene::Initialize(ServiceLocator& locator)
 	BaseScene::Initialize(locator);
 
 	_timeScale = locator.timeScale;
+	_sound = locator.sound;
+	if (_sound)
+		_sound->PlayBgm("stage");   // 同じ曲が鳴っていれば、続ける(「もういちど」で、頭に戻らない)
 	_resultPanel.Initialize(locator);
 
 	auto* cannon = FindGameObject<CannonController>();
@@ -89,6 +93,9 @@ void GameScene::SubscribeEvents()
 		{
 			AddScorePopup(gain);
 
+			if (_sound)
+				_sound->PlaySe(gain.isHead ? "head" : "hit");
+
 			// 当たった瞬間に、少し遅くする(頭ヒットは、もっと遅く)
 			if (_timeScale)
 			{
@@ -101,6 +108,9 @@ void GameScene::SubscribeEvents()
 
 	_roundManager.OnShotFired.Subscribe([this]()
 		{
+			if (_sound)
+				_sound->PlaySe("shot");
+
 			// 発射した位置を覚えておく(止まったときの飛距離の採点に使う)
 			if (_ragdoll)
 				_launchRootX = _ragdoll->GetRootPosition().x;
@@ -131,7 +141,12 @@ void GameScene::SubscribeEvents()
 		});
 
 	// ボーナスが入ったら、画面の中央に、大きく出す
-	_scoreManager.OnBonusGained.Subscribe([this](float points) { StartBonusPopup(points); });
+	_scoreManager.OnBonusGained.Subscribe([this](float points)
+		{
+			StartBonusPopup(points);
+			if (_sound)
+				_sound->PlaySe("clear");
+		});
 	// 玉を撃ち終えたら、いまのステージの結果を、ゲーム画面の上に出す
 	_roundManager.OnFinished.Subscribe([this]()
 		{

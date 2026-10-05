@@ -30,6 +30,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
     //画面の拡大率の影響で、マウス座標とウィンドウサイズがズレるのを防ぐ
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
+    //XAudio2(サウンド)とWICは、COMが必要。すでに別のモードで初期化済みでも、そのまま続けてよい
+    const HRESULT comResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
     //設計図を宣言
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;//コールバックの関数指定
@@ -85,6 +88,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
     gameManager.Release();
 
     UnregisterClass(wc.lpszClassName, hInstance);
+
+    if (SUCCEEDED(comResult))
+        CoUninitialize();
 
     return static_cast<int>(msg.wParam);
 }

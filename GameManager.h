@@ -18,6 +18,7 @@
 #include "PhysicsSystem.h"
 #include "Timer.h"
 #include "TimeScale.h"
+#include "SoundManager.h"
 
 class GameManager
 {
@@ -47,6 +48,7 @@ private:
     Renderer _renderer;
     Timer _timer;
     TimeScale _timeScale;   // スローモーションなどの、時間の倍率
+    SoundManager _soundManager;   // 効果音とBGM(シーンをまたいで、1つだけ持つ)
 
     TextureManager _textureManager;
 

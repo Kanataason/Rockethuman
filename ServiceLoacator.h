@@ -11,6 +11,7 @@ class GameObjectFactory;
 class UiRenderer;
 class SceneManager;
 class TimeScale;
+class SoundManager;
 
 /// <summary>
 /// 他のコンポーネントでも必要となる物を入れる構造体
@@ -27,4 +28,5 @@ struct ServiceLocator
     TimeScale* timeScale = nullptr;
     UiRenderer* uiRenderer = nullptr;
     PhysicsSystem* physicsSystem = nullptr;
+    SoundManager* sound = nullptr;
 };

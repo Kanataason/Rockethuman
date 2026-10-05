@@ -21,6 +21,7 @@ void GameManager::Initialize(HWND hwnd)
 
     // 各システムへの参照をまとめてシーン側に渡す
     auto context = CreateServiceLocator();
+    _soundManager.Initialize(context);   // シーンの初期化で、BGMを鳴らせるように、先に作る
     _debugDraw.Initialize(context);
     _sceneManager.Initialize(context,&_physicsSystem);
     _uiRenderer.Initialize(context.device, context.context,
@@ -51,6 +52,7 @@ void GameManager::Update()
     const float deltaTime = realDeltaTime * _timeScale.Get();
 
     _input->Update();
+    _soundManager.Update();
 
     _sceneManager.Update(deltaTime);
 
@@ -90,6 +92,7 @@ ServiceLocator GameManager::CreateServiceLocator()
     context.factory = &_gameObjectFactory;
     context.sceneManager = &_sceneManager;
     context.timeScale = &_timeScale;
+    context.sound = &_soundManager;
 
     return context;
 }

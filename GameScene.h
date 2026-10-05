@@ -13,6 +13,7 @@
 class Ragdoll;
 class CameraFollow;
 class TimeScale;
+class SoundManager;
 
 class GameScene : public BaseScene
 {
@@ -76,6 +77,7 @@ private:
 	// ゲージの色の帯は、発射の速さと同じ表(PowerZone.h)を使う
 	// 的に当たったときのスローモーション(倍率と、元の速さに戻るまでの実時間)
 	TimeScale* _timeScale = nullptr;
+	SoundManager* _sound = nullptr;   // 効果音とBGM(借りるだけ。ゲーム全体で1つ)
 	float _hitSlowScale = 0.35f;
 	float _hitSlowSeconds = 1.25f;
 	float _headSlowScale = 0.2f;     // 頭ヒットは、もっと遅く、長く

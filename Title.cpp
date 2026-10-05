@@ -7,6 +7,7 @@
 #include "CameraController.h"
 #include "UiRenderer.h"
 #include "SceneManager.h"
+#include "SoundManager.h"
 
 using namespace UiInfo;
 
@@ -21,6 +22,9 @@ void Title::Initialize(ServiceLocator& locator)
 {
 	_input = locator.input;
 	BaseScene::Initialize(locator);
+
+	if (locator.sound)
+		locator.sound->PlayBgm("title");
 
 	// W/Sはメニュー選択に使うので、タイトルのカメラは動かさない
 	for (const auto& object : _objects)

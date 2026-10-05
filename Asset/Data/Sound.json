@@ -1,0 +1,12 @@
+{
+    "SE": [
+        { "name": "shot",  "path": "Asset/Sound/shot.wav" },
+        { "name": "hit",   "path": "Asset/Sound/hit.wav" },
+        { "name": "head",  "path": "Asset/Sound/head.wav" },
+        { "name": "clear", "path": "Asset/Sound/clear.wav" }
+    ],
+    "BGM": [
+        { "name": "title", "path": "Asset/Sound/bgm_title.wav" },
+        { "name": "stage", "path": "Asset/Sound/bgm_stage.wav" }
+    ]
+}
