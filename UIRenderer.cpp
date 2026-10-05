@@ -1,5 +1,7 @@
 ﻿#include "UIRenderer.h"
 
+#include <WICTextureLoader.h>
+
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
@@ -17,6 +19,8 @@ namespace
 bool UiRenderer::Initialize(ID3D11Device* device, ID3D11DeviceContext* context,
     const wchar_t* fontFilePath, float screenWidth, float screenHeight)
 {
+    _device = device;
+    _context = context;
     _spriteBatch = std::make_unique<SpriteBatch>(context);
 
     // フォントファイルが見つからない場合は例外が投げられる
@@ -151,6 +155,37 @@ XMFLOAT2 UiRenderer::MeasureString(const std::wstring& text, float scale) const
 {
     const XMVECTOR textSize = _font->MeasureString(text.c_str());
     return XMFLOAT2(XMVectorGetX(textSize) * scale, XMVectorGetY(textSize) * scale);
+}
+
+ComPtr<ID3D11ShaderResourceView> UiRenderer::LoadTexture(const wchar_t* filePath) const
+{
+    ComPtr<ID3D11ShaderResourceView> texture;
+    if (!_device)
+        return texture;
+
+    const HRESULT result = CreateWICTextureFromFile(_device, _context, filePath, nullptr,
+        texture.ReleaseAndGetAddressOf());
+    if (FAILED(result))
+    {
+        OutputDebugStringW((std::wstring(L"UiRenderer: texture load failed: ") + filePath + L"\n").c_str());
+        texture.Reset();
+    }
+    return texture;
+}
+
+void UiRenderer::DrawTexture(ID3D11ShaderResourceView* texture, float left, float top,
+    float width, float height, FXMVECTOR color)
+{
+    // 読み込みに失敗した画像(nullptr)は、何も描かない
+    if (!texture)
+        return;
+
+    const RECT destination =
+    {
+        static_cast<LONG>(left), static_cast<LONG>(top),
+        static_cast<LONG>(left + width), static_cast<LONG>(top + height)
+    };
+    _spriteBatch->Draw(texture, destination, ToPremultiplied(color));
 }
 
 bool UiRenderer::HitTest(float left, float top, float width, float height, const POINT& clientPos) const

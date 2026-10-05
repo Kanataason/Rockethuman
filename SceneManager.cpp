@@ -13,7 +13,8 @@ namespace
 		std::function<std::unique_ptr<BaseScene>()>> MakeSceneFunctionTable =
 	{
 		{SceneName::Title,[]{return std::make_unique<Title>();}},
-		{SceneName::GameScene,[] {return std::make_unique<GameScene>();}},
+		{SceneName::Stage1,[] {return std::make_unique<GameScene>();}},
+		{SceneName::Stage2,[] {return std::make_unique<GameScene>();}},
 		{SceneName::Result,[] {return std::make_unique<Result>();}}
 	};
 }
@@ -49,6 +50,7 @@ void SceneManager::RequestScene()
 {
 	const auto& data = _sceneList.at(_nextScene);
 	_nextScene = SceneName::None;
+	_currentSceneName = data.sceneName;
 
 	//消す前にReleaseを呼ぶ(RigidBody/Colliderの登録解除は、デストラクタが自動的に行う)
 	if (_currentScene)
@@ -72,7 +74,8 @@ void SceneManager::EntryScene()
 		auto data = _jsonLoader.LoadSceneData(scene);
 		
 		const auto& it = MakeSceneFunctionTable.find(data.sceneName);
-		if (it == MakeSceneFunctionTable.end())return;
+		// 作り方が登録されていない名前は飛ばす(returnすると、タイトルへの切り替えまで行われず、最初のシーンが無いまま落ちる)
+		if (it == MakeSceneFunctionTable.end())continue;
 
 		data.scene = it->second;	
 		_sceneList[data.sceneName] = data;

@@ -120,7 +120,7 @@ namespace RagdollTuning
     constexpr float kGroundAngularDampPerFrame = 0.6f;
 
     // 地面の摩擦係数(接触1回あたり、サブステップ単位)。1 = 即座に滑りを止める。
-    constexpr float kGroundFriction = 0.4f;
+    constexpr float kGroundFriction = 0.7f;
 
     // 地面でのバウンド
     // 反発係数。0 = 跳ねない、1 = ぶつかったときと同じ速さで跳ね返る。

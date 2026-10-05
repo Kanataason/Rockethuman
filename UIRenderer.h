@@ -48,6 +48,14 @@ public:
 
     DirectX::XMFLOAT2 MeasureString(const std::wstring& text, float scale) const;
 
+    // 画像(PNG)を読み込む。失敗したらnullptrのまま返る。Initialize後に呼ぶこと
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> LoadTexture(const wchar_t* filePath) const;
+
+    // 画像を、(left, top)から width x height に引き伸ばして描く(星のアイコンなど)
+    // 色は画像に掛ける。白(1,1,1,1)なら、そのままの色
+    void DrawTexture(ID3D11ShaderResourceView* texture, float left, float top,
+        float width, float height, DirectX::FXMVECTOR color);
+
     // ボタンの判定用:マウスの位置(ウィンドウ内のピクセル座標)が、
     // 仮想解像度(1280x720)基準の矩形(left, top, width, height)の中にあるか調べる
     // ※ clientPos は InputSystem::GetMouseClientPosition() で取得したものを渡す
@@ -62,6 +70,8 @@ private:
     std::unique_ptr<DirectX::SpriteBatch> _spriteBatch;
     std::unique_ptr<DirectX::SpriteFont>  _font;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> _whiteTexture;
+    ID3D11Device* _device = nullptr;           // 画像の読み込みに使う(所有しない)
+    ID3D11DeviceContext* _context = nullptr;   // 同上
     float _screenWidth = VirtualWidth;
     float _screenHeight = VirtualHeight;
 };

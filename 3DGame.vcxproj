@@ -169,6 +169,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="HingeJoint.cpp" />
+    <ClCompile Include="Joint.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="JsonLoader.cpp" />
     <ClCompile Include="main.cpp" />
@@ -198,6 +199,7 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UIRenderer.cpp" />
     <ClCompile Include="UiLayout.cpp" />
+    <ClCompile Include="ResultPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationLoader.h" />
@@ -283,6 +285,7 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UiRenderer.h" />
     <ClInclude Include="UiLayout.h" />
+    <ClInclude Include="ResultPanel.h" />
     <ClInclude Include="VectorUtility.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>

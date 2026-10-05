@@ -59,8 +59,9 @@ namespace UiInfo
             }}
         },
          {PanelType::Result, {
-            .frame = {.left = 100.0f, .top = 100.0f, .width = 400.0f, .height = 300.0f,
-                       .thickness = 2.0f, .frameColor = { 0, 1, 0, 1 } },
+            // 画面の中央(1280x720の中心 640,360 が、パネルの中心)
+            .frame = {.left = 340.0f, .top = 80.0f, .width = 600.0f, .height = 560.0f,
+                       .thickness = 3.0f, .frameColor = { 1.0f, 0.85f, 0.3f, 1 } },
             .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
             .items = {{TextType::None, ButtonType::None}
             }}

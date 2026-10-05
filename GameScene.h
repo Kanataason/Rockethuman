@@ -5,6 +5,7 @@
 #include "BaseScene.h"
 #include "ScoreManager.h"
 #include "RoundManager.h"
+#include "ResultPanel.h"
 #include "UIRenderer.h"
 #include "UiLayout.h"
 #include "UiTween.h"
@@ -34,7 +35,6 @@ private:
 	void DrawComboText();
 	void DrawGauge();
 	void DrawAimHint();
-	void DrawResultPanel();
 private:
 	// 的に当たった場所に出す、浮き上がって消える文字
 	struct ScorePopup
@@ -47,6 +47,7 @@ private:
 
 	RoundManager _roundManager;
 	ScoreManager _scoreManager;
+	ResultPanel _resultPanel;   // 玉を撃ち終えたあとに、ゲーム画面の上に重ねて出す
 
 	Ragdoll* _ragdoll = nullptr;
 	float _launchRootX = 0.0f;   // 発射した瞬間の、体のX位置(飛距離の採点に使う)

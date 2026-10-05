@@ -1,0 +1,90 @@
+{
+    "Objects": [
+
+        {
+            "attribute": "Other",
+            "type": "Light"
+        },
+        {
+            "attribute": "Other",
+            "type": "Camera",
+            "position": [ 0, 3, -30 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
+        },
+        {
+            "attribute": "File",
+            "path": "Asset/Prefab/Dancing.fbx",
+            "type": "Player",
+            "animations": [
+                {
+                    "name": "Idle",
+                    "path": "Asset/Animation/Idle.fbx"
+                },
+                {
+                    "name": "Walk",
+                    "path": "Asset/Animation/Walk.fbx"
+                }
+            ],
+            "position": [ 1, 1, 0 ],
+            "scale": [ 0.01, 0.01, 0.01 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "ScoreObject",
+            "material": "crate",
+            "position": [ 10, 1.5, 10 ],
+            "scale": [ 1, 1, 1 ],
+            "count": [ 3, 4, 1 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "Prop",
+            "material": "background",
+            "position": [ 0, 10, 20 ],
+            "scale": [ 200, 60, 0.1 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "Cannon",
+            "shape": "BoxBottomPivot",
+            "position": [ -20, 1.5, 10 ],
+            "scale": [ 1.5, 4, 1 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "Prop",
+            "position": [ -20, 1.5, 10 ],
+            "scale": [ 3, 1.3, 3 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "Prop",
+            "material": "ground",
+            "position": [ 1, -1, 10 ],
+            "scale": [ 200, 3, 30 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "Prop",
+            "material": "ground",
+            "position": [ 5, 8, 10 ],
+            "scale": [ 10, 1, 2 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "ScoreObject",
+            "material": "crate",
+            "position": [ 5, 9, 10 ],
+            "scale": [ 1, 1, 1 ],
+            "count": [ 3, 3, 1 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "ScoreObject",
+            "material": "goldCrate",
+            "position": [ 1, 9, 10 ],
+            "scale": [ 1, 1, 1 ],
+            "score": 500
+        }
+    ]
+}

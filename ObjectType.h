@@ -38,7 +38,8 @@ enum class Attribute //図形のタイプ
 
 enum class SceneName {
 	Title,
-	GameScene,
+	Stage1,
+	Stage2,
 	Result,
 	None,
 };

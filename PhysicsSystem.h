@@ -33,7 +33,13 @@ public:
     // CollisionManager側の登録解除と、_rigidBodies内の参照の後始末を両方行う
     void RemoveCollider(Collider* collider);
 
-    void AddJoint(Joint* joint) { _jointList.push_back(joint); };
+    // 登録時に、Joint側にも登録先を覚えさせる(Jointの所有者はRagdoll。ここは参照するだけ)
+    void AddJoint(Joint* joint);
+
+    // Jointのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
+    // 消し忘れると、シーンを作り直したあとのSolveJointsで、破棄済みのJointを触って落ちる
+    void RemoveJoint(Joint* joint);
+
     void AddCollider(Collider* collider) { collider->SetRegistry(this); _collisionManager.AddCollider(collider); }
 
     CollisionManager* GetCollisionManager() { return &_collisionManager; }

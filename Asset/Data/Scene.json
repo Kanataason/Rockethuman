@@ -1,16 +1,20 @@
 {
     "Scenes": [
-    {
-        "SceneName":"Title",
-        "ScenePath":"Asset/Data/Title.json"
-    },
-    {
-        "SceneName":"GameScene",
-        "ScenePath":"Asset/Data/GameScene.json"
-    },
-    {
-        "SceneName":"Result",
-        "ScenePath":"Asset/Data/Result.json"
-    }
-]
+        {
+            "SceneName": "Title",
+            "ScenePath": "Asset/Data/Title.json"
+        },
+        {
+            "SceneName": "Stage1",
+            "ScenePath": "Asset/Data/Stage1.json"
+        },
+        {
+            "SceneName": "Stage2",
+            "ScenePath": "Asset/Data/Stage2.json"
+        },
+        {
+            "SceneName": "Result",
+            "ScenePath": "Asset/Data/Result.json"
+        }
+    ]
 }

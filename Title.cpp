@@ -46,7 +46,7 @@ void Title::ConfirmSelected()
 	switch (MenuEntries[_selectedIndex].text)
 	{
 	case TextType::Start:
-		_sceneManager->ChangeScene(SceneName::GameScene);
+		_sceneManager->ChangeScene(SceneName::Stage1);
 		break;
 	case TextType::Setting:
 		_currentPanel = PanelType::Setting;

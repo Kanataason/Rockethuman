@@ -11,6 +11,7 @@
 #include "ObjectStatus.h"
 #include "TimeScale.h"
 #include "PowerZone.h"
+#include "SceneManager.h"
 
 using namespace UiInfo;
 
@@ -40,6 +41,7 @@ void GameScene::Initialize(ServiceLocator& locator)
 	BaseScene::Initialize(locator);
 
 	_timeScale = locator.timeScale;
+	_resultPanel.Initialize(locator);
 
 	auto* cannon = FindGameObject<CannonController>();
 	auto* player = FindGameObject<Player>();
@@ -111,6 +113,17 @@ void GameScene::SubscribeEvents()
 			if (_cameraFollow)
 				_cameraFollow->ReturnToStart();
 		});
+
+	// 玉を撃ち終えたら、いまのステージの結果を、ゲーム画面の上に出す
+	_roundManager.OnFinished.Subscribe([this]()
+		{
+			_resultPanel.Show(static_cast<int>(_scoreManager.GetScore()));
+		});
+
+	// 結果パネルの選択。シーンの切り替えは「予約」だけで、実際の入れ替えは次のフレームの頭に行われる
+	// 同じシーン(GameScene)を指定すると、JSONから作り直されるので、スコアも玉数も、的の配置も、最初に戻る
+	_resultPanel.OnRetry.Subscribe([this]() { _sceneManager->Reload(); });
+	_resultPanel.OnBackToTitle.Subscribe([this]() { _sceneManager->ChangeScene(SceneName::Title); });
 }
 
 void GameScene::Update(float deltaTime)
@@ -122,6 +135,7 @@ void GameScene::Update(float deltaTime)
 	_shotCountPop.Update(deltaTime);
 	UpdateGauge(deltaTime);
 	UpdateScoreEffects(deltaTime);
+	_resultPanel.Update(deltaTime);
 }
 
 void GameScene::DrawUi()
@@ -139,21 +153,9 @@ void GameScene::DrawUi()
 	DrawScorePopups();
 	DrawGauge();
 	DrawAimHint();
-	DrawResultPanel();
+	_resultPanel.Draw();   // 一番手前(出ていないときは、何もしない)
 
 	_uiRenderer->End();
-}
-void GameScene::DrawResultPanel()
-{
-	if (_roundManager.GetState() != RoundState::Finished)return;
-
-	auto it = panelList.find(PanelType::Result);
-	if (it == panelList.end())
-		return;
-
-	const auto& panelData = it->second;
-
-	DrawPanelBase(panelData);
 }
 
 // 画面の下に、いま何を決めるのかを出す(角度 -> 威力の2段階)

@@ -22,6 +22,9 @@ public:
 
 	//変更を予約するだけ
 	void ChangeScene(SceneName name);
+	void Reload() { ChangeScene(_currentSceneName); };
+
+	SceneName GetCurrentSceneName()const { return _currentSceneName; }
 private:
 
 	//シーンの初期化をする
@@ -33,7 +36,8 @@ private:
 	std::unordered_map<SceneName, SceneData> _sceneList;
 	std::unique_ptr<BaseScene> _currentScene;
 
-	SceneName _nextScene;
+	SceneName _nextScene = SceneName::None;
+	SceneName _currentSceneName = SceneName::None;
 
 	ServiceLocator _locator{};
 	JsonLoader _jsonLoader;

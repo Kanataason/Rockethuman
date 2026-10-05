@@ -112,6 +112,17 @@ void PhysicsSystem::RemoveCollider(Collider* collider)
     WakeSleepingBodies();
 }
 
+void PhysicsSystem::AddJoint(Joint* joint)
+{
+    joint->SetRegistry(this);
+    _jointList.push_back(joint);
+}
+
+void PhysicsSystem::RemoveJoint(Joint* joint)
+{
+    std::erase(_jointList, joint);
+}
+
 void PhysicsSystem::UpdateBodySleep(float deltaTime)
 {
     for (auto& body : _rigidBodies)

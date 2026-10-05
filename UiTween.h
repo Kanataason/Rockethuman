@@ -17,7 +17,7 @@ struct Tween
 	void Update(float deltaTime)
 	{
 		if (duration > 0.0f)
-			time = std::min(time + deltaTime, duration);
+			time = (std::min)(time + deltaTime, duration);
 	}
 
 	bool IsPlaying() const { return duration > 0.0f && time < duration; }

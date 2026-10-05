@@ -34,7 +34,8 @@ namespace
 	const std::unordered_map<std::string, SceneName> SceneNameTable =
 	{
 		{"Title", SceneName::Title},
-		{"GameScene",SceneName::GameScene},
+		{"Stage1",SceneName::Stage1},
+		{"Stage2",SceneName::Stage2},
 		{"Result",SceneName::Result}
 	};
 }

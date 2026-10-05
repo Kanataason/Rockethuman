@@ -5,6 +5,8 @@
 #include "VectorUtility.h"
 #include "ConsoleUtility.h"
 
+class PhysicsSystem;
+
 class Joint
 {
 public:
@@ -22,7 +24,13 @@ public:
         _localAnchorB = bRot.Inverse() * (anchor - childPos); //これは常にゼロベクトル
 
     }
-    virtual ~Joint() = default;
+    // 登録先のPhysicsSystemがあれば、自動的に登録を解除する(定義はJoint.cpp)
+    // PhysicsSystemは生ポインタで持つだけなので、これがないと、シーンを作り直したときに、
+    // 破棄済みのJointを触ってクラッシュする
+    virtual ~Joint();
+
+    // PhysicsSystem::AddJointが呼ぶ(手動で呼ぶ必要はない)
+    void SetRegistry(PhysicsSystem* registry) { _registry = registry; }
 
     //位置拘束とアンカー点の速度拘束
     //疑似速度にすれを渡して角度拘束を呼ぶ
@@ -246,6 +254,8 @@ private:
     }
 
 protected:
+    PhysicsSystem* _registry = nullptr;
+
     RigidBody* _bodyA = nullptr;
     RigidBody* _bodyB = nullptr;
 
