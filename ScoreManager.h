@@ -19,8 +19,14 @@ struct ScoreGain
 class ScoreManager
 {
 public:
+	//すべての的を,壊した瞬間
+	Event<>OnAllCleared;
+
 	// 的に当たって、点が入った瞬間
 	Event<ScoreGain> OnScoreGained;
+
+	// クリアボーナスが入った瞬間(引数は、入った点)。画面に大きく出すのに使う
+	Event<float> OnBonusGained;
 
 	void Initialize(ServiceLocator& locator) {};
 
@@ -29,8 +35,10 @@ public:
 	// コンボの制限時間を進める
 	void Update(float deltaTime);
 
-	// 1発ぶんの飛距離(m)を点にして足す
+	// 1発ぶんの飛距離を点にして足す
 	void AddDistanceBonus(float meters);
+	// 残りの玉ぶんのボーナスを足して、OnBonusGainedで知らせる
+	void AddClearBonus(int remainingShots);
 
 	// コンボを途切れさせる(1発が終わったときに呼ぶ)
 	void ResetCombo();
@@ -38,8 +46,17 @@ public:
 	float GetScore()const { return _totalScore; }
 	int GetCombo()const { return _combo; }
 private:
+	void CheckRemainingTarget();
+
+	void AddHitTarget() { ++_hitTotalTarget; }
+	void AddTarget() { ++_totalTargetCount; }
 	void AddHit(const HitInfo& hit);
 private:
+	const int _bonusPoint = 1000;
+
+	int _totalTargetCount = 0;
+	int _hitTotalTarget = 0;
+
 	// ---- 採点の調整値 ----
 	float _comboWindowSeconds = 3.0f;   // 前の的から、この秒数以内に当てるとコンボ
 	float _comboStep = 0.25f;           // コンボ1つにつき、倍率が増える量

@@ -4,7 +4,7 @@ namespace UiInfo
 {
     const std::unordered_map<TextType, TextData> textList =
     {
-        {TextType::Start,{.text = L"スタート",.centerX = 640.0f,.centerY = 430.0f,.scale = 0.7f
+        {TextType::Start,{.text = L"セレクトステージ",.centerX = 640.0f,.centerY = 430.0f,.scale = 0.36f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
         {TextType::Setting,{.text = L"オプション",.centerX = 640.0f,.centerY = 510.0f,.scale = 0.55f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
@@ -15,7 +15,17 @@ namespace UiInfo
         {TextType::Score,{.text = L"スコア",.centerX = 90.0f,.centerY = 44.0f,.scale = 0.3f
         ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}},
         {TextType::ShotCount,{.text = L"のこり",.centerX = 640.0f,.centerY = 44.0f,.scale = 0.3f
-        ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}}
+        ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+
+        // ステージ選択(ボタンの中心に、文字を置く)
+        {TextType::StageSelectTitle,{.text = L"ステージをえらぶ",.centerX = 640.0f,.centerY = 185.0f,.scale = 0.65f
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+        {TextType::StageSelectHint,{.text = L"W/S: えらぶ    スペース: けってい    Enter: もどる",.centerX = 640.0f,.centerY = 520.0f,.scale = 0.28f
+        ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+        {TextType::Stage1,{.text = L"ステージ 1",.centerX = 640.0f,.centerY = 295.0f,.scale = 0.6f
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+        {TextType::Stage2,{.text = L"ステージ 2",.centerX = 640.0f,.centerY = 385.0f,.scale = 0.6f
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}}
     };
 
     const std::unordered_map<ButtonType, ButtonData> buttonList =
@@ -25,6 +35,8 @@ namespace UiInfo
         {ButtonType::End,{.left = 540.0f,.top = 560.0f,.width = 200.0f,.height = 60.0f}},
         {ButtonType::Panel,{.left = 350.0f,.top = 100.0f,.width = 500.0f,.height = 500.0f}},
         {ButtonType::MouseControll,{.left = 350.0f,.top = 100.0f,.width = 200.0f,.height = 200.0f}},
+        {ButtonType::Stage1,{.left = 490.0f,.top = 260.0f,.width = 300.0f,.height = 70.0f}},
+        {ButtonType::Stage2,{.left = 490.0f,.top = 350.0f,.width = 300.0f,.height = 70.0f}},
     };
 
     const std::unordered_map<PanelType, PanelData> panelList =
@@ -34,6 +46,15 @@ namespace UiInfo
                        .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
             .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
             .items = {{TextType::MouseControll, ButtonType::MouseControll},
+            } }
+        },
+        // ステージ選択(画面の中央)。上から下への並びが、W/Sで選ぶ順番
+        { PanelType::StageSelect, {
+            .frame = {.left = 340.0f, .top = 130.0f, .width = 600.0f, .height = 440.0f,
+                       .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
+            .fillColor = { 0.0f, 0.0f, 0.0f, 0.65f },
+            .items = {{TextType::Stage1, ButtonType::Stage1},
+                      {TextType::Stage2, ButtonType::Stage2},
             } }
         },
         {PanelType::Score, {

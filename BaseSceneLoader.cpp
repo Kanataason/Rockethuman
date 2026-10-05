@@ -37,4 +37,24 @@ void SceneLoader::LoadSceneGameObject(BaseScene* scene,const std::string& path,
 		for (const auto& one : loader.ExpandRepeat(data))
 			scene->AddObject(factory.CreateObject(one));
 	}
+	// "Stage" は { ... } のオブジェクト。省略したら、StageDataの初期値のまま
+	if (root.contains("Stage") && root["Stage"].is_object())
+		scene->SetStageInfo(LoadSceneStageInfo(root["Stage"]));
+}
+
+StageData SceneLoader::LoadSceneStageInfo(const json& root)
+{
+	StageData data{};
+
+	// 書かれていない項目は、StageDataの初期値のまま使う
+	data.shotCount = root.value("shotCount", data.shotCount);
+
+	if (root.contains("starThresholds") && root["starThresholds"].is_array()
+		&& root["starThresholds"].size() >= 3)
+	{
+		for (size_t i = 0; i < data.starThresholds.size(); ++i)
+			data.starThresholds[i] = root["starThresholds"][i].get<int>();
+	}
+
+	return data;
 }

@@ -24,7 +24,8 @@ void ObjectStatus::OnCollisionEnter(Collider* other, const CollisionResult& resu
 	hit.baseScore = _score;
 	hit.position = result.contactPoint;
 
-	// 体が飛んでいく向き(右か左か)。当たったコライダーが、どのボーンのものかも調べて、頭かどうかを決める
+	// 体が飛んでいく向き(右か左か)。
+	// 当たったコライダーが、どのボーンのものかも調べて、頭かどうかを決める
 	float directionX = 1.0f;
 	if (auto* owner = other->GetOwner())
 	{

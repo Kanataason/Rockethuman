@@ -21,7 +21,7 @@ public :
 	// "count"で並べる指定があるとき、並べたぶんのObjectDataに増やして返す(指定がなければ、1個だけ)
 	std::vector<ObjectData> ExpandRepeat(const ObjectData& base)const;
 
-	SceneData LoadSceneData(const json& root)const;
+	BaseSceneData LoadSceneData(const json& root)const;
 private:
 
 	//各Jsonから値を取り出す

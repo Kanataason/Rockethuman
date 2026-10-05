@@ -6,6 +6,7 @@
 #include "Renderer.h"
 #include "BaseSceneLoader.h"
 #include "BaseGameObjectFactory.h"
+#include "ObjectType.h"
 
 #include "ServiceLoacator.h"
 
@@ -43,7 +44,7 @@ public:
 				return component;
 		return nullptr;
 	}
-
+	virtual void SetStageInfo(StageData data) {};
 	const virtual std::vector<std::unique_ptr<GameObject>>& GetObjectList() const { return _objects; };
 private:
 	//各オブジェクトを初期化

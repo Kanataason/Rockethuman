@@ -19,7 +19,8 @@ void CannonController::Initialize(ServiceLocator& locator)
 void CannonController::AddForcePlayer(float deltaTime)
 {
     auto& transform = GetOwner()->GetTransform();
-    const Vector3 direction = Vector::fromF3ToV3(transform.GetUp());   // すでに長さ1
+    // 砲身は、大砲の+X方向(横)に伸びている。Rotation.zが、水平からの上向きの角度になる
+    const Vector3 direction = Vector::fromF3ToV3(transform.GetRight());   // すでに長さ1
 
     // 威力ゲージの量(0～1)から、速さを決める。緑は弱く、黄色は中くらい、赤は強い(PowerZone.hの表)
     const float power = _roundManager ? _roundManager->GetPowerAmount() : 1.0f;
@@ -90,17 +91,17 @@ void CannonController::SetPlayerPosition()
     if (!_player)
         return;
 
-    //Playerの場所の割合
-    constexpr float helfSize = 0.28f;
-
     auto& transform = GetOwner()->GetTransform();
 
-    //砲台の向き、砲台の原点と方向を足して長さと割合をかけてplayerの場所を決める
-    const Vector3 upDirection = Vector::fromF3ToV3(transform.GetUp());
+    //砲台の原点から、砲身の向きに _playerOffset だけ進んだ所に、playerを置く
+    //(以前は Scale.y を使っていたが、FBXは Scale が 0.01 などなので、メートルで直接指定する)
+    const Vector3 barrelDirection = Vector::fromF3ToV3(transform.GetRight());
     const Vector3 center = Vector::fromF3ToV3(transform.Position)
-        + upDirection * (transform.Scale.y * helfSize);
+        + barrelDirection * _playerOffset;
 
     auto& playerTransform = _player->GetOwner()->GetTransform();
     playerTransform.Position = Vector::fromV3ToF3(center);
-    playerTransform.Rotation.z = transform.Rotation.z;
+
+    //playerは立った姿(頭が+Y)なので、砲身(+X)に頭を向けるために、-90度ぶん寝かせる
+    playerTransform.Rotation.z = transform.Rotation.z - 90.0f;
 }

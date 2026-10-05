@@ -16,6 +16,7 @@ void CameraFollow::StartFollow()
 		return;
 
 	_startRootY = _target->GetRootPosition().y;
+	_hasBeenFast = false;
 	_mode = Mode::Follow;
 }
 
@@ -41,14 +42,25 @@ void CameraFollow::Update(float deltaTime)
 
 		const auto root = _target->GetRootPosition();
 
-		// 奥行きは速さによって拡大縮小。横は腰の少し先、縦は動いた分の一部だけ追う
-		goal.x = root.x + _lockX;
-		goal.y = _startPosition.y + (root.y - _startRootY) *_followYRatio;
-
-		// 今のラグドールの速さに応じて、なめらかに引く
+		// 今のラグドールの速さ(0=止まる ～ 1=速い)
 		const float speed = _target->GetRootVelocity().Length();
-		const float pullBackRatio = std::clamp(speed / _pullBackFullSpeed, 0.0f, 1.0f);
-		goal.z = _startPosition.z * (1.0f + (_pullBackScale - 1.0f) * pullBackRatio);
+		const float speedRatio = std::clamp(speed / _pullBackFullSpeed, 0.0f, 1.0f);
+
+		// 速く飛んだあとで、遅くなってきたら寄る。最初の、まだ速くなっていない間は、寄らない
+		_hasBeenFast = _hasBeenFast || speed > _zoomInArmSpeed;
+		const float minScale = _hasBeenFast ? _zoomInScale : 1.0f;
+
+		// 奥行きは速さによって拡大縮小(速い: 引く ～ 遅い: 寄る)。横は腰の少し先
+		// 縦は、速いときは動いた分の一部だけ。寄るほど、プレイヤーが画面の中心に来るように、全部追う
+		const float yRatio = _followYRatio + (1.0f - _followYRatio) * (1.0f - speedRatio);
+		goal.x = root.x + _lockX;
+		goal.y = _startPosition.y + (root.y - _startRootY) * yRatio;
+
+		const float scale = minScale + (_pullBackScale - minScale) * speedRatio;
+		goal.z = _startPosition.z * scale;
+
+		// 寄りすぎて、プレイヤーにめり込まないように、距離に下限をつける
+		goal.z = (std::min)(goal.z, root.z - _minDistanceToTarget);
 
 		sharpness = _followSharpness;
 	}

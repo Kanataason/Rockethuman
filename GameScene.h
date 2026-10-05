@@ -20,6 +20,7 @@ public:
 	void Initialize(ServiceLocator& locator)override;
 	void Update(float deltaTime)override;
 	void DrawUi()override;
+	void SetStageInfo(StageData data)override;
 private:
 	void SubscribeEvents();
 
@@ -33,6 +34,8 @@ private:
 	void UpdateScoreEffects(float deltaTime);
 	void DrawScorePopups();
 	void DrawComboText();
+	void StartBonusPopup(float points);
+	void DrawBonusPopup();
 	void DrawGauge();
 	void DrawAimHint();
 private:
@@ -55,6 +58,11 @@ private:
 
 	// 残りの玉数が、ポンと弾むアニメーション(ラグドールが止まったとき)
 	Tween _shotCountPop;
+
+	// クリアボーナスの、画面の中央に出る、大きな文字
+	bool _bonusActive = false;
+	float _bonusPoints = 0.0f;
+	float _bonusAge = 0.0f;   // 出てからの秒数
 
 	std::vector<ScorePopup> _scorePopups;
 	Tween _comboPop;       // コンボが増えたときの弾み

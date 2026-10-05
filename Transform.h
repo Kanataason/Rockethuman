@@ -7,6 +7,10 @@ struct Transform
     DirectX::XMFLOAT3 Rotation{ 0.0f, 0.0f, 0.0f };
     DirectX::XMFLOAT3 Scale{ 1.0f, 1.0f, 1.0f };
 
+    // 見た目だけの回転(度)。モデルの向きが、ゲームの向きと合わないときに、モデルだけを回す。
+    // 描画の行列にだけ入り、GetForward/GetRight/GetUpや、Rotationを書き換える処理(大砲の揺れなど)には影響しない
+    DirectX::XMFLOAT3 ModelRotation{ 0.0f, 0.0f, 0.0f };
+
     //すべての値のワールド行列を合成
     DirectX::XMMATRIX GetWorldMatrix() const;
 

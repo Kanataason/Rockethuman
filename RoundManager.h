@@ -44,11 +44,21 @@ public:
 	// ラグドールが止まったことを伝える(飛んでいるときだけ受け付ける)
 	void NotifySettled();
 
+	//すべての的を壊したら呼ばれる
+	void NotifyAllCleared();
+
+	void SetShotCount(int shotCount) { _shotCount = shotCount; }
+
 	int GetShotCount()const { return _shotCount; }
 	RoundState GetState()const { return _state; }
 private:
 	// 止まってから、次に進むまでの間(秒)
-	static constexpr float kResultSeconds = 1.5f;
+	const float _resultSeconds = 1.5f;
+	float _clearTimer = 0.0f;
+	bool _isCleared = false;   // 的を全部飛ばした(終わるまで待っている)
+
+	// 終わりにして、結果を出す(OnFinished を1回だけ呼ぶ)
+	void Finish();
 
 	int _shotCount = 3;
 	RoundState _state = RoundState::AimAngle;

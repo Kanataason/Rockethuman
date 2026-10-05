@@ -1,7 +1,6 @@
 ﻿#include "ResultPanel.h"
 
 #include <algorithm>
-#include <array>
 #include <string>
 #include <Windows.h>
 
@@ -14,9 +13,6 @@ using namespace UiInfo;
 
 namespace
 {
-	// ---- 星の採点: この点数以上で、星が1個 / 2個 / 3個 ----
-	constexpr std::array<int, 3> starThresholds = { 1500, 3500, 6000 };
-
 	// ---- 演出のタイミング(秒) ----
 	constexpr float panelPopSeconds = 0.35f;        // パネルが弾んで出る
 	constexpr float scoreCountSeconds = 0.9f;       // スコアが0から数え上がる
@@ -57,7 +53,7 @@ void ResultPanel::Initialize(ServiceLocator& locator)
 int ResultPanel::CalculateStars(int score)
 {
 	int stars = 0;
-	for (const int threshold : starThresholds)
+	for (const int threshold : _starThresholds)
 	{
 		if (score >= threshold)
 			++stars;

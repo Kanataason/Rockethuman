@@ -33,7 +33,7 @@ private:
 	//シーンを新しく生成
 	void RequestScene();
 private:
-	std::unordered_map<SceneName, SceneData> _sceneList;
+	std::unordered_map<SceneName, BaseSceneData> _sceneList;
 	std::unique_ptr<BaseScene> _currentScene;
 
 	SceneName _nextScene = SceneName::None;

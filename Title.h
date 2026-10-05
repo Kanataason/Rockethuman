@@ -13,12 +13,19 @@ public:
 	void Update(float deltaTime)override;
 	void DrawUi()override;
 private:
+	// 画面の状態ごとの入力(メニュー / ステージ選択 / 設定パネル)
+	void UpdateMenu();
+	void UpdateStageSelect();
 
 	void ConfirmSelected();
-	void DrawMenuItem(MenuEntry menu, int index);
-	void DrawPanel(PanelType typeIndex);
+	void DrawMenuItem(MenuEntry menu, bool selected);
+	// selectedIndex: パネルの中で、選んでいる行(選ぶ物がないパネルは -1)
+	void DrawPanel(PanelType typeIndex, int selectedIndex);
+	void DrawStageSelect();
+	void DrawText(TextType type);
 private:
-	int _selectedIndex = 0;
+	int _selectedIndex = 0;     // メニュー(セレクトステージ / オプション / エンド)で選んでいる行
+	int _stageIndex = 0;        // ステージ選択で選んでいる行
 
 	PanelType _currentPanel = PanelType::None;
 

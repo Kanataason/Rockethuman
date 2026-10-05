@@ -364,6 +364,26 @@ std::shared_ptr<ModelDatas> ModelLoader::FBXLoadModel(const std::string& path)
         return nullptr;
     }
 
+    // 動かない物(ボーンもアニメーションもない)は、ノードの位置・回転・拡大を、頂点に焼き込む。
+    // 焼き込まないと、複数のパーツ(車輪・砲身など)が、全部、原点に同じ向きで重なって描かれる
+    // (このゲームは、メッシュの頂点だけを読み、ノードの変換は使わないため)。
+    // ボーンのあるモデル(プレイヤー)は、ノードの変換を、スケルトンとして使うので、そのままにする
+    bool hasBones = false;
+    for (unsigned i = 0; i < scene->mNumMeshes; ++i)
+    {
+        if (scene->mMeshes[i]->mNumBones > 0)
+            hasBones = true;
+    }
+    if (!hasBones && scene->mNumAnimations == 0)
+    {
+        scene = importer.ApplyPostProcessing(aiProcess_PreTransformVertices);
+        if (!scene)
+        {
+            OutputDebugStringA(importer.GetErrorString());
+            return nullptr;
+        }
+    }
+
     auto data = std::make_shared<ModelDatas>();
     std::unordered_map<std::string, aiBone*> boneNames;
     std::unordered_map<std::string, int> boneIndexMap;

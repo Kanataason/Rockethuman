@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <wrl/client.h>
 #include <d3d11.h>
+#include <array>
 
 #include "Event.h"
 #include "ServiceLoacator.h"
@@ -26,10 +27,12 @@ public:
 	void Update(float deltaTime);
 	void Draw();
 
+	void SetStarThresholds(const std::array<int, 3>& starThresholds) { _starThresholds = starThresholds; }
+
 	bool IsVisible() const { return _visible; }
 private:
 	// 星の数(0～3)。スコアが、何点以上で何個か
-	static int CalculateStars(int score);
+	int CalculateStars(int score);
 
 	// 開始から start 秒後に始まる、duration 秒のアニメーションの進み具合(0～1)
 	float Progress(float start, float duration) const;
@@ -42,6 +45,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> _starOn;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> _starOff;
+
+	std::array<int, 3> _starThresholds = { 1500, 3500, 6000 };   // 何も渡されなかったとき用(初期値がないと、ごみの値になる)
 
 	bool _visible = false;
 	float _elapsed = 0.0f;   // Show してからの秒数。アニメーションは、全部これから計算する

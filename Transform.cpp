@@ -32,7 +32,10 @@ DirectX::XMMATRIX Transform::GetWorldMatrix() const
             Position.y,
             Position.z);
 
-    return scale * rotation * translation;
+    // 見た目だけの回転は、拡大のあと・ゲーム上の回転の前に掛ける(モデルの中の向きを直してから、物体として回す)
+    XMMATRIX modelRotation = MakeRotationMatrix(ModelRotation);
+
+    return scale * modelRotation * rotation * translation;
 }
 DirectX::XMFLOAT3 Transform::GetForward() const
 {

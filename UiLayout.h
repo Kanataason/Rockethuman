@@ -18,6 +18,10 @@ enum class TextType
     MouseControll,
     Score,
     ShotCount,
+    StageSelectTitle,
+    StageSelectHint,
+    Stage1,
+    Stage2,
     None
 };
 enum class ButtonType
@@ -28,11 +32,14 @@ enum class ButtonType
     Panel,
     MouseControll,
     Score,
+    Stage1,
+    Stage2,
     None
 };
 enum class PanelType
 {
     Setting,
+    StageSelect,
     Score,
     ShotCount,
     Result,

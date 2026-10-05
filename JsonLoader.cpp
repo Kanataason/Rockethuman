@@ -107,6 +107,16 @@ Transform JsonLoader::LoadTransform(const json& root)
 		transform.Scale.z = root["scale"][2].get<float>();
 	}
 
+	// ModelRotation [x, y, z](度)を読み込む。見た目だけの回転
+	if (root.contains("modelRotation") &&
+		root["modelRotation"].is_array() &&
+		root["modelRotation"].size() >= 3)
+	{
+		transform.ModelRotation.x = root["modelRotation"][0].get<float>();
+		transform.ModelRotation.y = root["modelRotation"][1].get<float>();
+		transform.ModelRotation.z = root["modelRotation"][2].get<float>();
+	}
+
 	return transform;
 }
 std::string JsonLoader::LoadPath(const json& root)const
@@ -147,9 +157,9 @@ void JsonLoader::LoadAnimationPath(const json& root, std::vector<AnimationData>&
 			});
 	}
 }
-SceneData JsonLoader::LoadSceneData(const json& root)const
+BaseSceneData JsonLoader::LoadSceneData(const json& root)const
 {
-	SceneData data{};
+	BaseSceneData data{};
 
 	if (root.contains("SceneName"))
 		data.sceneName = ToSceneName(root.at("SceneName").get<std::string>());

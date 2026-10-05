@@ -30,6 +30,16 @@ namespace
 	constexpr float comboScale = 0.5f;
 	constexpr float comboPopSeconds = 0.3f;
 
+	// クリアボーナスの大きな文字(画面の中央)
+	constexpr float bonusLifetime = 1.45f;       // 消えるまでの秒数(結果パネルが出る前に、消える長さ)
+	constexpr float bonusPopSeconds = 0.4f;      // 小さい所から、ドンと出てくる時間
+	constexpr float bonusFadeStart = 0.75f;      // 寿命のここから先で、だんだん透明になる(0～1)
+	constexpr float bonusCenterX = 640.0f;
+	constexpr float bonusLabelY = 230.0f;
+	constexpr float bonusPointsY = 330.0f;
+	constexpr float bonusLabelScale = 0.6f;
+	constexpr float bonusPointsScale = 1.5f;
+
 	// 威力ゲージ
 	constexpr float dimZoneAlpha = 0.28f;        // まだ届いていない色の帯の、薄さ
 	constexpr float gaugeLabelOffsetY = 22.0f;   // ゲージの下端から、帯の名前までの距離
@@ -114,6 +124,14 @@ void GameScene::SubscribeEvents()
 				_cameraFollow->ReturnToStart();
 		});
 
+	_scoreManager.OnAllCleared.Subscribe([this]()
+		{
+			_scoreManager.AddClearBonus(_roundManager.GetShotCount());
+			_roundManager.NotifyAllCleared();
+		});
+
+	// ボーナスが入ったら、画面の中央に、大きく出す
+	_scoreManager.OnBonusGained.Subscribe([this](float points) { StartBonusPopup(points); });
 	// 玉を撃ち終えたら、いまのステージの結果を、ゲーム画面の上に出す
 	_roundManager.OnFinished.Subscribe([this]()
 		{
@@ -124,6 +142,12 @@ void GameScene::SubscribeEvents()
 	// 同じシーン(GameScene)を指定すると、JSONから作り直されるので、スコアも玉数も、的の配置も、最初に戻る
 	_resultPanel.OnRetry.Subscribe([this]() { _sceneManager->Reload(); });
 	_resultPanel.OnBackToTitle.Subscribe([this]() { _sceneManager->ChangeScene(SceneName::Title); });
+}
+
+void GameScene::SetStageInfo(StageData data)
+{
+	_resultPanel.SetStarThresholds(data.starThresholds);
+	_roundManager.SetShotCount(data.shotCount);
 }
 
 void GameScene::Update(float deltaTime)
@@ -151,6 +175,7 @@ void GameScene::DrawUi()
 	DrawShotCountPanel();
 	DrawComboText();
 	DrawScorePopups();
+	DrawBonusPopup();
 	DrawGauge();
 	DrawAimHint();
 	_resultPanel.Draw();   // 一番手前(出ていないときは、何もしない)
@@ -281,6 +306,45 @@ void GameScene::UpdateScoreEffects(float deltaTime)
 		_comboPop.Start(comboPopSeconds);
 	_lastCombo = combo;
 	_comboPop.Update(deltaTime);
+
+	if (_bonusActive)
+	{
+		_bonusAge += deltaTime;
+		if (_bonusAge >= bonusLifetime)
+			_bonusActive = false;
+	}
+}
+
+void GameScene::StartBonusPopup(float points)
+{
+	_bonusActive = true;
+	_bonusPoints = points;
+	_bonusAge = 0.0f;
+}
+
+// 「ぜんぶ たおした!」と、ボーナスの点を、画面の中央に大きく出す
+void GameScene::DrawBonusPopup()
+{
+	if (!_bonusActive)
+		return;
+
+	const float t = _bonusAge / bonusLifetime;
+
+	// 小さい所から、大きく行き過ぎて、元の大きさに戻る(ドンと出る)。そのあとも、少し脈打つ
+	const float popT = (std::min)(_bonusAge / bonusPopSeconds, 1.0f);
+	const float pulse = 1.0f + 0.04f * std::sin(_bonusAge * 14.0f);
+	const float scale = (0.2f + 0.8f * EaseOutBack(popT)) * pulse;
+
+	const float alpha = t < bonusFadeStart ? 1.0f : 1.0f - (t - bonusFadeStart) / (1.0f - bonusFadeStart);
+
+	const DirectX::XMVECTOR outline = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, alpha);
+
+	_uiRenderer->DrawStringCentered(L"ぜんぶ たおした!", bonusCenterX, bonusLabelY, bonusLabelScale * scale,
+		DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, alpha), outline, 5.0f);
+
+	_uiRenderer->DrawStringCentered(L"+" + FormatWithComma(static_cast<int>(_bonusPoints)),
+		bonusCenterX, bonusPointsY, bonusPointsScale * scale,
+		DirectX::XMVectorSet(1.0f, 0.82f, 0.15f, alpha), outline, 8.0f);
 }
 
 // 当たった場所から浮き上がって、消える文字。当たった場所は世界座標なので、カメラが動いても場所についていく

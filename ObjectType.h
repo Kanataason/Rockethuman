@@ -2,6 +2,7 @@
 #include <string>
 #include <DirectXMath.h>
 #include <vector>
+#include <array>
 #include <functional>
 #include "Transform.h"
 
@@ -52,13 +53,18 @@ struct AnimationData
 
 class BaseScene;
 
-struct SceneData
+struct BaseSceneData
 {
 	std::string path = "";
 	SceneName sceneName = SceneName::None;
 	std::function<std::unique_ptr<BaseScene>()> scene;
 };
 
+struct StageData
+{
+	int shotCount = 3;
+	std::array<int, 3 > starThresholds = { 1500, 3500, 6000 };   // JSONに書かなかったときの値(0だと、0点でも星3つになる)
+};
 //Jsonからのデータを入れる構造体
 struct ObjectData
 {

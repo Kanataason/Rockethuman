@@ -5,6 +5,7 @@
 
 void ScoreManager::SubScribeEvent(ObjectStatus* status)
 {
+	AddTarget();
 	status->OnSendScore.Subscribe([this](HitInfo hit) { AddHit(hit); });
 }
 
@@ -38,11 +39,28 @@ void ScoreManager::AddHit(const HitInfo& hit)
 	gain.isHead = hit.isHead;
 	gain.position = hit.position;
 	OnScoreGained.Invoke(gain);
+
+	CheckRemainingTarget();
+}
+void ScoreManager::CheckRemainingTarget()
+{
+	AddHitTarget();
+
+	//すべての的を倒したら一回だけ呼ぶ
+	if (_hitTotalTarget >= _totalTargetCount && _totalTargetCount > 0)
+		OnAllCleared.Invoke();
 }
 
 void ScoreManager::AddDistanceBonus(float meters)
 {
 	_totalScore += (std::max)(0.0f, meters) * _pointsPerMeter;
+}
+
+void ScoreManager::AddClearBonus(int remainingShots)
+{
+	const float bonus = static_cast<float>((std::max)(0, remainingShots) * _bonusPoint);
+	_totalScore += bonus;
+	OnBonusGained.Invoke(bonus);
 }
 
 void ScoreManager::ResetCombo()

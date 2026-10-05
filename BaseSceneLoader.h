@@ -14,6 +14,8 @@ public :
 
 	void LoadSceneGameObject(BaseScene* scene,const std::string& loadPath,
 		JsonLoader& loader,GameObjectFactory& factory);
+private:
+	StageData LoadSceneStageInfo(const json& root);
 private :
 	JsonLoader _jsonLoader;
 };

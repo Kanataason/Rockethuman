@@ -27,6 +27,10 @@ private:
 
 	float _swingFrame = 0.0f;//現在の回転値はラジアン
 	float _swingSpeed = 1.0f;
-	float _swingMinAngle = -80.0f;
+	// 砲身の、水平(+X)からの上向きの角度(度)。この範囲を行ったり来たりする
+	float _swingMinAngle = 10.0f;
 	float _swingMaxAngle = 80.0f;
+
+	// 大砲の原点から、playerを置く場所までの、砲身に沿った距離(m)
+	float _playerOffset = 1.1f;
 };
