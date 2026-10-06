@@ -24,6 +24,14 @@ void ObjectStatus::OnCollisionEnter(Collider* other, const CollisionResult& resu
 	hit.baseScore = _score;
 	hit.position = result.contactPoint;
 
+	// 念のための保険: 接触点が空(原点)の結果が来たときは、当たったボーンのコライダーの中心を使う
+	// (得点の文字が、世界の原点という、体から遠い場所に出るのを防ぐ)
+	if (result.colliderA == nullptr || result.colliderB == nullptr)
+	{
+		const XMFLOAT3 center = other->GetCenter();
+		hit.position = Vector3(center.x, center.y, center.z);
+	}
+
 	// 体が飛んでいく向き(右か左か)。
 	// 当たったコライダーが、どのボーンのものかも調べて、頭かどうかを決める
 	float directionX = 1.0f;
@@ -32,6 +40,7 @@ void ObjectStatus::OnCollisionEnter(Collider* other, const CollisionResult& resu
 		if (auto* ragdoll = owner->GetComponent<Ragdoll>())
 		{
 			hit.isHead = ragdoll->GetBoneName(other).find("Head") != std::string::npos;
+			ragdoll->DebugLogContact(other, result.contactPoint);   // 【調べる間だけ】得点の文字の位置の確認用
 
 			const float rootVelocityX = ragdoll->GetRootVelocity().x;
 			if (std::abs(rootVelocityX) > 0.1f)

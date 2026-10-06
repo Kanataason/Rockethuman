@@ -46,6 +46,8 @@ void CharacterRoster::Load(const std::string& jsonPath)
 		character.name = StringUtility::ToWide(entry.value("name", character.modelPath));
 		character.scale = entry.value("scale", character.scale);
 		character.colliderScale = entry.value("colliderScale", character.colliderScale);
+		character.bounceRestitution = entry.value("bounceRestitution", character.bounceRestitution);
+		character.bounceCount = entry.value("bounceCount", character.bounceCount);
 
 		if (entry.contains("animations") && entry["animations"].is_array())
 		{
@@ -97,4 +99,6 @@ void CharacterRoster::ApplyToPlayer(ObjectData& playerData) const
 	playerData.transform.Scale = { character->scale, character->scale, character->scale };
 	playerData.animationDatas = character->animations;
 	playerData.colliderScale = character->colliderScale;
+	playerData.bounceRestitution = character->bounceRestitution;
+	playerData.bounceCount = character->bounceCount;
 }

@@ -43,10 +43,12 @@ void ModelLoader::GetFbxObjectData(MeshInfo& meshinfo, const aiMesh* aimesh, con
         // UVが存在しないメッシュにはデフォルト値を設定
         if (aimesh->HasTextureCoords(0))
         {
+            // FBXのUVは、下がV=0(OpenGL式)。DirectXで読み込んだ画像は、上がV=0なので、Vを反転する
+            // (しないと、テクスチャが上下逆に貼られる: 頭に足の模様、など)
             vertex.UV =
             {
                 aimesh->mTextureCoords[0][i].x,
-                aimesh->mTextureCoords[0][i].y
+                1.0f - aimesh->mTextureCoords[0][i].y
             };
         }
         else

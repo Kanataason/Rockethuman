@@ -330,8 +330,15 @@ public:
     float GetHipHeight()const { return _hipHeight; }
     void SetColliderScale(float scale) { _colliderScale = scale; }
 
+    // 地面でのバウンドを強くする(よく跳ねるキャラクター用)。発射のたびに、全ボーンへ設定される
+    // restitution: 強く跳ねるときの反発係数(1より大きいと、元の速さより強く跳ねる) / count: 強く跳ねられる回数
+    void SetBounce(float restitution, int count) { _bounceRestitution = restitution; _bounceCount = count; }
+
     // コライダーに対応するボーンの名前。このラグドールのコライダーでなければ、空文字
     std::string GetBoneName(const Collider* collider) const;
+
+    // 【調べる間だけ】当たったボーンの、物理の位置・見た目の位置・接触点を、contact_log.txt に書く
+    void DebugLogContact(const Collider* collider, const Vector3& contactPoint) const;
 private:
     void InitializeBoneLength();
     void SetLockZ(bool lock);
@@ -460,6 +467,8 @@ private:
 
     float _bodyScale = 1.0f;
     float _colliderScale = 1.0f;
+    float _bounceRestitution = 1.0f;
+    int _bounceCount = 0;   // 0 = 強く跳ねない(ふつうのキャラクター)
     float _hipHeight = 0.0f;
 
     bool _enabled = false;

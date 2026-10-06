@@ -389,8 +389,21 @@ void PhysicsSystem::SolveJoints(float subDeltaTime)
     }
 }
 
+namespace
+{
+    // 胴体のボーンか(全身で跳ねるきっかけになるのは、これだけ。手足や頭は、きっかけにならない)
+    bool IsTrunkBone(const std::string& name)
+    {
+        return name == "mixamorig:Hips" || name == "mixamorig:Spine" ||
+            name == "mixamorig:Spine1" || name == "mixamorig:Spine2";
+    }
+}
+
 void PhysicsSystem::SolveCollisions(float deltaTime,float subDeltaTime)
 {
+    // 全身で跳ねたあとの、休みの時間を進める
+    _hopCooldown = std::max(0.0f, _hopCooldown - subDeltaTime);
+
     //地面フラグを初期化
     for (auto& body : _rigidBodies)
     {
@@ -439,8 +452,13 @@ void PhysicsSystem::SolveCollisions(float deltaTime,float subDeltaTime)
             //めり込む向きの速度成分を消す
             body.rigidBody->RemoveVelocityAlongNormal(normal);
 
+            // 跳ねた直後(休みの間)の、ラグドールの地面の摩擦は、かけない
+            // (摩擦で、地面に沿った速さが消えると、斜めに跳ね返らず、真上に跳ねてしまう)
+            const bool justHopped = isGround && _hopCooldown > 0.0f && body.ragdollBone.nodeIndex >= 0;
+
             //摩擦(地面とボーン同士で係数を変える)
-            body.rigidBody->ApplyFriction(normal,isGround ? RagdollTuning::kGroundFriction : RagdollTuning::kBoneFriction, subDeltaTime);
+            if (!justHopped)
+                body.rigidBody->ApplyFriction(normal,isGround ? RagdollTuning::kGroundFriction : RagdollTuning::kBoneFriction, subDeltaTime);
         }
     }
 }
@@ -451,8 +469,11 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
 {
     RigidBody& rigidBody = *body.rigidBody;
 
+    // ぶつかる前の速度(まだ何も消されていない状態)。ぶつかる前の向きで、跳ね返る向きを決めるために、覚えておく
+    const Vector3 incomingVelocity = rigidBody.GetVelocity();
+
     // ぶつかる前の、地面に向かう速さ(中心の速度の法線成分)。バウンドの強さは、これで決める
-    const float impactSpeed = -Vector::Dot(rigidBody.GetVelocity(), contactNormal);
+    const float impactSpeed = -Vector::Dot(incomingVelocity, contactNormal);
 
     constexpr float penetrationCorrectionRate = RagdollTuning::penetrationCorrectionRate;
     constexpr float penetrationSlop = RagdollTuning::penetrationSlop;
@@ -482,10 +503,63 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
     // バウンド: しきい値を超えた分だけ、反発係数をかけて、地面から離れる向きの速度を足す。
     // 接触点のインパルスだけでは、当たった位置のずれのぶんが回転に逃げて、ほとんど跳ねないので、
     // ボーンの中心の速度に、直接足している
+    // 体ぜんたいで「ぴょん」と跳ねる設定のとき(キャラクター固有)は、胴体が地面に当たったときだけ、全身をまとめて跳ねさせる
+    // (手足や頭が当たっただけでは、全身は跳ねない)。跳ねたら、このボーンの、ふつうのバウンドは足さない
+    if (_hopCountLeft > 0 && IsTrunkBone(body.ragdollBone.name))
+    {
+        if (TryRagdollHop(rigidBody, incomingVelocity, contactNormal))
+            return;
+    }
+
     const float bounceSpeed = RagdollTuning::kGroundRestitution *
         std::max(0.0f, impactSpeed - RagdollTuning::kGroundBounceMinSpeed);
     if (bounceSpeed > 0.0f)
         rigidBody.SetVelocity(rigidBody.GetVelocity() + contactNormal * bounceSpeed);
+}
+
+void PhysicsSystem::SetRagdollHop(float restitution, int count)
+{
+    _hopRestitution = restitution;
+    _hopCountLeft = std::max(0, count);
+    _hopCooldown = 0.0f;
+}
+
+// 胴体が地面にぶつかったら、ボールが跳ね返るように、入ってきた向きで反射させて、全身をひとつの塊として、跳ね上げる
+// 戻り値: 跳ねたか(休み中や、遅い着地では、跳ねない)
+bool PhysicsSystem::TryRagdollHop(RigidBody& trigger, const Vector3& incomingVelocity, const Vector3& contactNormal)
+{
+    // 胴体のあちこちが、続けて地面に当たっても、1回だけ跳ねる
+    if (_hopCooldown > 0.0f)
+        return false;
+
+    // 地面に向かう速さ(負が、地面へ向かう向き)と、地面に沿った速さに分ける
+    const float normalSpeed = Vector::Dot(incomingVelocity, contactNormal);
+    const float impactSpeed = -normalSpeed;
+    if (impactSpeed < RagdollTuning::hopMinImpactSpeed)
+        return false;
+
+    const Vector3 tangentVelocity = incomingVelocity - contactNormal * normalSpeed;
+
+    // 反射: 地面に沿った速さは、ほぼそのまま(少しだけ減らす)。地面に向かう速さが、反発係数をかけた、離れる速さになる
+    // → 斜めに当たれば、斜めに跳ね返る(入射角と、反射角が、等しくなる)
+    const float outNormalSpeed = std::min(_hopRestitution * impactSpeed, RagdollTuning::hopMaxSpeed);
+    const Vector3 outgoingVelocity =
+        tangentVelocity * (1.0f - RagdollTuning::hopTangentLoss) + contactNormal * outNormalSpeed;
+
+    // きっかけのボーンの速度が、反射後の速度になるように、速度の変化量を計算して、全ボーンに同じ量を足す(体が、ばらけない)
+    const Vector3 velocityChange = outgoingVelocity - trigger.GetVelocity();
+
+    for (auto& other : _rigidBodies)
+    {
+        if (!other.rigidBody || other.ragdollBone.nodeIndex < 0)
+            continue;
+
+        other.rigidBody->SetVelocity(other.rigidBody->GetVelocity() + velocityChange);
+    }
+
+    --_hopCountLeft;
+    _hopCooldown = RagdollTuning::hopCooldownSeconds;
+    return true;
 }
 
 void PhysicsSystem::ResolveBoneContact(PhysicsBody& body, const CollisionResult& result,

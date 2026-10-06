@@ -23,6 +23,7 @@ void ObjectBuilders::BuildPlayer(GameObject& obj, const ObjectData& data, const 
     doll->SetSkeleton(model->skeleton);
     doll->SetParent(obj);
     doll->SetColliderScale(data.colliderScale);
+    doll->SetBounce(data.bounceRestitution, data.bounceCount);
 
     auto meshRenderer = obj.AddComponent<MeshRenderer>();
     meshRenderer->SetModel(model);

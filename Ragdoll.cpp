@@ -1,5 +1,6 @@
 ﻿#include "Ragdoll.h"
 #include <random>
+#include <fstream>
 #include "Skeleton.h"
 
 #include "MatrixUtility.h"
@@ -748,6 +749,44 @@ std::string Ragdoll::GetBoneName(const Collider* collider) const
     return std::string();
 }
 
+void Ragdoll::DebugLogContact(const Collider* collider, const Vector3& contactPoint) const
+{
+    const RagdollBone* hitBone = nullptr;
+    for (const auto& bone : _bones)
+    {
+        if (bone.collider.get() == collider)
+            hitBone = &bone;
+    }
+    if (!hitBone || !hitBone->rigidBody)
+        return;
+
+    // 物理: ボーンのRigidBodyの位置 と コライダーの中心
+    const Vector3 physics = hitBone->rigidBody->GetPosition();
+    const XMFLOAT3 colliderCenter = hitBone->collider->GetCenter();
+
+    // 見た目: スキニングに使うノードのGlobalTransform(オーナーの中での位置)を、ワールドに直した位置
+    const BoneNode& node = _skeleton->GetNode()[hitBone->nodeIndex];
+    const XMMATRIX ownerWorld = _owner->GetTransform().GetWorldMatrix();
+    const XMVECTOR nodeLocal = XMVectorSet(node.GlobalTransform._41, node.GlobalTransform._42, node.GlobalTransform._43, 1.0f);
+    XMFLOAT3 visual;
+    XMStoreFloat3(&visual, XMVector3TransformCoord(nodeLocal, ownerWorld));
+
+    char buffer[512];
+    sprintf_s(buffer,
+        "[Contact] bone=%s  physics=(%.2f, %.2f, %.2f)  colliderCenter=(%.2f, %.2f, %.2f)  visual=(%.2f, %.2f, %.2f)  contact=(%.2f, %.2f, %.2f)  ownerPos=(%.2f, %.2f, %.2f)\n",
+        hitBone->name.c_str(),
+        physics.x, physics.y, physics.z,
+        colliderCenter.x, colliderCenter.y, colliderCenter.z,
+        visual.x, visual.y, visual.z,
+        contactPoint.x, contactPoint.y, contactPoint.z,
+        _owner->GetTransform().Position.x, _owner->GetTransform().Position.y, _owner->GetTransform().Position.z);
+    OutputDebugStringA(buffer);
+
+    std::ofstream file("contact_log.txt", std::ios::app);
+    if (file.is_open())
+        file << buffer;
+}
+
 bool Ragdoll::AllBonesSleeping() const
 {
     for (const auto& bone : _bones)
@@ -802,6 +841,10 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
             bone.rigidBody->SetSleeping(false);
             bone.rigidBody->SetMaxSpeed(RagdollTuning::kLaunchMaxVelocitySpeed);
         }
+
+    // 体ぜんたいで「ぴょん」と跳ねる回数を、発射のたびに戻す(回数0のキャラクターは、ふつうのバウンドのまま)
+    if (_physicsSystem)
+        _physicsSystem->SetRagdollHop(_bounceRestitution, _bounceCount);
 
     // 各ボーンを、今のZで固定する(2D)。全ボーン分を1回で設定する
     SetLockZ(true);

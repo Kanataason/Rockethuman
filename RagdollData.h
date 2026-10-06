@@ -128,6 +128,16 @@ namespace RagdollTuning
     // これより遅い接触(m/s)では跳ねない。止まりかけの小さな震えを防ぐ。
     // 超えた分だけ跳ねるので、遅くなるほど自然に跳ねなくなる。
     constexpr float kGroundBounceMinSpeed = 1.5f;
+    // 体ぜんたいで「ぴょん」と跳ねるキャラクター用(PhysicsSystemの、RagdollHop)
+    // 跳ね上がる速さの上限(m/s)。上限がないと、跳ねるたびに、速さが増えて、手に負えなくなる
+    constexpr float hopMaxSpeed = 12.0f;
+    // これより遅い着地(m/s)では、跳ねない(止まりかけの、小さな接触で跳ねないように)
+    constexpr float hopMinImpactSpeed = 2.0f;
+    // 1回跳ねたら、この秒数のあいだは、次の跳ねを起こさない(胴体のあちこちが、続けて地面に当たっても、1回だけ跳ねる)
+    // この間は、地面の摩擦も、かけない(摩擦で横の速さが消えると、斜めに跳ね返らない)
+    constexpr float hopCooldownSeconds = 0.25f;
+    // 跳ねるときに、地面に沿った速さを、減らす割合(0 = そのまま、1 = 全部消す)
+    constexpr float hopTangentLoss = 0.1f;
 
 
     //ボーン同士の接触(PhysicsSystem)
@@ -136,13 +146,13 @@ namespace RagdollTuning
     // ボーン同士の押し出し処理(腕が胴体内部に入り込むなど)。
 
     // サブステップごとの補正割合
-    constexpr float kBoneContactBeta = 0.6f;
+    constexpr float kBoneContactBeta = 0.8f;
 
     // 無視するめり込み量(m)
-    constexpr float kBoneContactSlop = 0.003f;
+    constexpr float kBoneContactSlop = 0.0025f;
 
     // 1サブステップで補正する最大めり込み量
-    constexpr float kBoneContactMaxPush = 0.03f;
+    constexpr float kBoneContactMaxPush = 0.02f;
 
     // ボーン同士の摩擦係数(接触1回あたり、サブステップ単位)
     constexpr float kBoneFriction = 0.2f;

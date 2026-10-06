@@ -51,6 +51,10 @@ public:
     void UpdateRagdollBoneOffsets(RigidBody* rigidBody,
         const Vector3& localOffset, const Quaternion& localRotOffset, bool hasReliableComOffset);
 
+    // 体ぜんたいで「ぴょん」と跳ねる設定(キャラクター固有)。発射のたびに、設定し直す
+    // restitution: 着地の速さの何倍で跳ね上がるか / count: 跳ねられる回数(0なら、ふつうの、ボーンごとのバウンド)
+    void SetRagdollHop(float restitution, int count);
+
     void ResetRagdollTimer() { _ragdollElapsedTime = 0.0f; _ragdollSystem.ResetRest(); }
     // 休止(倒れて静止したら止める処理)を使うかを切り替える。吊り下げ中は false にする
     void SetRagdollRestEnabled(bool enabled) { _ragdollSystem.SetRestEnabled(enabled); }
@@ -110,6 +114,10 @@ private:
     void ApplyBoneImpactAngularImpulse(PhysicsBody& body, const CollisionResult& result,
         const Vector3& contactNormal, float velocityAlongNormalBefore);
 
+    // 胴体が地面に当たったとき、入ってきた向きで反射させて、全ボーンを、同じ速度の変化で、まとめて跳ね上げる
+    // 跳ねたら true
+    bool TryRagdollHop(RigidBody& trigger, const Vector3& incomingVelocity, const Vector3& contactNormal);
+
     void LockRigidBodyAxis();
 
     // ほとんど動いていない箱などを、スリープさせる(ラグドールのボーンは、RagdollSystemが眠らせる)
@@ -120,6 +128,11 @@ private:
 private:
     float _sleepSpeed = 0.2f;     // この速さ(m/s)より遅い間は、「動いていない」とみなす
     float _sleepSeconds = 0.5f;   // 動いていない状態が、この秒数続いたら、スリープさせる
+
+    // 体ぜんたいで跳ねる設定
+    float _hopRestitution = 1.0f;
+    int _hopCountLeft = 0;       // 残りの回数。0なら、この仕組みは使わない
+    float _hopCooldown = 0.0f;   // 次に跳ねられるまでの、残りの秒数
 
     float _ragdollElapsedTime = 0.0f;
     std::vector<PhysicsBody> _rigidBodies;

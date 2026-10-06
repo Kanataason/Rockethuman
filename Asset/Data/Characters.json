@@ -20,7 +20,9 @@
             "name": "エルビス",
             "path": "Asset/Prefab/debu.fbx",
             "scale": 0.02,
-            "colliderScale": 1.2,
+            "colliderScale": 1.3,
+            "bounceRestitution": 1.6,
+            "bounceCount": 2,
             "animations": [
                 { "name": "Idle", "path": "Asset/Animation/Idle.fbx" },
                 { "name": "Walk", "path": "Asset/Animation/Walk.fbx" }

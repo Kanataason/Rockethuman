@@ -45,6 +45,9 @@ float4 main(PS_IN input) : SV_TARGET
     float3 L = normalize(-Light.Direction);
     
     float4 texColor = gTexture.Sample(gSampler, input.uv) * Material.Color;
+    // 透明な部分は描かない(アルファテスト)。目・眉・口の画像のように、透明な部分のある画像のため
+    // アルファのない画像は、アルファが1なので、これまでどおり、全部描かれる
+    clip(texColor.a - 0.5f);
 
     if (Material.Unlit != 0)
         return texColor;

@@ -192,46 +192,64 @@ bool Collision::Check(const CapsuleCollider& cap, const SphereCollider& sphere)
 }
 
 // カプセルの軸上の最近点とBoxの最近点との距離で判定
+namespace
+{
+    // カプセルの軸と、箱(AABB)の、最近接点を、反復して求める。
+    // Check(当たったか)と Resolve(押し出し)で、同じ計算を使うための共通の処理。
+    // 別々の計算だと、Checkは「当たった」と答えるのに、Resolveは「めり込みなし」と答えて、空の結果(接触点が原点)が返ってしまう
+    //   axisPoint: カプセルの軸上の点 / boxPoint: 箱の表面(または内部)の点
+    void ClosestPointsCapsuleBox(Vector3 aS, Vector3 aE,
+        Vector3 bMin, Vector3 bMax, Vector3& axisPoint, Vector3& boxPoint)
+    {
+        // Vector3の演算子は、constの左辺に使えないので、値で受け取って、constなしで使う
+        Vector3 ab = aE - aS;
+        const float sq = Vector::SqMagnitude(ab);
+
+        //とりあえずカプセルの中点からスタート
+        Vector3 p = aS + ab * 0.5f;
+        Vector3 closest;
+
+        // 2～3回反復して収束させる
+        for (int i = 0; i < 3; ++i)
+        {
+            // pに一番近い箱の表面上の点を求める
+            closest.x = std::max(bMin.x, std::min(p.x, bMax.x));
+            closest.y = std::max(bMin.y, std::min(p.y, bMax.y));
+            closest.z = std::max(bMin.z, std::min(p.z, bMax.z));
+
+            // その点に一番近いカプセル軸上の点を求める
+            float t = 0.0f;
+            if (sq >= EPSILON)
+            {
+                Vector3 aq = closest - aS;
+                t = Vector::Dot(aq, ab) / sq;
+            }
+            t = std::clamp(t, 0.0f, 1.0f);
+            p = aS + ab * t;
+        }
+
+        axisPoint = p;
+        boxPoint = closest;
+    }
+}
+
 bool Collision::Check(const CapsuleCollider& cap, const BoxCollider& box)
 {
-    Vector3 aS, aE, bMin, bMax,
-        ab, aq, center;
+    Vector3 aS, aE, bMin, bMax;
     Vector::fromF3ToV3(cap.GetStart(), aS);
     Vector::fromF3ToV3(cap.GetEnd(), aE);
     Vector::fromF3ToV3(box.GetMin(), bMin);
     Vector::fromF3ToV3(box.GetMax(), bMax);
-    Vector::fromF3ToV3(box.GetPosition(), center);
 
-    float radius = cap.GetRadius();
+    const float radius = cap.GetRadius();
 
-    ab = aE - aS;
-    aq = center - aS;
+    Vector3 axisPoint, boxPoint;
+    ClosestPointsCapsuleBox(aS, aE, bMin, bMax, axisPoint, boxPoint);
 
-    float donom = Vector::SqMagnitude(ab);
+    const float distanceSq = Vector::SqMagnitude(axisPoint - boxPoint);
 
-    float t;
-    if (donom >= EPSILON)
-    {
-        t = Vector::Dot(aq, ab) / donom;
-    }
-    else
-    {
-        t = 0.0f;
-    }
-    t = std::clamp(t, 0.0f, 1.0f);
-
-    Vector3 p = aS + ab * t;
-    Vector3 closet;
-
-    closet.x = std::max(bMin.x, std::min(p.x, bMax.x));
-    closet.y = std::max(bMin.y, std::min(p.y, bMax.y));
-    closet.z = std::max(bMin.z, std::min(p.z, bMax.z));
-
-    Vector3 diff = p - closet;
-
-    float distance = Vector::SqMagnitude(diff);
-
-    return distance <= radius * radius;
+    // 箱の内部に軸が入っている(距離がほぼ0)か、距離が半径より小さい(Resolveで、めり込み量が正になる条件と同じ)
+    return distanceSq <= EPSILON || distanceSq < radius * radius;
 }
 
 
@@ -663,31 +681,9 @@ CollisionResult Collision::Resolve(CapsuleCollider& cap, BoxCollider& box)
 
     float radius = cap.GetRadius();
 
-    Vector3 ab = aE - aS;
-    float sq = Vector::SqMagnitude(ab);
-
-    //とりあえずカプセルの中点からスタート
-    Vector3 p = aS + ab * 0.5f;
-
-    Vector3 closest;
-    // 2～3回反復して収束させる
-    for (int i = 0; i < 3; ++i)
-    {
-        // pに一番近い箱の表面上の点を求める
-        closest.x = std::max(bMin.x, std::min(p.x, bMax.x));
-        closest.y = std::max(bMin.y, std::min(p.y, bMax.y));
-        closest.z = std::max(bMin.z, std::min(p.z, bMax.z));
-
-        // その点に一番近いカプセル軸上の点を求める
-        float t = 0.0f;
-        if (sq >= EPSILON)
-        {
-            Vector3 aq = closest - aS;
-            t = Vector::Dot(aq, ab) / sq;
-        }
-        t = std::clamp(t, 0.0f, 1.0f);
-        p = aS + ab * t;
-    }
+    // Checkと同じ計算で、最近接点を求める(違う計算だと、当たったのに、結果が空になる)
+    Vector3 p, closest;
+    ClosestPointsCapsuleBox(aS, aE, bMin, bMax, p, closest);
 
     Vector3 diff = closest - p;
     float distanceSq = Vector::SqMagnitude(diff);
