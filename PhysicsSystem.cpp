@@ -101,15 +101,27 @@ void PhysicsSystem::RemoveCollider(Collider* collider)
     // Colliderのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
     // _rigidBodiesの中に、このColliderを指しているエントリが残っていると、
     // SyncStaticColliders等が破棄済みのColliderを触ってクラッシュするので、先に消す
+    //
+    // 注意: デストラクタの中では、派生クラスの部分がもう壊れている。ここで、GetMin() などの仮想関数を呼ぶと、
+    //       純粋仮想関数の呼び出しになって、abort() で落ちる。だから、ここでは、コライダーの形を、触らない
     std::erase_if(_rigidBodies, [&](const PhysicsBody& body)
         {
             return body.collider == collider;
         });
 
     _collisionManager.ReleaseCollider(collider->GetID());
+}
+
+void PhysicsSystem::RemoveColliderAndWakeNear(Collider* collider)
+{
+    // 生きているコライダー用(的を飛ばすときなど)。先に範囲を取ってから消して、近くの眠っている箱だけを起こす
+    const XMFLOAT3 min = collider->GetMin();
+    const XMFLOAT3 max = collider->GetMax();
+
+    RemoveCollider(collider);
 
     // 消えた物を支えにしていた箱が、眠ったまま浮かないように、起こして、落ち着き直させる
-    WakeSleepingBodies();
+    WakeSleepingBodies(min, max);
 }
 
 void PhysicsSystem::AddJoint(Joint* joint)
@@ -146,15 +158,65 @@ void PhysicsSystem::UpdateBodySleep(float deltaTime)
     }
 }
 
-void PhysicsSystem::WakeSleepingBodies()
+void PhysicsSystem::WakeSleepingBodies(const XMFLOAT3& min, const XMFLOAT3& max)
 {
+    // 起こす対象: 眠っている、動かせる物(箱など)。ラグドールのボーンは、対象外
+    const auto isSleepingBox = [](const PhysicsBody& body)
+        {
+            return body.rigidBody && body.collider && body.ragdollBone.nodeIndex < 0
+                && body.rigidBody->IsSleeping() && !body.rigidBody->IsKinematic();
+        };
+
+    constexpr float margin = 0.3f;   // 消えた物の範囲を、少し広げて見る(支えにされていた箱を、確実に拾うため)
+    std::vector<PhysicsBody*> wokenBodies;   // 起こした箱。この上に乗っている箱を、順番に探していく
+
+    // 1. 消えた物の範囲に、触れている箱を起こす
     for (auto& body : _rigidBodies)
     {
-        if (!body.rigidBody || body.ragdollBone.nodeIndex >= 0)
+        if (!isSleepingBox(body))
             continue;
 
-        if (body.rigidBody->IsSleeping() && !body.rigidBody->IsKinematic())
+        const XMFLOAT3 bMin = body.collider->GetMin();
+        const XMFLOAT3 bMax = body.collider->GetMax();
+        const bool overlap =
+            bMin.x <= max.x + margin && bMax.x >= min.x - margin &&
+            bMin.y <= max.y + margin && bMax.y >= min.y - margin &&
+            bMin.z <= max.z + margin && bMax.z >= min.z - margin;
+        if (overlap)
+        {
             body.rigidBody->SetSleeping(false);
+            wokenBodies.push_back(&body);
+        }
+    }
+
+    // 2. 起こした箱の上に乗っている箱を、起こす。起こした箱の上も、さらに調べる(上へ上へと伝わる)
+    //    下の箱が落ちると、その上の箱も落ちるので、積み上げた壁の、下をつぶしても、上が浮かない
+    //    横に並んだ箱は、起こさない(支えは、下にあるだけなので)
+    constexpr float contactGap = 0.3f;     // 下の箱の上面から、この距離以内なら、乗っているとみなす
+    constexpr float minOverlapWidth = 0.05f;   // 横(XとZ)に、これ以上重なっていれば、真上にあるとみなす
+    for (size_t i = 0; i < wokenBodies.size(); ++i)
+    {
+        const XMFLOAT3 lower = wokenBodies[i]->collider->GetMin();
+        const XMFLOAT3 upper = wokenBodies[i]->collider->GetMax();
+
+        for (auto& body : _rigidBodies)
+        {
+            if (!isSleepingBox(body))
+                continue;
+
+            const XMFLOAT3 bMin = body.collider->GetMin();
+            const XMFLOAT3 bMax = body.collider->GetMax();
+
+            const bool isOnTop = bMin.y >= upper.y - contactGap && bMin.y <= upper.y + contactGap;
+            const bool overlapsSideways =
+                bMin.x < upper.x - minOverlapWidth && bMax.x > lower.x + minOverlapWidth &&
+                bMin.z < upper.z - minOverlapWidth && bMax.z > lower.z + minOverlapWidth;
+            if (isOnTop && overlapsSideways)
+            {
+                body.rigidBody->SetSleeping(false);
+                wokenBodies.push_back(&body);
+            }
+        }
     }
 }
 

@@ -34,8 +34,7 @@ namespace
 	const std::unordered_map<std::string, SceneName> SceneNameTable =
 	{
 		{"Title", SceneName::Title},
-		{"Stage1",SceneName::Stage1},
-		{"Stage2",SceneName::Stage2},
+		{"Stage",SceneName::Stage},
 		{"Result",SceneName::Result}
 	};
 }
@@ -181,6 +180,7 @@ ObjectData JsonLoader::LoadGameObjectData(const json& root)
 	data.transform = LoadTransform(root);
 	data.materialName = LoadMaterial(root);
 	data.score = root.value("score", data.score);
+	data.startAsleep = root.value("asleep", true);
 	LoadRepeat(root, data);
 	
 	LoadAnimationPath(root,data.animationDatas);

@@ -1,0 +1,74 @@
+{
+    "Stage": {
+        "shotCount": 1,
+        "starThresholds": [ 1500, 3500, 13000 ]
+    },
+    "Objects": [
+
+        {
+            "attribute": "Other",
+            "type": "Light"
+        },
+        {
+            "attribute": "Other",
+            "type": "Camera",
+            "position": [ 0, 3, -30 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
+        },
+        {
+            "attribute": "File",
+            "path": "Asset/Prefab/Dancing.fbx",
+            "type": "Player",
+            "animations": [
+                {
+                    "name": "Idle",
+                    "path": "Asset/Animation/Idle.fbx"
+                },
+                {
+                    "name": "Walk",
+                    "path": "Asset/Animation/Walk.fbx"
+                }
+            ],
+            "position": [ 1, 1, 0 ],
+            "scale": [ 0.01, 0.01, 0.01 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "ScoreObject",
+            "material": "crate",
+            "position": [ 10, 1, 10 ],
+            "scale": [ 1, 1, 1 ],
+            "count": [ 10, 10, 1 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "Prop",
+            "material": "background",
+            "position": [ 0, 10, 20 ],
+            "scale": [ 200, 60, 0.1 ]
+        },
+        {
+            "attribute": "File",
+            "path": "Asset/Prefab/Cannon.fbx",
+            "type": "Cannon",
+            "position": [ -20, 2.3, 10 ],
+            "scale": [ 0.02, 0.019, 0.017 ],
+            "modelRotation": [ 0, 90, 0 ]
+        },
+        {
+            "attribute": "File",
+            "path": "Asset/Prefab/Wheel.fbx",
+            "type": "Prop",
+            "position": [ -20, 1.6, 10 ],
+            "scale": [ 0.011, 0.011, 0.011 ],
+            "modelRotation": [ 0, 90, 0 ]
+        },
+        {
+            "attribute": "Primitive",
+            "type": "Prop",
+            "material": "ground",
+            "position": [ 1, -1, 10 ],
+            "scale": [ 200, 3, 30 ]
+        }
+    ]
+}

@@ -83,7 +83,7 @@ void ObjectStatus::UpdateFly(float deltaTime)
 		if (_physicsSystem)
 		{
 			if (auto* collider = GetOwner()->GetComponent<Collider>())
-				_physicsSystem->RemoveCollider(collider);
+				_physicsSystem->RemoveColliderAndWakeNear(collider);
 		}
 
 		_baseScale = transform.Scale;

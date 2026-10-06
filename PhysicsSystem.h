@@ -31,7 +31,11 @@ public:
 
     // Colliderのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
     // CollisionManager側の登録解除と、_rigidBodies内の参照の後始末を両方行う
+    // (デストラクタの中から呼ばれるので、コライダーの形(GetMinなど)は、触らない)
     void RemoveCollider(Collider* collider);
+
+    // 生きているコライダーを外して、その近くで眠っている箱だけを起こす(的を飛ばすときなど)
+    void RemoveColliderAndWakeNear(Collider* collider);
 
     // 登録時に、Joint側にも登録先を覚えさせる(Jointの所有者はRagdoll。ここは参照するだけ)
     void AddJoint(Joint* joint);
@@ -123,8 +127,8 @@ private:
     // ほとんど動いていない箱などを、スリープさせる(ラグドールのボーンは、RagdollSystemが眠らせる)
     void UpdateBodySleep(float deltaTime);
 
-    // 眠っている箱などを、すべて起こす(下の箱が消えて、上の箱が落ちるときなどに使う)
-    void WakeSleepingBodies();
+    // 眠っている箱などのうち、範囲(min～max。少し広げて見る)に入る物だけを起こす(下の箱が消えて、上の箱が落ちるときなどに使う)
+    void WakeSleepingBodies(const XMFLOAT3& min, const XMFLOAT3& max);
 private:
     float _sleepSpeed = 0.2f;     // この速さ(m/s)より遅い間は、「動いていない」とみなす
     float _sleepSeconds = 0.5f;   // 動いていない状態が、この秒数続いたら、スリープさせる

@@ -5,12 +5,7 @@
             "ScenePath": "Asset/Data/Title.json"
         },
         {
-            "SceneName": "Stage1",
-            "ScenePath": "Asset/Data/Stage1.json"
-        },
-        {
-            "SceneName": "Stage2",
-            "ScenePath": "Asset/Data/Stage2.json"
+            "SceneName": "Stage"
         },
         {
             "SceneName": "Result",

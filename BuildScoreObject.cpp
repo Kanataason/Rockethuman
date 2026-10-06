@@ -23,6 +23,11 @@ void ObjectBuilders::BuildScoreObject(GameObject& obj, const ObjectData& data, c
     auto rigid = obj.AddComponent<RigidBody>();
     rigid->DisableKinematic();
     rigid->SetPosition(Vector::fromF3ToV3(data.transform.Position));
+    // 最初から眠らせる。積んだ箱は、置いた時点で落ち着いているので、落ち着くのを待たなくていい
+    if (data.startAsleep)
+    {
+        rigid->SetSleeping(true);
+    }
 
     // 質量が0のままだと、衝突の計算で 1/質量 が無限大になり、NaN(位置が消える)になる
     // 慣性は、立方体として 質量 × 辺の長さ^2 / 6 で求める

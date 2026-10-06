@@ -1,0 +1,13 @@
+{
+    "Stages": [
+        { "name": "ステージ 1", "path": "Asset/Data/Stage1.json" },
+        {
+            "name": "ステージ 2",
+            "path": "Asset/Data/Stage2.json"
+        },
+        {
+            "name": "ステージ 3",
+            "path": "Asset/Data/Stage3.json"
+        }
+    ]
+}

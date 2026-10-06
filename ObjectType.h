@@ -40,8 +40,7 @@ enum class Attribute //図形のタイプ
 
 enum class SceneName {
 	Title,
-	Stage1,
-	Stage2,
+	Stage,//ステージ。どのステージかは、StageRosterで選んでいるもの(Stages.json)
 	Result,
 	None,
 };
@@ -81,6 +80,7 @@ struct ObjectData
 	float colliderScale = 1.0f;
 	float bounceRestitution = 1.0f;   // 地面で強く跳ねるときの反発係数(プレイヤー用)
 	int bounceCount = 0;              // 強く跳ねられる回数。0なら、ふつう
+	bool startAsleep = true;
 
 	// 同じ物を並べる指定(Jsonの"count"と"step")。XYZの各方向に、何個ずつ、どれだけ離して並べるか
 	DirectX::XMINT3 repeatCount = { 1, 1, 1 };

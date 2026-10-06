@@ -1,6 +1,8 @@
 ﻿#include "Title.h"
 
+#include <algorithm>
 #include <array>
+#include <string>
 
 #include "InputSystem.h"
 #include "GameObject.h"
@@ -9,14 +11,21 @@
 #include "SceneManager.h"
 #include "SoundManager.h"
 #include "CharacterRoster.h"
+#include "StageRoster.h"
 
 using namespace UiInfo;
 
 namespace
 {
-	// ステージ選択の並び。panelList の StageSelect の items と、同じ順番にすること
-	constexpr std::array<SceneName, 2> stageScenes = { SceneName::Stage1, SceneName::Stage2 };
-	constexpr int stageCount = static_cast<int>(stageScenes.size());
+	// ステージ選択の、名前の行(パネルの中に、上から並べる)。ステージの数が、行の数より多いときは、スクロールする
+	constexpr int stageVisibleRows = 4;
+	constexpr float stageRowLeft = 490.0f;
+	constexpr float stageRowTop = 225.0f;
+	constexpr float stageRowWidth = 300.0f;
+	constexpr float stageRowHeight = 56.0f;
+	constexpr float stageRowGap = 10.0f;
+	constexpr float stageRowTextScale = 0.55f;
+	constexpr float stageCounterY = 495.0f;   // 「2 / 5」のように、いま何番目かを出す所
 
 	// キャラクター選択の、名前の行(パネルの中に、上から並べる)
 	constexpr float characterRowLeft = 490.0f;
@@ -31,7 +40,15 @@ void Title::Initialize(ServiceLocator& locator)
 {
 	_input = locator.input;
 	_characters = locator.characters;
+	_stages = locator.stages;
 	BaseScene::Initialize(locator);
+
+	// 前に遊んだステージを、選んだままにしておく
+	if (_stages)
+	{
+		_stageIndex = _stages->GetSelectedIndex();
+		AdjustStageScroll();
+	}
 
 	if (locator.sound)
 		locator.sound->PlayBgm("title");
@@ -83,17 +100,25 @@ void Title::UpdateMenu()
 
 void Title::UpdateStageSelect()
 {
-	if (_input->GetKeyDown('W') || _input->GetKeyDown(VK_UP))
-		_stageIndex = (_stageIndex + stageCount - 1) % stageCount;
-
-	if (_input->GetKeyDown('S') || _input->GetKeyDown(VK_DOWN))
-		_stageIndex = (_stageIndex + 1) % stageCount;
-
-	// 決定: 選んだステージを、遊び始める(シーンの切り替えは予約。次のフレームの頭に入れ替わる)
-	if (_input->GetKeyDown(VK_SPACE))
+	// ステージの一覧が空(Stages.jsonがない)ときは、選ぶものがないので、もどるだけ
+	const int stageCount = _stages ? _stages->GetCount() : 0;
+	if (stageCount > 0)
 	{
-		_sceneManager->ChangeScene(stageScenes[_stageIndex]);
-		return;
+		if (_input->GetKeyDown('W') || _input->GetKeyDown(VK_UP))
+			_stageIndex = (_stageIndex + stageCount - 1) % stageCount;
+
+		if (_input->GetKeyDown('S') || _input->GetKeyDown(VK_DOWN))
+			_stageIndex = (_stageIndex + 1) % stageCount;
+
+		AdjustStageScroll();
+
+		// 決定: 選んだステージを、遊び始める(シーンの切り替えは予約。次のフレームの頭に入れ替わる)
+		if (_input->GetKeyDown(VK_SPACE))
+		{
+			_stages->Select(_stageIndex);
+			_sceneManager->ChangeScene(SceneName::Stage);
+			return;
+		}
 	}
 
 	// もどる: メニューに戻る
@@ -209,10 +234,58 @@ void Title::DrawPanel(PanelType typeIndex, int selectedIndex)
 		DrawMenuItem(panel.items[i], i == selectedIndex);
 }
 
+// 選んでいるステージが、見えている行の中に入るように、スクロールの位置を直す
+void Title::AdjustStageScroll()
+{
+	const int stageCount = _stages ? _stages->GetCount() : 0;
+
+	if (_stageIndex < _stageScroll)
+		_stageScroll = _stageIndex;
+	if (_stageIndex >= _stageScroll + stageVisibleRows)
+		_stageScroll = _stageIndex - stageVisibleRows + 1;
+
+	_stageScroll = (std::max)(0, (std::min)(_stageScroll, (std::max)(0, stageCount - stageVisibleRows)));
+}
+
 void Title::DrawStageSelect()
 {
-	DrawPanel(PanelType::StageSelect, _stageIndex);
+	DrawPanel(PanelType::StageSelect, -1);
 	DrawText(TextType::StageSelectTitle);
+
+	// ステージの名前を、上から並べる(いま選んでいるステージは、黄色)
+	if (_stages && _stages->GetCount() > 0)
+	{
+		const auto& list = _stages->GetList();
+		const int stageCount = _stages->GetCount();
+		const int rows = (std::min)(stageCount, stageVisibleRows);
+
+		for (int row = 0; row < rows; row++)
+		{
+			const int index = _stageScroll + row;
+			const float top = stageRowTop + (stageRowHeight + stageRowGap) * static_cast<float>(row);
+			const bool selected = (index == _stageIndex);
+
+			_uiRenderer->DrawFrame(stageRowLeft, top, stageRowWidth, stageRowHeight, 2.0f,
+				selected ? XMVectorSet(1, 1, 0, 1) : XMVectorSet(1, 1, 1, 1));
+			_uiRenderer->DrawStringCentered(list[static_cast<size_t>(index)].name,
+				stageRowLeft + stageRowWidth * 0.5f, top + stageRowHeight * 0.5f, stageRowTextScale,
+				selected ? XMVectorSet(1, 1, 0, 1) : XMVectorSet(1, 1, 1, 1),
+				XMVectorSet(0, 0, 0, 1));
+		}
+
+		// 見えていない行があるときだけ、いま何番目かを出す
+		if (stageCount > stageVisibleRows)
+		{
+			_uiRenderer->DrawStringCentered(std::to_wstring(_stageIndex + 1) + L" / " + std::to_wstring(stageCount),
+				640.0f, stageCounterY, 0.3f, XMVectorSet(0.7f, 0.8f, 1.0f, 1), XMVectorSet(0, 0, 0, 1));
+		}
+	}
+	else
+	{
+		_uiRenderer->DrawStringCentered(L"ステージが ありません", 640.0f, 330.0f, 0.45f,
+			XMVectorSet(1, 1, 1, 1), XMVectorSet(0, 0, 0, 1));
+	}
+
 	DrawText(TextType::StageSelectHint);
 }
 

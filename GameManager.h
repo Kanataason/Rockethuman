@@ -20,6 +20,7 @@
 #include "TimeScale.h"
 #include "SoundManager.h"
 #include "CharacterRoster.h"
+#include "StageRoster.h"
 
 class GameManager
 {
@@ -51,6 +52,7 @@ private:
     TimeScale _timeScale;   // スローモーションなどの、時間の倍率
     SoundManager _soundManager;   // 効果音とBGM(シーンをまたいで、1つだけ持つ)
     CharacterRoster _characterRoster;   // 選べるキャラクターと、選んでいる人(シーンを作り直しても残る)
+    StageRoster _stageRoster;           // 遊べるステージと、選んでいるステージ(「もういちど」で、同じステージになる)
 
     TextureManager _textureManager;
 

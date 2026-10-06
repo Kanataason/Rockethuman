@@ -13,8 +13,9 @@ class SceneManager;
 class TimeScale;
 class SoundManager;
 class CharacterRoster;
+class StageRoster;
 
-/// <summary>
+///<summary>
 /// 他のコンポーネントでも必要となる物を入れる構造体
 /// </summary>
 struct ServiceLocator
@@ -31,4 +32,5 @@ struct ServiceLocator
     PhysicsSystem* physicsSystem = nullptr;
     SoundManager* sound = nullptr;
     CharacterRoster* characters = nullptr;   // 選べるキャラクターの一覧と、選んでいる人
+    StageRoster* stages = nullptr;           // 遊べるステージの一覧と、選んでいるステージ
 };

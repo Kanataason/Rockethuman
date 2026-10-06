@@ -202,6 +202,7 @@
     <ClCompile Include="UIRenderer.cpp" />
     <ClCompile Include="UiLayout.cpp" />
     <ClCompile Include="PausePanel.cpp" />
+    <ClCompile Include="StageRoster.cpp" />
     <ClCompile Include="ResultPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -292,6 +293,7 @@
     <ClInclude Include="UiRenderer.h" />
     <ClInclude Include="UiLayout.h" />
     <ClInclude Include="PausePanel.h" />
+    <ClInclude Include="StageRoster.h" />
     <ClInclude Include="ResultPanel.h" />
     <ClInclude Include="VectorUtility.h" />
     <ClInclude Include="Vertex.h" />

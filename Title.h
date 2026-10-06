@@ -6,6 +6,7 @@
 
 class InputSystem;
 class CharacterRoster;
+class StageRoster;
 
 class Title : public BaseScene
 {
@@ -24,14 +25,17 @@ private:
 	// selectedIndex: パネルの中で、選んでいる行(選ぶ物がないパネルは -1)
 	void DrawPanel(PanelType typeIndex, int selectedIndex);
 	void DrawStageSelect();
+	void AdjustStageScroll();
 	void DrawCharacterSelect();
 	void DrawText(TextType type);
 private:
 	int _selectedIndex = 0;     // メニュー(セレクトステージ / オプション / エンド)で選んでいる行
-	int _stageIndex = 0;        // ステージ選択で選んでいる行
+	int _stageIndex = 0;        // ステージ選択で選んでいるステージの番号
+	int _stageScroll = 0;       // ステージ選択で、いちばん上に見えているステージの番号
 
 	PanelType _currentPanel = PanelType::None;
 
 	InputSystem* _input = nullptr;
 	CharacterRoster* _characters = nullptr;   // 選べるキャラクターと、選んでいる人(借りるだけ)
+	StageRoster* _stages = nullptr;           // 遊べるステージと、選んでいるステージ(借りるだけ)
 };

@@ -4,6 +4,7 @@
 #include "Title.h"
 #include "GameScene.h"
 #include "Result.h"
+#include "StageRoster.h"
 
 
 //シーンの作り方をテーブルで登録
@@ -13,8 +14,7 @@ namespace
 		std::function<std::unique_ptr<BaseScene>()>> MakeSceneFunctionTable =
 	{
 		{SceneName::Title,[]{return std::make_unique<Title>();}},
-		{SceneName::Stage1,[] {return std::make_unique<GameScene>();}},
-		{SceneName::Stage2,[] {return std::make_unique<GameScene>();}},
+		{SceneName::Stage,[] {return std::make_unique<GameScene>();}},
 		{SceneName::Result,[] {return std::make_unique<Result>();}}
 	};
 }
@@ -59,7 +59,13 @@ void SceneManager::RequestScene()
 	_currentScene.reset();
 
 	_currentScene = data.scene();
-	_sceneLoader.LoadSceneGameObject(_currentScene.get(), data.path, _jsonLoader, *_locator.factory,
+
+	// ステージは、選んでいるステージのJSON(Stages.json)を読む。それ以外は、Scene.jsonに書いたJSON
+	std::string path = data.path;
+	if (data.sceneName == SceneName::Stage && _locator.stages)
+		path = _locator.stages->GetSelectedPath();
+
+	_sceneLoader.LoadSceneGameObject(_currentScene.get(), path, _jsonLoader, *_locator.factory,
 		_locator.characters);
     _currentScene->Initialize(_locator);
 }

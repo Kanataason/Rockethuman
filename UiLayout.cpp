@@ -22,10 +22,6 @@ namespace UiInfo
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
         {TextType::StageSelectHint,{.text = L"W/S: えらぶ    スペース: けってい    Enter: もどる",.centerX = 640.0f,.centerY = 520.0f,.scale = 0.28f
         ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}},
-        {TextType::Stage1,{.text = L"ステージ 1",.centerX = 640.0f,.centerY = 295.0f,.scale = 0.6f
-        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
-        {TextType::Stage2,{.text = L"ステージ 2",.centerX = 640.0f,.centerY = 385.0f,.scale = 0.6f
-        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
 
         // キャラクター選択(名前の行は、キャラクターの数だけ、Title.cppが並べる)
         {TextType::CharacterSelectTitle,{.text = L"キャラクターをえらぶ",.centerX = 640.0f,.centerY = 185.0f,.scale = 0.55f
@@ -41,8 +37,6 @@ namespace UiInfo
         {ButtonType::End,{.left = 540.0f,.top = 560.0f,.width = 200.0f,.height = 60.0f}},
         {ButtonType::Panel,{.left = 350.0f,.top = 100.0f,.width = 500.0f,.height = 500.0f}},
         {ButtonType::MouseControll,{.left = 350.0f,.top = 100.0f,.width = 200.0f,.height = 200.0f}},
-        {ButtonType::Stage1,{.left = 490.0f,.top = 260.0f,.width = 300.0f,.height = 70.0f}},
-        {ButtonType::Stage2,{.left = 490.0f,.top = 350.0f,.width = 300.0f,.height = 70.0f}},
     };
 
     const std::unordered_map<PanelType, PanelData> panelList =
@@ -54,14 +48,12 @@ namespace UiInfo
             .items = {{TextType::MouseControll, ButtonType::MouseControll},
             } }
         },
-        // ステージ選択(画面の中央)。上から下への並びが、W/Sで選ぶ順番
+        // ステージ選択(画面の中央)。選ぶ行は、ステージの一覧(Stages.json)から作るので、itemsは空
         { PanelType::StageSelect, {
             .frame = {.left = 340.0f, .top = 130.0f, .width = 600.0f, .height = 440.0f,
                        .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
             .fillColor = { 0.0f, 0.0f, 0.0f, 0.65f },
-            .items = {{TextType::Stage1, ButtonType::Stage1},
-                      {TextType::Stage2, ButtonType::Stage2},
-            } }
+            .items = {} }
         },
         // キャラクター選択(画面の中央)。選ぶ行は、キャラクターの一覧から作るので、itemsは空
         { PanelType::CharacterSelect, {
