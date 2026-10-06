@@ -32,5 +32,5 @@ private:
 	float _swingMaxAngle = 80.0f;
 
 	// 大砲の原点から、playerを置く場所までの、砲身に沿った距離(m)
-	float _playerOffset = 1.1f;
+	float _playerOffset = 3.3f;
 };

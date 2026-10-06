@@ -4,9 +4,9 @@ namespace UiInfo
 {
     const std::unordered_map<TextType, TextData> textList =
     {
-        {TextType::Start,{.text = L"セレクトステージ",.centerX = 640.0f,.centerY = 430.0f,.scale = 0.36f
+        {TextType::Start,{.text = L"ステージセレクト",.centerX = 640.0f,.centerY = 430.0f,.scale = 0.36f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
-        {TextType::Setting,{.text = L"オプション",.centerX = 640.0f,.centerY = 510.0f,.scale = 0.55f
+        {TextType::Setting,{.text = L"キャラクターセレクト",.centerX = 640.0f,.centerY = 510.0f,.scale = 0.29f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
         {TextType::End,{.text = L"エンド",.centerX = 640.0f,.centerY = 590.0f,.scale = 0.7f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
@@ -25,7 +25,13 @@ namespace UiInfo
         {TextType::Stage1,{.text = L"ステージ 1",.centerX = 640.0f,.centerY = 295.0f,.scale = 0.6f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
         {TextType::Stage2,{.text = L"ステージ 2",.centerX = 640.0f,.centerY = 385.0f,.scale = 0.6f
-        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}}
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+
+        // キャラクター選択(名前の行は、キャラクターの数だけ、Title.cppが並べる)
+        {TextType::CharacterSelectTitle,{.text = L"キャラクターをえらぶ",.centerX = 640.0f,.centerY = 185.0f,.scale = 0.55f
+        ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
+        {TextType::CharacterSelectHint,{.text = L"W/S: えらぶ    スペース: けってい",.centerX = 640.0f,.centerY = 535.0f,.scale = 0.28f
+        ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}}
     };
 
     const std::unordered_map<ButtonType, ButtonData> buttonList =
@@ -56,6 +62,13 @@ namespace UiInfo
             .items = {{TextType::Stage1, ButtonType::Stage1},
                       {TextType::Stage2, ButtonType::Stage2},
             } }
+        },
+        // キャラクター選択(画面の中央)。選ぶ行は、キャラクターの一覧から作るので、itemsは空
+        { PanelType::CharacterSelect, {
+            .frame = {.left = 340.0f, .top = 130.0f, .width = 600.0f, .height = 440.0f,
+                       .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
+            .fillColor = { 0.0f, 0.0f, 0.0f, 0.65f },
+            .items = {} }
         },
         {PanelType::Score, {
             .frame = {.left = 20.0f, .top = 20.0f, .width = 320.0f, .height = 120.0f,

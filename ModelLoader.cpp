@@ -6,6 +6,7 @@
 #include "Material.h"
 #include "ConsoleUtility.h"
 #include "MatrixUtility.h"
+#include "BoneNameUtility.h"
 
 
 void ModelLoader::GetFbxObjectData(MeshInfo& meshinfo, const aiMesh* aimesh, const std::unordered_map<std::string, int>& boneMap)
@@ -128,8 +129,9 @@ int ModelLoader::CreateBoneNode(const aiNode* node,Skeleton& nodes, int parentIn
 {
     BoneNode boneNode;
 
+    // mixamorig9: などの番号つきの名前は、mixamorig: にそろえる(ラグドール・IKが名前で探すため)
     boneNode.Name =
-        node->mName.C_Str();
+        BoneNameUtility::NormalizeMixamoPrefix(node->mName.C_Str());
 
     const XMFLOAT4X4 localTransform =
         MatrixUtility::ConvertMatrix(node->mTransformation);
@@ -230,12 +232,15 @@ void ModelLoader::BuildSkeleton(aiNode* node, Skeleton& skeleton,
     // このノードがボーンとして使われているか確認
     if (it != boneMap.end())
     {
+        // boneMap / boneIndexMap は、FBXの元の名前で引く。Skeletonの中の名前は、そろえた名前
+        const std::string normalizedName = BoneNameUtility::NormalizeMixamoPrefix(name);
+
         Bone bone;
-        bone.Name = name;
+        bone.Name = normalizedName;
         bone.ParentIndex = parentIndex;
         bone.OffsetMatrix = MatrixUtility::ConvertMatrix(it->second->mOffsetMatrix);
         bone.LocalTransform = MatrixUtility::ConvertMatrix(node->mTransformation);
-        bone.NodeIndex = skeleton.FindNode(name);
+        bone.NodeIndex = skeleton.FindNode(normalizedName);
 
         const int currentIndex = static_cast<int>(skeleton.GetBones().size());
         boneIndexMap[name] = currentIndex;
@@ -291,7 +296,7 @@ void ModelLoader::GetFbxAnimationData(const aiScene* scene,Animation& animation,
     for (unsigned i = 0; i < aiAnim->mNumChannels; ++i)
     {
         aiNodeAnim* channel = aiAnim->mChannels[i];
-        const std::string nodeName = channel->mNodeName.C_Str();
+        const std::string nodeName = BoneNameUtility::NormalizeMixamoPrefix(channel->mNodeName.C_Str());
 
         // Skeletonに存在しないNodeは無視
         const int nodeIndex = skeleton.FindNode(nodeName);

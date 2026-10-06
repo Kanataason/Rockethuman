@@ -10,26 +10,10 @@
 
 #include <ThirdParty/nlohmann/json.hpp>
 
+#include "StringUtility.h"
+
 using json = nlohmann::json;
-
-namespace
-{
-	// JSONのパス(UTF-8)を、SoundEffectが受け取るワイド文字列に変える
-	std::wstring ToWide(const std::string& utf8)
-	{
-		if (utf8.empty())
-			return std::wstring();
-
-		const int length = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
-		if (length <= 0)
-			return std::wstring();
-
-		std::wstring wide(static_cast<size_t>(length), L'\0');
-		MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, wide.data(), length);
-		wide.resize(static_cast<size_t>(length) - 1);   // 終端の'\0'を除く
-		return wide;
-	}
-}
+using StringUtility::ToWide;
 
 void SoundManager::Initialize(ServiceLocator& /*locator*/)
 {

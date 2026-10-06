@@ -22,6 +22,7 @@ void GameManager::Initialize(HWND hwnd)
     // 各システムへの参照をまとめてシーン側に渡す
     auto context = CreateServiceLocator();
     _soundManager.Initialize(context);   // シーンの初期化で、BGMを鳴らせるように、先に作る
+    _characterRoster.Load("Asset/Data/Characters.json");
     _debugDraw.Initialize(context);
     _sceneManager.Initialize(context,&_physicsSystem);
     _uiRenderer.Initialize(context.device, context.context,
@@ -93,6 +94,7 @@ ServiceLocator GameManager::CreateServiceLocator()
     context.sceneManager = &_sceneManager;
     context.timeScale = &_timeScale;
     context.sound = &_soundManager;
+    context.characters = &_characterRoster;
 
     return context;
 }

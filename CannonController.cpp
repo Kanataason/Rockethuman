@@ -96,11 +96,12 @@ void CannonController::SetPlayerPosition()
     //砲台の原点から、砲身の向きに _playerOffset だけ進んだ所に、playerを置く
     //(以前は Scale.y を使っていたが、FBXは Scale が 0.01 などなので、メートルで直接指定する)
     const Vector3 barrelDirection = Vector::fromF3ToV3(transform.GetRight());
-    const Vector3 center = Vector::fromF3ToV3(transform.Position)
-        + barrelDirection * _playerOffset;
+    const Vector3 barrelPoint = Vector::fromF3ToV3(transform.Position) + barrelDirection * _playerOffset;
+    const float hipsHeight = _ragdoll->GetHipHeight();
+    const Vector3 origin = barrelPoint - barrelDirection * hipsHeight;
 
     auto& playerTransform = _player->GetOwner()->GetTransform();
-    playerTransform.Position = Vector::fromV3ToF3(center);
+    playerTransform.Position = Vector::fromV3ToF3(origin);
 
     //playerは立った姿(頭が+Y)なので、砲身(+X)に頭を向けるために、-90度ぶん寝かせる
     playerTransform.Rotation.z = transform.Rotation.z - 90.0f;

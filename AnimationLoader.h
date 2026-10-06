@@ -9,6 +9,7 @@
 
 #include "Animation.h"
 #include "Skeleton.h"
+#include "BoneNameUtility.h"
 
 class AnimationLoader
 {
@@ -123,7 +124,8 @@ public:
                 name.pop_back();
         }
 
-        return name;
+        // mixamorig9:Hips → mixamorig:Hips(モデル側の名前も、同じようにそろえている)
+        return BoneNameUtility::NormalizeMixamoPrefix(std::move(name));
     }
 
 private:

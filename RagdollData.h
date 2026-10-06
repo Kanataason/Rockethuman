@@ -268,5 +268,5 @@ namespace RagdollTuning
 
     //デバッグの切り替え変数
 
-    constexpr bool IsDebug = false;
+    constexpr bool IsDebug = true;
 }

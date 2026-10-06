@@ -20,6 +20,7 @@ using namespace RagdollData;
 void Ragdoll::Initialize(ServiceLocator& loacator)
 {
     _physicsSystem = loacator.physicsSystem;
+    InitializeBoneLength();
     AddRagDoll();
 
 }
@@ -67,12 +68,13 @@ void Ragdoll::CreateBone(int boneNameIndex)
     bone.rigidBody->DisableKinematic();
 
     if (auto radiusIt = boneRadius.find(boneName); radiusIt != boneRadius.end())
-        bone.collider->SetRadius(radiusIt->second);
+        bone.collider->SetRadius(radiusIt->second * _bodyScale * _colliderScale);
 
     if (auto massIt = boneMass.find(boneName); massIt != boneMass.end())
     {
-        bone.rigidBody->SetMass(massIt->second);
-        bone.rigidBody->SetInertia(massIt->second * RagdollTuning::kInertiaPerMass);
+        const float scaledMass = massIt->second * (float)std::pow(_bodyScale, 3);
+        bone.rigidBody->SetMass(scaledMass);
+        bone.rigidBody->SetInertia(scaledMass * RagdollTuning::kInertiaPerMass * _bodyScale * _bodyScale);
     }
 
     PhysicsBody body;
@@ -89,6 +91,29 @@ void Ragdoll::CreateBone(int boneNameIndex)
     _physicsSystem->AddPhysicsBody(std::move(body));
 
     _bones.push_back(std::move(bone));
+}
+void Ragdoll::InitializeBoneLength()
+{
+    //身長を測ってそれをboneのサイズに適応
+    const int head = _skeleton->FindNode("mixamorig:Head");
+    const int foot = _skeleton->FindNode("mixamorig:LeftFoot");
+    const int hips = _skeleton->FindNode("mixamorig:Hips");
+    if (head < 0 || foot < 0 || hips < 0)
+    {
+        _bodyScale = 1.0f;
+        _hipHeight = 0.0f;       // 測れないときは、足元を、そのまま砲身の位置に置く
+        return;
+    }
+    const auto& nodes = _skeleton->GetNode();
+    const float scaleY = _owner->GetTransform().Scale.y;
+    const float height = nodes[head].BindGlobalTransform._42 - nodes[foot].BindGlobalTransform._42;
+    const float heightMeters = height * scaleY;
+
+    // 足元(モデルの原点)から腰までの高さ(m)。Transformの大きさを掛けて、メートルにする。
+    // 分割されたノードのモデルでも、本体のバインドのグローバルは、位置を含んだ値になる
+    _hipHeight = nodes[hips].BindGlobalTransform._42 * scaleY;
+
+    _bodyScale = heightMeters / referenceHeight;
 }
 
 void Ragdoll::AddRagDoll()
@@ -121,11 +146,11 @@ void Ragdoll::InitializeRootBone(RagdollBone& bone, const WorldPose& nodePose)
 void Ragdoll::SetupLeafCapsule(RagdollBone& bone, WorldPose& nodePose, const Vector3& axisFromParent)
 {
     //足先や手先の固定の長さ
-    float leafHeight = RagdollTuning::leafHeight;
+    float leafHeight = RagdollTuning::leafHeight * _bodyScale;
 
     // 手など、短い末端ボーンは、名前ごとの長さを使う
     if (const auto heightIt = leafHeights.find(bone.name); heightIt != leafHeights.end())
-        leafHeight = heightIt->second;
+        leafHeight = heightIt->second * _bodyScale;
 
     // ボーンのローカルY軸(伸びる方向)をワールド空間へ
     Vector3 leafAxis = nodePose.rotation * Vector3(0.0f, 1.0f, 0.0f);

@@ -22,6 +22,8 @@ enum class TextType
     StageSelectHint,
     Stage1,
     Stage2,
+    CharacterSelectTitle,
+    CharacterSelectHint,
     None
 };
 enum class ButtonType
@@ -40,6 +42,7 @@ enum class PanelType
 {
     Setting,
     StageSelect,
+    CharacterSelect,
     Score,
     ShotCount,
     Result,

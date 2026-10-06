@@ -52,7 +52,7 @@
             "path": "Asset/Prefab/Cannon.fbx",
             "type": "Cannon",
             "position": [ -20, 2.3, 10 ],
-            "scale": [ 0.012, 0.012, 0.016 ],
+            "scale": [ 0.02, 0.019, 0.017 ],
             "modelRotation": [ 0, 90, 0 ]
         },
         {

@@ -22,6 +22,7 @@ void ObjectBuilders::BuildPlayer(GameObject& obj, const ObjectData& data, const 
     auto doll = obj.AddComponent<Ragdoll>();
     doll->SetSkeleton(model->skeleton);
     doll->SetParent(obj);
+    doll->SetColliderScale(data.colliderScale);
 
     auto meshRenderer = obj.AddComponent<MeshRenderer>();
     meshRenderer->SetModel(model);

@@ -59,7 +59,8 @@ void SceneManager::RequestScene()
 	_currentScene.reset();
 
 	_currentScene = data.scene();
-	_sceneLoader.LoadSceneGameObject(_currentScene.get(), data.path, _jsonLoader, *_locator.factory);
+	_sceneLoader.LoadSceneGameObject(_currentScene.get(), data.path, _jsonLoader, *_locator.factory,
+		_locator.characters);
     _currentScene->Initialize(_locator);
 }
 

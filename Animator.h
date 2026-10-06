@@ -110,6 +110,8 @@ private:
 	InputSystem* _input = nullptr;
 	Ragdoll* _ragDoll = nullptr;
 
+	bool _hasHipsTranslationNode = false;   // 腰の位置が、別ノード(…_Translation)に分かれているモデルか
+
 	IkChain _rightChain{};
 	IkChain _leftChain{};
 };

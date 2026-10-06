@@ -7,6 +7,7 @@ using json = nlohmann::json;
 #include "BaseScene.h"
 #include "BaseGameObjectFactory.h"
 #include "ObjectType.h"
+#include "CharacterRoster.h"
 
 void SceneLoader::LoadObjects(BaseScene& scene,std::string& loadPath,GameObjectFactory& factory)
 {
@@ -25,13 +26,17 @@ void SceneLoader::LoadObjects(BaseScene& scene,std::string& loadPath,GameObjectF
 }
 
 void SceneLoader::LoadSceneGameObject(BaseScene* scene,const std::string& path,
-	JsonLoader& loader,GameObjectFactory& factory)
+	JsonLoader& loader,GameObjectFactory& factory,const CharacterRoster* characters)
 {
 	json root = loader.LoadJsonData(path);
 
 	for (const auto& obj : root.at("Objects"))
 	{
 		auto data = loader.LoadGameObjectData(obj);
+
+		// プレイヤーは、タイトルで選んだキャラクターに差し替える(位置は、ステージのJSONのまま)
+		if (characters && data.typeName == ObjectType::Player)
+			characters->ApplyToPlayer(data);
 
 		// "count"で並べる指定があれば、その個数ぶん作る(なければ1個)
 		for (const auto& one : loader.ExpandRepeat(data))

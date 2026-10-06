@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <functional>
+#include <memory>
 #include "Transform.h"
 
 //役割(どのBuild関数で組み立てるか)。形(メッシュ)はPrimitiveShapeで別に指定する
@@ -77,6 +78,7 @@ struct ObjectData
 	Transform transform = {};
 	DirectX::XMFLOAT3 direction = { 0,0,0 };
 	float score = 100.0f;   // 的の基本点(Jsonの"score"。省略時は100)
+	float colliderScale = 1.0f;
 
 	// 同じ物を並べる指定(Jsonの"count"と"step")。XYZの各方向に、何個ずつ、どれだけ離して並べるか
 	DirectX::XMINT3 repeatCount = { 1, 1, 1 };

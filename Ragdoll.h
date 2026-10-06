@@ -27,6 +27,8 @@ struct WorldPose
 //共通処理
 namespace RagdollData
 {
+    constexpr float referenceHeight = 3.088f;//基準のサイズ
+
     inline constexpr static const char* boneNames[] =
     {
         "mixamorig:Hips",
@@ -323,10 +325,15 @@ public:
     //CameraFollowでカメラの引き具合を決めるためにrootの速さをとる
     Vector3 GetRootVelocity() const;
 
+    //体のY軸大きさ
+    float GetBodyScale()const { return _bodyScale; }
+    float GetHipHeight()const { return _hipHeight; }
+    void SetColliderScale(float scale) { _colliderScale = scale; }
+
     // コライダーに対応するボーンの名前。このラグドールのコライダーでなければ、空文字
     std::string GetBoneName(const Collider* collider) const;
 private:
-
+    void InitializeBoneLength();
     void SetLockZ(bool lock);
 
     // 飛行中の切り替え。飛んでいる間は重力トルクを止め、着地したら戻す
@@ -450,6 +457,10 @@ private:
 
     GameObject* _owner = nullptr;
     RigidBody* _hipsRigidBody = nullptr;
+
+    float _bodyScale = 1.0f;
+    float _colliderScale = 1.0f;
+    float _hipHeight = 0.0f;
 
     bool _enabled = false;
     bool _isFlying = false;
