@@ -7,7 +7,7 @@
 #pragma comment(lib, "dxgi.lib")
 
 //デバイス・コンテキストを受け取り、描画に必要な一式を作成する
-void DebugDraw::Initialize(ServiceLoacator& loacator)
+void DebugDraw::Initialize(ServiceLocator& loacator)
 {
     SetDevice(loacator.device);
     SetContext(loacator.context);
@@ -35,7 +35,7 @@ void DebugDraw::CreateShader()
 void DebugDraw::CreateConstantBuffer()
 {
     D3D11_BUFFER_DESC desc{};
-    desc.ByteWidth = sizeof(DebagConstantBuffer);
+    desc.ByteWidth = sizeof(DebugConstantBuffer);
     desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
@@ -53,7 +53,7 @@ void DebugDraw::CreateVertexBuffer()
     desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.ByteWidth =
         static_cast<UINT>(
-            sizeof(DebagDrawVertex) * _vertexCapacity);
+            sizeof(DebugDrawVertex) * _vertexCapacity);
 
     desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; //毎フレームMapで書き込むためCPUアクセスを許可
@@ -172,7 +172,7 @@ void DebugDraw::CreateInputLayout()
 
 void DebugDraw::DrawLine(const XMFLOAT3& start, const XMFLOAT3& end, const XMFLOAT4& color)
 {
-    DebagDrawVertex v;
+    DebugDrawVertex v;
 
     v.Position = start;
     v.Color = color;
@@ -538,14 +538,14 @@ void DebugDraw::Render(Camera& camera)
     memcpy(
         mapped.pData,
         _vertices.data(),
-        sizeof(DebagDrawVertex) * _vertices.size());
+        sizeof(DebugDrawVertex) * _vertices.size());
 
     _context->Unmap(
         _vertecesBlob.Get(),
         0);
 
     //VertexBuffer設定
-    UINT stride = sizeof(DebagDrawVertex);
+    UINT stride = sizeof(DebugDrawVertex);
     UINT offset = 0;
 
     _context->IASetVertexBuffers(

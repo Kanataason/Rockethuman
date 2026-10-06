@@ -3,7 +3,7 @@
 #include "ObjectType.h"
 #include "RigidBody.h"
 
-#include "DebagUtility.h"
+#include "DebugUtility.h"
 #include "PhysicsSystem.h"
 #include "GameObject.h"
 #include "BaseLight.h"

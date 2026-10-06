@@ -9,7 +9,7 @@
 
 #include "Transform.h"
 #include "Mesh.h"
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 //60fps固定で物理演算を回すための固定タイムステップ
 constexpr float fixedDeltaTime = 1.0f / 60.0f;
 void GameManager::Initialize(HWND hwnd)

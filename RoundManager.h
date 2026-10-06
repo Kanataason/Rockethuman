@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 #include "Event.h"
 
 //1発ごとの流れ

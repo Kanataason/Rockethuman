@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 
 //効果音(SE)とBGM。DirectXTK Audioを使うので、読み込めるのは WAV だけ
 class SoundManager

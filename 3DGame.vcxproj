@@ -144,7 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animator.cpp" />
-    <ClCompile Include="BallJoin.cpp" />
+    <ClCompile Include="BallJoint.cpp" />
     <ClCompile Include="BaseGameObjectFactory.cpp" />
     <ClCompile Include="BuildProp.cpp" />
     <ClCompile Include="BuildPlayer.cpp" />
@@ -232,7 +232,7 @@
     <ClInclude Include="CollisionResult.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ConsoleUtility.h" />
-    <ClInclude Include="DebagUtility.h" />
+    <ClInclude Include="DebugUtility.h" />
     <ClInclude Include="DebugController.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Event.h" />
@@ -288,7 +288,7 @@
     <ClInclude Include="StringUtility.h" />
     <ClInclude Include="UiTween.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="ServiceLoacator.h" />
+    <ClInclude Include="ServiceLocator.h" />
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="StateMachine.h" />

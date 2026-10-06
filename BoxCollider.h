@@ -5,7 +5,7 @@
 #include <Windows.h>
 
 #include "Collider.h"
-#include "DebagUtility.h"
+#include "DebugUtility.h"
 #include  <algorithm>
 constexpr float HALF = 0.5f;
 

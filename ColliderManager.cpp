@@ -1,7 +1,7 @@
 ﻿#include "CollisionManager.h"
 #include "Collider.h"
 #include "GameObject.h"
-#include "DebagUtility.h"
+#include "DebugUtility.h"
 
 void CollisionManager::AddCollider(Collider* collider)
 {

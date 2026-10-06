@@ -3,7 +3,7 @@
 #include "ScoreManager.h"
 #include "ObjectStatus.h"
 
-void ScoreManager::SubScribeEvent(ObjectStatus* status)
+void ScoreManager::SubscribeEvent(ObjectStatus* status)
 {
 	AddTarget();
 	status->OnSendScore.Subscribe([this](HitInfo hit) { AddHit(hit); });

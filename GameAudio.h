@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <string>
 
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 
 class Ragdoll;
 class ScoreManager;

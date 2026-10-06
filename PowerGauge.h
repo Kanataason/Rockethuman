@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <DirectXMath.h>
 
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 
 class UiRenderer;
 class RoundManager;
@@ -24,5 +24,5 @@ private:
 
 	float _gaugeSpeed = 2.0f;
 	float _gaugeFrame = 0.0f;
-	float _gaugeAmmount = 0.0f;
+	float _gaugeAmount = 0.0f;
 };

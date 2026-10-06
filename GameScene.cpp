@@ -44,14 +44,14 @@ void GameScene::SetCannonInfo()
 	for (const auto& obj : _objects)
 	{
 		if (auto* component = obj->GetComponent<ObjectStatus>())
-			_scoreManager.SubScribeEvent(component);
+			_scoreManager.SubscribeEvent(component);
 	}
 }
 
 void GameScene::SubscribeEvents()
 {
-	//ラグドールが止まったら、1発ぶんの流れを進める
-	//止まった瞬間 -> 残りの玉数のアニメーション
+	//ラグドールが止まったら、1発ぶんの流れを進める(RoundManager)
+	//止まった瞬間 -> 飛距離ボーナスを足して、コンボを区切る(残りの玉数の表示は、GameHudが弾ませる)
 	//少し待つ     -> ラグドールを大砲に戻して、次の1発へ
 	_ragdoll = FindGameObject<Ragdoll>();
 	if (_ragdoll)
@@ -120,7 +120,7 @@ void GameScene::SubscribeEvents()
 		});
 
 	//結果パネルの選択。シーンの切り替えは「予約」だけで、実際の入れ替えは次のフレームの頭に行われる
-	//同じシーン(GameScene)を指定すると、JSONから作り直されるので、スコアも玉数も、的の配置も、最初に戻る
+	//同じステージ(SceneName::Stage)を指定すると、選んでいるステージのJSONから作り直されるので、スコアも玉数も、的の配置も、最初に戻る
 	_resultPanel.OnRetry.Subscribe([this]() { _sceneManager->Reload(); });
 	_resultPanel.OnBackToTitle.Subscribe([this]() { _sceneManager->ChangeScene(SceneName::Title); });
 

@@ -204,7 +204,7 @@
     <ClCompile Include="HingeJoint.cpp">
       <Filter>ソース ファイル\Physics\Ragdoll</Filter>
     </ClCompile>
-    <ClCompile Include="BallJoin.cpp">
+    <ClCompile Include="BallJoint.cpp">
       <Filter>ソース ファイル\Physics\Ragdoll</Filter>
     </ClCompile>
     <ClCompile Include="ColliderManager.cpp">
@@ -362,7 +362,7 @@
     <ClInclude Include="MeshRenderer.h">
       <Filter>ヘッダー ファイル\Component</Filter>
     </ClInclude>
-    <ClInclude Include="ServiceLoacator.h">
+    <ClInclude Include="ServiceLocator.h">
       <Filter>ヘッダー ファイル\Struct</Filter>
     </ClInclude>
     <ClInclude Include="Collider.h">
@@ -464,7 +464,7 @@
     <ClInclude Include="ConsoleUtility.h">
       <Filter>ヘッダー ファイル\Utillity</Filter>
     </ClInclude>
-    <ClInclude Include="DebagUtility.h">
+    <ClInclude Include="DebugUtility.h">
       <Filter>ヘッダー ファイル\Utillity</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">

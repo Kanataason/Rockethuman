@@ -51,7 +51,7 @@ void PowerGauge::Draw()
 		dimColor.w = dimZoneAlpha;
 		_uiRenderer->DrawRect(panelData.left, zoneTop, panelData.width, zoneHeight, XMLoadFloat4(&dimColor));
 
-		const float filledEnd = (std::min)(_gaugeAmmount, zone.upTo);
+		const float filledEnd = (std::min)(_gaugeAmount, zone.upTo);
 		if (filledEnd > zoneStart)
 		{
 			const float segmentHeight = panelData.height * (filledEnd - zoneStart);
@@ -73,7 +73,7 @@ void PowerGauge::Draw()
 	//威力を決めている間と、発射したあとは、いまの帯の名前を、その色でゲージの下に出す
 	if (_roundManager->GetState() != RoundState::AimAngle)
 	{
-		const PowerZone::Zone& zone = PowerZone::ZoneAt(_gaugeAmmount);
+		const PowerZone::Zone& zone = PowerZone::ZoneAt(_gaugeAmount);
 		_uiRenderer->DrawStringCentered(zone.label,
 			panelData.left + panelData.width * 0.5f, panelData.top + panelData.height + gaugeLabelOffsetY,
 			gaugeLabelScale, XMLoadFloat4(&zone.color), DirectX::XMVectorSet(0, 0, 0, 1));
@@ -90,12 +90,12 @@ void PowerGauge::Update(float deltaTime)
 	case RoundState::AimAngle:
 		//角度を決めている間は、ゲージを空にして待つ(次の1発も、毎回0から動き出す)
 		_gaugeFrame = 0.0f;
-		_gaugeAmmount = 0.0f;
+		_gaugeAmount = 0.0f;
 		break;
 
 	case RoundState::AimPower:
 		_gaugeFrame += _gaugeSpeed * deltaTime;
-		_gaugeAmmount = std::abs(std::sin(_gaugeFrame));
+		_gaugeAmount = std::abs(std::sin(_gaugeFrame));
 		break;
 
 	default:
@@ -104,5 +104,5 @@ void PowerGauge::Update(float deltaTime)
 	}
 
 	//大砲が撃つときに読めるように、今の量を渡しておく
-	_roundManager->SetPowerAmount(_gaugeAmmount);
+	_roundManager->SetPowerAmount(_gaugeAmount);
 }

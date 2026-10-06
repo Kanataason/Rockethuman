@@ -66,9 +66,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 
     MSG msg = {};
-    ShowCursor(TRUE);//カーソル非表示
+    ShowCursor(FALSE);//カーソル非表示
 
-    while (msg.message != WM_QUIT)//アプリを終了したら
+    while (msg.message != WM_QUIT)//終了するまで繰り返す
     {
         //windowsから何か動作連絡が来ているか確認
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))

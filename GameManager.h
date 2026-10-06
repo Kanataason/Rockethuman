@@ -10,7 +10,7 @@
 #include "MaterialLoader.h"
 #include "TextureManager.h"
 #include "InputSystem.h"
-#include "DebagUtility.h"
+#include "DebugUtility.h"
 #include "AnimationLoader.h"
 #include "SceneManager.h"
 #include "UiRenderer.h"

@@ -4,7 +4,7 @@
 #include "Transform.h"
 #include "Object.h"
 #include "Component.h"
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 
 class Camera:public Component
 {

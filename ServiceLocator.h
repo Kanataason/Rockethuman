@@ -23,7 +23,7 @@ struct ServiceLocator
     InputSystem* input = nullptr;
     ID3D11Device* device = nullptr;
     ID3D11DeviceContext* context = nullptr;
-    DebugDraw* debag = nullptr;
+    DebugDraw* debug = nullptr;
     GameObjectFactory* factory = nullptr;
     SceneManager* sceneManager = nullptr;
 

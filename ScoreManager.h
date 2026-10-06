@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 #include "VectorUtility.h"
 #include "Event.h"
 
@@ -30,7 +30,7 @@ public:
 
 	void Initialize(ServiceLocator& locator) {};
 
-	void SubScribeEvent(ObjectStatus* object);
+	void SubscribeEvent(ObjectStatus* object);
 
 	//コンボの制限時間を進める
 	void Update(float deltaTime);

@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "Vertex.h"
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
@@ -15,7 +15,7 @@ class Camera;
 
 class DebugDraw
 {
-    struct DebagConstantBuffer
+    struct DebugConstantBuffer
     {
         XMMATRIX world;
         XMMATRIX view;
@@ -67,12 +67,12 @@ private:
     void CreateConstantBuffer();
 
 private:
-    std::vector<DebagDrawVertex> _vertices;
+    std::vector<DebugDrawVertex> _vertices;
 
     ID3D11Device* _device = nullptr;
     ID3D11DeviceContext* _context = nullptr;
 
-    DebagConstantBuffer _constantData = {};
+    DebugConstantBuffer _constantData = {};
 
     ComPtr<ID3D11InputLayout> _inputLayout;
     ComPtr<ID3DBlob> _vertexShaderBlob;

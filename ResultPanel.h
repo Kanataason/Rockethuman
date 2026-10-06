@@ -4,7 +4,7 @@
 #include <array>
 
 #include "Event.h"
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 
 class InputSystem;
 class UiRenderer;

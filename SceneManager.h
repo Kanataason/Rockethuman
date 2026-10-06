@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <BaseScene.h>
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 #include "ObjectType.h"
 #include "BaseSceneLoader.h"
 #include "JsonLoader.h"

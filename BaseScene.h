@@ -8,7 +8,7 @@
 #include "BaseGameObjectFactory.h"
 #include "ObjectType.h"
 
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 
 class PhysicsSystem;
 class DebugDraw;

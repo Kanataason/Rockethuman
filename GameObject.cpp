@@ -1,6 +1,6 @@
 ﻿#include "GameObject.h"
 #include "Renderer.h"
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 
 //指定した型のComponentを検索してコンポーネントに通知を送る処理
 

@@ -1,5 +1,5 @@
 ﻿#include "PhysicsSystem.h"
-#include "DebagUtility.h"
+#include "DebugUtility.h"
 
 #include "ConsoleUtility.h"
 #include "GameObject.h"

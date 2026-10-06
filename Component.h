@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <memory>
 
-#include "ServiceLoacator.h"
+#include "ServiceLocator.h"
 #include "CollisionResult.h"
 
 class Collider;

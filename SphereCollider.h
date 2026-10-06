@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Collider.h"
 #include "Transform.h"
-#include "DebagUtility.h"
+#include "DebugUtility.h"
 
 //球形のCollider
 class SphereCollider : public Collider

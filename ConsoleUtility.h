@@ -37,7 +37,7 @@ public:
 		OutputDebugStringA(buffer);
 	}
 	template<typename T>
-	static void ConsoloeDebag(const T& value, const std::string& name, const std::string& typeName)
+	static void ConsoleDebug(const T& value, const std::string& name, const std::string& typeName)
 	{
 		std::ostringstream oss;
 

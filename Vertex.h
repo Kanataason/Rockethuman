@@ -13,7 +13,7 @@ struct Vertex
     DirectX::XMUINT4 BoneIndex = XMUINT4(0, 0, 0, 0);
     DirectX::XMFLOAT4 Weight = XMFLOAT4(0, 0, 0, 0);
 };
-struct DebagDrawVertex
+struct DebugDrawVertex
 {
     DirectX::XMFLOAT3 Position;
     DirectX::XMFLOAT4 Color;

@@ -5,7 +5,7 @@
 #include "GameObject.h"
 #include "RigidBody.h"
 
-#include "DebagUtility.h"
+#include "DebugUtility.h"
 #include "MathUtility.h"
 #include "ConsoleUtility.h"
 
