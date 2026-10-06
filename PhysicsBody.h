@@ -5,7 +5,7 @@
 
 struct PhysicsBody
 {
-    // 所有者はGameObject(RigidBody/Colliderのunique_ptr)。ここでは借りるだけ
+    //所有者はGameObject(RigidBody/Colliderのunique_ptr)。ここでは借りるだけ
     RigidBody* rigidBody = nullptr;
     Collider* collider = nullptr;
 

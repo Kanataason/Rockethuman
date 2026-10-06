@@ -12,11 +12,11 @@ using namespace DirectX;
 class DebugConsole
 {
 public:
-	/// <summary>
-	/// コンソールに受け取った行列を出す関数
-	/// </summary>
-	/// <param name="main"></param>
-	/// <param name="name"></param>
+	///<summary>
+	///コンソールに受け取った行列を出す関数
+	///</summary>
+	///<param name="main"></param>
+	///<param name="name"></param>
 	static void ConsoleFLOAT4X4(const XMFLOAT4X4 main, const std::string type, const std::string& name)
 	{
 		char buffer[512];

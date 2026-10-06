@@ -12,9 +12,9 @@
 
 using namespace DirectX;
 
-// ここから当たり判定(交差しているかどうかだけを返す)
+//ここから当たり判定(交差しているかどうかだけを返す)
 
-// 中心間距離が半径の合計以下かどうかで判定
+//中心間距離が半径の合計以下かどうかで判定
 bool Collision::Check(const SphereCollider& acoll, const SphereCollider& bcoll)
 {
     Vector3 aCenter, bCenter;
@@ -36,7 +36,7 @@ bool Collision::Check(const SphereCollider& acoll, const SphereCollider& bcoll)
         (radiusA + radiusB);
 }
 
-// AABBの判定をする(各軸で範囲が重なっているか)
+//AABBの判定をする(各軸で範囲が重なっているか)
 bool Collision::Check(const BoxCollider& acoll, const BoxCollider& bcoll)
 {
     Vector3 aMax, aMin, bMax, bMin;
@@ -51,7 +51,7 @@ bool Collision::Check(const BoxCollider& acoll, const BoxCollider& bcoll)
         aMin.z <= bMax.z && aMax.z >= bMin.z;
 }
 
-// Box上の最近点を求め、その点とSphere中心との距離で判定する
+//Box上の最近点を求め、その点とSphere中心との距離で判定する
 bool Collision::Check(const BoxCollider& box, const SphereCollider& sphere)
 {
     Vector3 centerS, bMin, bMax;
@@ -63,19 +63,19 @@ bool Collision::Check(const BoxCollider& box, const SphereCollider& sphere)
     Vector::fromF3ToV3(box.GetMax(), bMax);
     Vector::fromF3ToV3(box.GetMin(), bMin);
 
-    // 各軸ごとに範囲内へクランプしてBox上の最近点を得る
+    //各軸ごとに範囲内へクランプしてBox上の最近点を得る
     closest.x = std::max(bMin.x, std::min(centerS.x, bMax.x));
     closest.y = std::max(bMin.y, std::min(centerS.y, bMax.y));
     closest.z = std::max(bMin.z, std::min(centerS.z, bMax.z));
 
     Vector3 vector = closest - centerS;
 
-    float result = vector.x * vector.x + vector.y * vector.y + vector.z * vector.z; // 距離の2乗
+    float result = vector.x * vector.x + vector.y * vector.y + vector.z * vector.z; //距離の2乗
 
     return result <= radius * radius;
 }
 
-// 2本の線分(カプセルの軸)間の最短距離で判定
+//2本の線分(カプセルの軸)間の最短距離で判定
 bool Collision::Check(const CapsuleCollider& aCapsule, const CapsuleCollider& bCapsule)
 {
     Vector3 aStart, aEnd, bStart, bEnd;
@@ -89,13 +89,13 @@ bool Collision::Check(const CapsuleCollider& aCapsule, const CapsuleCollider& bC
     float radiusA = aCapsule.GetRadius();
     float radiusB = bCapsule.GetRadius();
 
-    // Capsule A の中心線
+    //Capsule A の中心線
     Vector3 a1 = aEnd - aStart;
 
-    // Capsule B の中心線
+    //Capsule B の中心線
     Vector3 b1 = bEnd - bStart;
 
-    // 始点同士
+    //始点同士
     Vector3 c1 = aStart - bStart;
 
     float dotA = a1.x * a1.x + a1.y * a1.y + a1.z * a1.z;
@@ -104,7 +104,7 @@ bool Collision::Check(const CapsuleCollider& aCapsule, const CapsuleCollider& bC
     float dotD = a1.x * c1.x + a1.y * c1.y + a1.z * c1.z;
     float dotE = b1.x * c1.x + b1.y * c1.y + b1.z * c1.z;
 
-    // 平行判定(分母が0に近いと解が不安定になる)
+    //平行判定(分母が0に近いと解が不安定になる)
     float normal = dotA * dotC - dotB * dotB;
 
     float s = 0.0f;
@@ -112,7 +112,7 @@ bool Collision::Check(const CapsuleCollider& aCapsule, const CapsuleCollider& bC
 
     if (fabs(normal) < EPSILON)
     {
-        // 平行な場合はs=0固定でtだけ求める
+        //平行な場合はs=0固定でtだけ求める
         if (dotC > EPSILON)
         {
             t = dotE / dotC;
@@ -128,11 +128,11 @@ bool Collision::Check(const CapsuleCollider& aCapsule, const CapsuleCollider& bC
         t = (dotA * dotE - dotB * dotD) / normal;
     }
 
-    // 線分の範囲(0～1)に収める
+    //線分の範囲(0～1)に収める
     s = std::clamp(s, 0.0f, 1.0f);
     t = std::clamp(t, 0.0f, 1.0f);
 
-    // 最近接点
+    //最近接点
     Vector3 pointA = aStart + a1 * s;
     Vector3 pointB = bStart + b1 * t;
 
@@ -148,7 +148,7 @@ bool Collision::Check(const CapsuleCollider& aCapsule, const CapsuleCollider& bC
     return distanceSq <= resultRadius * resultRadius;
 }
 
-// カプセルの軸上の最近点とSphere中心との距離で判定
+//カプセルの軸上の最近点とSphere中心との距離で判定
 bool Collision::Check(const CapsuleCollider& cap, const SphereCollider& sphere)
 {
     Vector3 center, aS, aE;
@@ -191,17 +191,17 @@ bool Collision::Check(const CapsuleCollider& cap, const SphereCollider& sphere)
     return  distanceSq <= radius * radius;
 }
 
-// カプセルの軸上の最近点とBoxの最近点との距離で判定
+//カプセルの軸上の最近点とBoxの最近点との距離で判定
 namespace
 {
-    // カプセルの軸と、箱(AABB)の、最近接点を、反復して求める。
-    // Check(当たったか)と Resolve(押し出し)で、同じ計算を使うための共通の処理。
-    // 別々の計算だと、Checkは「当たった」と答えるのに、Resolveは「めり込みなし」と答えて、空の結果(接触点が原点)が返ってしまう
-    //   axisPoint: カプセルの軸上の点 / boxPoint: 箱の表面(または内部)の点
+    //カプセルの軸と、箱(AABB)の、最近接点を、反復して求める。
+    //Check(当たったか)と Resolve(押し出し)で、同じ計算を使うための共通の処理。
+    //別々の計算だと、Checkは「当たった」と答えるのに、Resolveは「めり込みなし」と答えて、空の結果(接触点が原点)が返ってしまう
+    //axisPoint: カプセルの軸上の点 / boxPoint: 箱の表面(または内部)の点
     void ClosestPointsCapsuleBox(Vector3 aS, Vector3 aE,
         Vector3 bMin, Vector3 bMax, Vector3& axisPoint, Vector3& boxPoint)
     {
-        // Vector3の演算子は、constの左辺に使えないので、値で受け取って、constなしで使う
+        //Vector3の演算子は、constの左辺に使えないので、値で受け取って、constなしで使う
         Vector3 ab = aE - aS;
         const float sq = Vector::SqMagnitude(ab);
 
@@ -209,15 +209,15 @@ namespace
         Vector3 p = aS + ab * 0.5f;
         Vector3 closest;
 
-        // 2～3回反復して収束させる
+        //2～3回反復して収束させる
         for (int i = 0; i < 3; ++i)
         {
-            // pに一番近い箱の表面上の点を求める
+            //pに一番近い箱の表面上の点を求める
             closest.x = std::max(bMin.x, std::min(p.x, bMax.x));
             closest.y = std::max(bMin.y, std::min(p.y, bMax.y));
             closest.z = std::max(bMin.z, std::min(p.z, bMax.z));
 
-            // その点に一番近いカプセル軸上の点を求める
+            //その点に一番近いカプセル軸上の点を求める
             float t = 0.0f;
             if (sq >= EPSILON)
             {
@@ -248,14 +248,14 @@ bool Collision::Check(const CapsuleCollider& cap, const BoxCollider& box)
 
     const float distanceSq = Vector::SqMagnitude(axisPoint - boxPoint);
 
-    // 箱の内部に軸が入っている(距離がほぼ0)か、距離が半径より小さい(Resolveで、めり込み量が正になる条件と同じ)
+    //箱の内部に軸が入っている(距離がほぼ0)か、距離が半径より小さい(Resolveで、めり込み量が正になる条件と同じ)
     return distanceSq <= EPSILON || distanceSq < radius * radius;
 }
 
 
 //ここからは押し出し判定の処理(交差している場合の法線・めり込み量・接触点を返す)
 
-// 円コライダー同士限定の押し出し処理
+//円コライダー同士限定の押し出し処理
 CollisionResult Collision::Resolve(SphereCollider& acoll, SphereCollider& bcoll)
 {
     Vector3 aCenter, bCenter;
@@ -265,7 +265,7 @@ CollisionResult Collision::Resolve(SphereCollider& acoll, SphereCollider& bcoll)
     float radiusA = acoll.GetRadius();
     float radiusB = bcoll.GetRadius();
 
-    // 2つの球の中心ベクトルと距離を取得
+    //2つの球の中心ベクトルと距離を取得
     Vector3 diff = aCenter - bCenter;
 
     float distance = std::sqrt(Vector::SqMagnitude(diff));
@@ -273,7 +273,7 @@ CollisionResult Collision::Resolve(SphereCollider& acoll, SphereCollider& bcoll)
     float penetration =
         (radiusA + radiusB) - distance;
 
-    // めり込んでいなければ衝突なし
+    //めり込んでいなければ衝突なし
     if (penetration <= 0.0f)
         return {};
 
@@ -286,7 +286,7 @@ CollisionResult Collision::Resolve(SphereCollider& acoll, SphereCollider& bcoll)
     }
     else
     {
-        // 中心が完全に一致している場合のフォールバック
+        //中心が完全に一致している場合のフォールバック
         normal = { 0.0f, 1.0f, 0.0f };
     }
 
@@ -303,7 +303,7 @@ CollisionResult Collision::Resolve(SphereCollider& acoll, SphereCollider& bcoll)
     return result;
 }
 
-// Box同士の押し出し処理(最小重なり軸を押し出し方向にする)
+//Box同士の押し出し処理(最小重なり軸を押し出し方向にする)
 CollisionResult Collision::Resolve(BoxCollider& acoll, BoxCollider& bcoll)
 {
     Vector3 aMax, aMin, bMax, bMin, aCenter, bCenter;
@@ -312,12 +312,12 @@ CollisionResult Collision::Resolve(BoxCollider& acoll, BoxCollider& bcoll)
     Vector::fromF3ToV3(bcoll.GetMax(), bMax);
     Vector::fromF3ToV3(bcoll.GetMin(), bMin);
 
-    // 各軸の重なり量を求める
+    //各軸の重なり量を求める
     float overlapX = std::min(aMax.x - bMin.x, bMax.x - aMin.x);
     float overlapY = std::min(aMax.y - bMin.y, bMax.y - aMin.y);
     float overlapZ = std::min(aMax.z - bMin.z, bMax.z - aMin.z);
 
-    // 一番浅くめり込んでいる軸がめり込み量になる
+    //一番浅くめり込んでいる軸がめり込み量になる
     float penetration =
         std::min({ overlapX, overlapY, overlapZ });
     if (penetration <= 0.0f)
@@ -330,7 +330,7 @@ CollisionResult Collision::Resolve(BoxCollider& acoll, BoxCollider& bcoll)
 
     Vector3 normal = { 0.0f, 0.0f, 0.0f };
 
-    // 最小重なり軸に沿って押し出す(中心位置の大小で向きを決める)
+    //最小重なり軸に沿って押し出す(中心位置の大小で向きを決める)
     if (overlapX <= overlapY && overlapX <= overlapZ)
     {
         float move = overlapX * HALF;
@@ -400,7 +400,7 @@ CollisionResult Collision::Resolve(BoxCollider& acoll, BoxCollider& bcoll)
     return result;
 }
 
-// Box-Sphereの押し出し処理
+//Box-Sphereの押し出し処理
 CollisionResult Collision::Resolve(BoxCollider& abox, SphereCollider& bsphere)
 {
     Vector3 closest;
@@ -414,7 +414,7 @@ CollisionResult Collision::Resolve(BoxCollider& abox, SphereCollider& bsphere)
     Vector::fromF3ToV3(abox.GetMax(), aMax);
     Vector::fromF3ToV3(abox.GetMin(), aMin);
 
-    // Box上の最近接点
+    //Box上の最近接点
     closest.x = std::max(aMin.x, std::min(sCenter.x, aMax.x));
     closest.y = std::max(aMin.y, std::min(sCenter.y, aMax.y));
     closest.z = std::max(aMin.z, std::min(sCenter.z, aMax.z));
@@ -437,7 +437,7 @@ CollisionResult Collision::Resolve(BoxCollider& abox, SphereCollider& bsphere)
     }
     else
     {
-        // Sphere中心がBox内部にある場合、一番近い面へ押し出す
+        //Sphere中心がBox内部にある場合、一番近い面へ押し出す
         float left = sCenter.x - aMin.x;
         float right = aMax.x - sCenter.x;
         float bottom = sCenter.y - aMin.y;
@@ -486,7 +486,7 @@ CollisionResult Collision::Resolve(BoxCollider& abox, SphereCollider& bsphere)
     Vector3 boxPoint =
         closest;
 
-    // 接触点を2点の中間にする
+    //接触点を2点の中間にする
     Vector3 contactPoint =
         (spherePoint + boxPoint) * 0.5f;
 
@@ -501,7 +501,7 @@ CollisionResult Collision::Resolve(BoxCollider& abox, SphereCollider& bsphere)
     return result;
 }
 
-// Capsule同士の押し出し処理(2線分間の最近接点を求めてから押し出す)
+//Capsule同士の押し出し処理(2線分間の最近接点を求めてから押し出す)
 CollisionResult Collision::Resolve(CapsuleCollider& a, CapsuleCollider& b)
 {
     Vector3 a1, b1, c1, aS, aE, bS, bE;
@@ -527,10 +527,10 @@ CollisionResult Collision::Resolve(CapsuleCollider& a, CapsuleCollider& b)
     auto denom = dotA * dotC - dotB * dotB;
     float s = 0.0f, t = 0.0f;
 
-    // ---- s(カプセルA上の位置)を先に決める ----
+    //---- s(カプセルA上の位置)を先に決める ----
     if (dotA <= EPSILON && dotC <= EPSILON)
     {
-        // 両方とも点(長さ0)
+        //両方とも点(長さ0)
         s = 0.0f; t = 0.0f;
     }
     else if (dotA <= EPSILON)
@@ -551,13 +551,13 @@ CollisionResult Collision::Resolve(CapsuleCollider& a, CapsuleCollider& b)
         }
         else
         {
-            s = 0.0f; // 平行な場合
+            s = 0.0f; //平行な場合
         }
 
-        // sを確定させてからtを計算する
+        //sを確定させてからtを計算する
         t = (dotB * s + dotE) / dotC;
 
-        // tが範囲外ならクランプして、sを再計算する
+        //tが範囲外ならクランプして、sを再計算する
         if (t < 0.0f)
         {
             t = 0.0f;
@@ -586,8 +586,8 @@ CollisionResult Collision::Resolve(CapsuleCollider& a, CapsuleCollider& b)
         Vector3 contactPoint = (pointA + pointB) * 0.5f;
 
         CollisionResult result;
-        // TODO: colliderA/Bをb,aの順で入れているが、normalはa->b向きのまま。
-        //       CollisionManager側の解釈(colliderAから見た押し出し方向か)に合わせて統一する
+        //TODO: colliderA/Bをb,aの順で入れているが、normalはa->b向きのまま。
+        //CollisionManager側の解釈(colliderAから見た押し出し方向か)に合わせて統一する
         result.colliderA = &b;
         result.colliderB = &a;
         result.normal = normal;
@@ -599,7 +599,7 @@ CollisionResult Collision::Resolve(CapsuleCollider& a, CapsuleCollider& b)
     return {};
 }
 
-// Capsule-Sphereの押し出し処理
+//Capsule-Sphereの押し出し処理
 CollisionResult Collision::Resolve(CapsuleCollider& acap, SphereCollider& asphere)
 {
     Vector3 center, aS, aE;
@@ -670,7 +670,7 @@ CollisionResult Collision::Resolve(CapsuleCollider& acap, SphereCollider& aspher
     return result;
 }
 
-// Capsule-Boxの押し出し処理(反復法でカプセル軸とBoxの最近接点を収束させる)
+//Capsule-Boxの押し出し処理(反復法でカプセル軸とBoxの最近接点を収束させる)
 CollisionResult Collision::Resolve(CapsuleCollider& cap, BoxCollider& box)
 {
     Vector3 aS, aE, bMin, bMax;
@@ -681,7 +681,7 @@ CollisionResult Collision::Resolve(CapsuleCollider& cap, BoxCollider& box)
 
     float radius = cap.GetRadius();
 
-    // Checkと同じ計算で、最近接点を求める(違う計算だと、当たったのに、結果が空になる)
+    //Checkと同じ計算で、最近接点を求める(違う計算だと、当たったのに、結果が空になる)
     Vector3 p, closest;
     ClosestPointsCapsuleBox(aS, aE, bMin, bMax, p, closest);
 
@@ -710,7 +710,7 @@ CollisionResult Collision::Resolve(CapsuleCollider& cap, BoxCollider& box)
     }
     else
     {
-        // カプセル軸上の点pがすでに箱の内部にある場合、一番近い面へ押し出す
+        //カプセル軸上の点pがすでに箱の内部にある場合、一番近い面へ押し出す
         float dx1 = p.x - bMin.x, dx2 = bMax.x - p.x;
         float dy1 = p.y - bMin.y, dy2 = bMax.y - p.y;
         float dz1 = p.z - bMin.z, dz2 = bMax.z - p.z;
@@ -728,7 +728,7 @@ CollisionResult Collision::Resolve(CapsuleCollider& cap, BoxCollider& box)
         result.colliderA = &cap;
         result.colliderB = &box;
         result.normal = normal;
-        result.penetration = minDist + radius; // 内部に入り込んだ分 + 半径ぶん
+        result.penetration = minDist + radius; //内部に入り込んだ分 + 半径ぶん
         result.contactPoint = p + normal * minDist;
         return result;
     }

@@ -58,7 +58,7 @@ public:
         ignorePairs.insert(
             MakePair(idA, idB));
     }
-    // ---------------------------------
+    //---------------------------------
     //当たり判定
     static bool Check(const SphereCollider& a, const SphereCollider& b);
     static bool Check( const BoxCollider& b, const SphereCollider& a);

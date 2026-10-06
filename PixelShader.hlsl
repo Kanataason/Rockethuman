@@ -49,6 +49,7 @@ float4 main(PS_IN input) : SV_TARGET
     // アルファのない画像は、アルファが1なので、これまでどおり、全部描かれる
     clip(texColor.a - 0.5f);
 
+    //テクスチャがあるものは光の影響を受けない
     if (Material.Unlit != 0)
         return texColor;
 

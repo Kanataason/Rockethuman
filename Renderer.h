@@ -19,9 +19,9 @@
 using Microsoft::WRL::ComPtr;
 
 using namespace DirectX;
-/// <summary>
-/// 描写する関数
-/// </summary>
+///<summary>
+///描写する関数
+///</summary>
 
 class GameObject;
 class Mesh;
@@ -50,7 +50,7 @@ private:
 	//コンパイル結果を確認
 	bool CompileShader();
 
-	// シェーダーオブジェクトの作成
+	//シェーダーオブジェクトの作成
 	void CreateShader();
 
 	void CreateConstantBuffer();
@@ -62,7 +62,7 @@ private:
 	void UpdateConstantBuffer(const Material& material, const Transform& transform);
 	bool CheckCompileFile(HRESULT hr, ID3DBlob* errorBlob);
 
-	// 頂点入力レイアウトの作成
+	//頂点入力レイアウトの作成
 	void CreateInputLayout();
 
 	void SetDeviceAndContext(ID3D11Device* device, ID3D11DeviceContext* context)

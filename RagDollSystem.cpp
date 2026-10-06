@@ -41,19 +41,19 @@ void RagdollSystem::ApplyRootGravityTorque(std::vector<PhysicsBody>& physicsBodi
     float totalMass = 0.0f;
     for (auto& body : physicsBodies)
     {
-        // ragdollのボーンだけが対象
+        //ragdollのボーンだけが対象
         if (!body.rigidBody || body.ragdollBone.nodeIndex < 0)
             continue;
 
         Vector3 position = body.rigidBody->GetPosition();
         if (body.ragdollBone.parentIndex < 0)
         {
-            // ルートは重心の計算には入れず、トルクを加える相手として覚えておく
+            //ルートは重心の計算には入れず、トルクを加える相手として覚えておく
             rootBody = &body;
         }
         else
         {
-            // ボーン原点ではなく、ボーンの重心で数える
+            //ボーン原点ではなく、ボーンの重心で数える
             position = position + body.rigidBody->GetRotation() * body.ragdollBone.colliderLocalOffset;
             weightedCom = weightedCom + position * body.rigidBody->GetMass();
             totalMass += body.rigidBody->GetMass();
@@ -80,17 +80,17 @@ void RagdollSystem::UpdateRest(std::vector<PhysicsBody>& physicsBodies, float de
     const MotionSummary motion = MeasureMotion(physicsBodies, deltaTime);
     const bool isDown = UpdateDownState(motion);
 
-    // 「ほぼ静止」: 静止の基準に kSettleSpeedFactor 倍の余裕を持たせたもの
+    //「ほぼ静止」: 静止の基準に kSettleSpeedFactor 倍の余裕を持たせたもの
     const bool nearlyStill = motion.hasRagdoll && isDown &&
         motion.maxLinearSpeed < RagdollTuning::kSettleSpeedFactor * RagdollTuning::kRestLinearSpeed &&
         motion.maxAngularSpeed < RagdollTuning::kSettleSpeedFactor * RagdollTuning::kRestAngularSpeed;
 
-    // ほぼ静止している時間(条件を外れたら 0 に戻る)
+    //ほぼ静止している時間(条件を外れたら 0 に戻る)
     _settleTimer = nearlyStill ? _settleTimer + deltaTime : 0.0f;
     if (nearlyStill)
         ApplySettleDamping(physicsBodies);
 
-    // 「完全静止」: 全ボーンが静止の基準を下回っている。その継続時間を測る
+    //「完全静止」: 全ボーンが静止の基準を下回っている。その継続時間を測る
     const bool fullyStill = motion.hasRagdoll && isDown && motion.allStill;
     _restTimer = fullyStill ? _restTimer + deltaTime : 0.0f;
 
@@ -113,7 +113,7 @@ RagdollSystem::MotionSummary RagdollSystem::MeasureMotion(std::vector<PhysicsBod
         motion.hasRagdoll = true;
         if (body.ragdollBone.parentIndex < 0)
         {
-            // 親がいないボーン = ルート腰
+            //親がいないボーン = ルート腰
             motion.hasRoot = true;
             motion.rootY = body.rigidBody->GetPosition().y;
         }
@@ -135,13 +135,13 @@ RagdollSystem::MotionSummary RagdollSystem::MeasureMotion(std::vector<PhysicsBod
 
         if (!body.restHasLast)
         {
-            // 前回の値がまだ無いので、速度は測れない
-            // 静止とはみなさない
+            //前回の値がまだ無いので、速度は測れない
+            //静止とはみなさない
             motion.allStill = false;
         }
         else if (deltaTime > 0.0f)
         {
-            // 前回からの移動量・回転量を速度に直す
+            //前回からの移動量・回転量を速度に直す
             const float linearSpeed = (position - body.restLastPos).Length() / deltaTime;
             const float angularSpeed = ComputeAngularSpeed(rotation, body.restLastRot, deltaTime);
 
@@ -150,7 +150,7 @@ RagdollSystem::MotionSummary RagdollSystem::MeasureMotion(std::vector<PhysicsBod
             if (angularSpeed > motion.maxAngularSpeed)
                 motion.maxAngularSpeed = angularSpeed;
 
-            // 1つでも基準より速いボーンがあれば、静止していない
+            //1つでも基準より速いボーンがあれば、静止していない
             if (linearSpeed > RagdollTuning::kRestLinearSpeed ||
                 angularSpeed > RagdollTuning::kRestAngularSpeed)
             {
@@ -158,7 +158,7 @@ RagdollSystem::MotionSummary RagdollSystem::MeasureMotion(std::vector<PhysicsBod
             }
         }
 
-        // 次回の比較用に、今回の位置・回転を保存する
+        //次回の比較用に、今回の位置・回転を保存する
         body.restLastPos = position;
         body.restLastRot = rotation;
         body.restHasLast = true;
@@ -173,18 +173,18 @@ bool RagdollSystem::UpdateDownState(const MotionSummary& motion)
 
     if (!motion.hasRagdoll)
     {
-        // ragdollが居なくなったので、記録をリセットする
+        //ragdollが居なくなったので、記録をリセットする
         _hasInitialRootY = false;
         _downLatched = false;
     }
     else if (!_hasInitialRootY && motion.anyBoneGrounded && motion.hasRoot)
     {
-        // 最初にどれかのボーンが地面に触れたときのルートの高さを、基準として記録する
+        //最初にどれかのボーンが地面に触れたときのルートの高さを、基準として記録する
         _initialRootY = motion.rootY;
         _hasInitialRootY = true;
     }
 
-    // 膝立ち・座りのように足だけが地面に触れている場合も倒れたとみなす
+    //膝立ち・座りのように足だけが地面に触れている場合も倒れたとみなす
     if (RagdollTuning::kRestUseRootDrop && motion.hasRagdoll && motion.hasRoot &&
         _hasInitialRootY &&
         motion.rootY < _initialRootY - RagdollTuning::kRestRootDrop)
@@ -192,7 +192,7 @@ bool RagdollSystem::UpdateDownState(const MotionSummary& motion)
         isDown = true;
     }
 
-    // 一度倒れたら保持する。速く動いたときだけ解除する 押したときだけ
+    //一度倒れたら保持する。速く動いたときだけ解除する 押したときだけ
     if (isDown)
         _downLatched = true;
     else if (motion.maxLinearSpeed > RagdollTuning::kRestUnlatchSpeed)
@@ -205,9 +205,9 @@ bool RagdollSystem::UpdateDownState(const MotionSummary& motion)
 
 void RagdollSystem::ApplySettleDamping(std::vector<PhysicsBody>& physicsBodies)
 {
-    // ramp:0(始めたばかり)～1(kSettleRampTime 経過)
+    //ramp:0(始めたばかり)～1(kSettleRampTime 経過)
     const float ramp = std::min(1.0f, _settleTimer / RagdollTuning::kSettleRampTime);
-    // settleFactor:1(減衰なし)～kSettleDamping(最大の減衰)
+    //settleFactor:1(減衰なし)～kSettleDamping(最大の減衰)
     const float settleFactor = 1.0f - (1.0f - RagdollTuning::kSettleDamping) * ramp;
 
     for (auto& body : physicsBodies)

@@ -1,11 +1,11 @@
 ﻿#include "ModelProvider.h"
 
-// モデルを取得し、各メッシュにマテリアル/テクスチャを割り当てる
+//モデルを取得し、各メッシュにマテリアル/テクスチャを割り当てる
 std::shared_ptr<ModelDatas> ModelProvider::Prepare(const ObjectData& data)
 {
     auto model = _modelManager.CheckModel(data);
 
-    // モデル読み込み失敗（未対応のPrimitiveやFBX読み込みエラー）
+    //モデル読み込み失敗（未対応のPrimitiveやFBX読み込みエラー）
     if (model == nullptr)
         return nullptr;
 
@@ -13,7 +13,7 @@ std::shared_ptr<ModelDatas> ModelProvider::Prepare(const ObjectData& data)
     {
         if (mesh.material != nullptr)
         {
-            // マテリアルにテクスチャパスが指定されていれば読み込んで設定
+            //マテリアルにテクスチャパスが指定されていれば読み込んで設定
             auto& path = mesh.material->GetTexturePath();
 
             if (!path.empty())
@@ -32,7 +32,7 @@ std::shared_ptr<ModelDatas> ModelProvider::Prepare(const ObjectData& data)
         }
         else
         {
-            // マテリアル未設定のメッシュには指定名のマテリアルを割り当てる
+            //マテリアル未設定のメッシュには指定名のマテリアルを割り当てる
             mesh.material = _materialManager.CheckMaterial(data.materialName);
         }
     }

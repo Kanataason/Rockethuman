@@ -11,13 +11,13 @@ class Camera:public Component
 
 
 public:
-	void Initialize(ServiceLocator& context) override {};
+	void Initialize(ServiceLocator& locator) override {};
 	void Update(float deltaTime) override {};
 
-	// ビュー行列を取得する
+	//ビュー行列を取得する
 	DirectX::XMMATRIX GetViewMatrix() const;
 
-	// 射影行列を取得する
+	//射影行列を取得する
 	DirectX::XMMATRIX GetProjectionMatrix() const;
 
 private:

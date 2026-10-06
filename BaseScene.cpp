@@ -27,22 +27,20 @@ void BaseScene::Draw(Renderer& renderer)
 		}
 		obj->Draw(renderer);
 	}
-	//デバッグの線描写
-	//debug->Render(*_camera);
 }
 
-void BaseScene::Initialize(ServiceLocator& context)//シーンの情報初期化
+void BaseScene::Initialize(ServiceLocator& locator)//シーンの情報初期化
 {
-	_physicsSystem = context.physicsSystem;
-	_uiRenderer = context.uiRenderer;
-	_sceneManager = context.sceneManager;
-	SetObjectInfo(context);
+	_physicsSystem = locator.physicsSystem;
+	_uiRenderer = locator.uiRenderer;
+	_sceneManager = locator.sceneManager;
+	SetObjectInfo(locator);
 }
-void BaseScene::SetObjectInfo(ServiceLocator& context)
+void BaseScene::SetObjectInfo(ServiceLocator& locator)
 {
 	for (const auto& obj : _objects)
 	{
-		obj->Initialize(context);
+		obj->Initialize(locator);
 
 		auto rigid = obj->GetComponent<RigidBody>();
 		auto collider = obj->GetComponent<Collider>();
@@ -82,8 +80,8 @@ void BaseScene::Release()
 }
 void BaseScene::AddObject(std::unique_ptr<GameObject> object)
 {
-	// 生成に失敗したObject(モデルの読み込みエラーなど)は、nullptrで返ってくる。
-	// そのまま入れると、Initialize/Update/Drawで全オブジェクトを回すときに落ちる
+	//生成に失敗したObject(モデルの読み込みエラーなど)は、nullptrで返ってくる。
+	//そのまま入れると、Initialize/Update/Drawで全オブジェクトを回すときに落ちる
 	if (!object)
 		return;
 

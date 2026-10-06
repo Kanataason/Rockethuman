@@ -14,7 +14,7 @@ using namespace DirectX;
 constexpr const float EPSILON = 0.00001f;
 constexpr const float GRAVITY = -9.8f;
 
-// 固定する軸を指す番号
+//固定する軸を指す番号
 enum class Axis { X = 0, Y = 1, Z = 2 };
 
 class PhysicsSystem;
@@ -22,48 +22,48 @@ class PhysicsSystem;
 class RigidBody :public Component
 {
 public:
-	void Initialize(ServiceLocator& loacator)override;
+	void Initialize(ServiceLocator& locator)override;
 
-    // 登録済みのPhysicsSystemがあれば、自動的に登録を解除する(定義はRigidBody.cpp)
+    //登録済みのPhysicsSystemがあれば、自動的に登録を解除する(定義はRigidBody.cpp)
     ~RigidBody() override;
 
-    // 登録先のPhysicsSystemを覚えておく(デストラクタで、自動的に登録解除するため)
+    //登録先のPhysicsSystemを覚えておく(デストラクタで、自動的に登録解除するため)
     void SetRegistry(PhysicsSystem* system) { _registry = system; }
 	void FixedUpdate(float deltaTime);
 
-    // 並進運動の更新: 重力 → 減衰 → 速度制限 → 位置の積分 の順に行う
-    // 速度を先に更新してから、その新しい速度で位置を動かす
-    // 位置を先に動かす方式より、重力下でのエネルギーが増えにくく安定するため
+    //並進運動の更新: 重力 → 減衰 → 速度制限 → 位置の積分 の順に行う
+    //速度を先に更新してから、その新しい速度で位置を動かす
+    //位置を先に動かす方式より、重力下でのエネルギーが増えにくく安定するため
 	void UpdateGravity(float deltaTime);
 
-    // ジョイントのピボットから見てずれた位置にある重心に、重力で回転力(トルク)をかける
-    // ピボットを支点に、腕や脚が振り子のように垂れ下がる動きを出すために、回転側にも重力を反映する
+    //ジョイントのピボットから見てずれた位置にある重心に、重力で回転力(トルク)をかける
+    //ピボットを支点に、腕や脚が振り子のように垂れ下がる動きを出すために、回転側にも重力を反映する
     void ApplyGravityTorque(const Vector3& centerOfMassOffsetLocal, float deltaTime);
 
-    // ワールド座標のオフセットを直接受け取る版の重力トルク
-    // ラグドール全体の重心(ルートから見たずれ)に対して、全体の質量で重力トルクをかける用途を想定
+    //ワールド座標のオフセットを直接受け取る版の重力トルク
+    //ラグドール全体の重心(ルートから見たずれ)に対して、全体の質量で重力トルクをかける用途を想定
     void ApplyGravityTorqueWorld(const Vector3& worldComOffset, float totalMass, float deltaTime);
 
 
-    // 溜めたトルクを角速度に反映する
-    // 他のシステム(ジョイントなど)からは Torque に足すだけにして、
-    // 角加速度・減衰・速度制限はここだけで処理するようにする
+    //溜めたトルクを角速度に反映する
+    //他のシステム(ジョイントなど)からは Torque に足すだけにして、
+    //角加速度・減衰・速度制限はここだけで処理するようにする
     void ApplyTorque(float deltaTime);
 
 
-    // 接触面に沿った(接線方向の)速度だけを減らす
-    // 法線方向の速度は、押し出しや反発の処理が扱うのでここでは触らない
+    //接触面に沿った(接線方向の)速度だけを減らす
+    //法線方向の速度は、押し出しや反発の処理が扱うのでここでは触らない
     void ApplyFriction(const Vector3& normal, float frictionDecayPerSecond, float deltaTime);
 
 
-    // 角速度を、Rotationに反映する
-    // 角速度ベクトルは「向き = 回転軸、長さ = 1秒あたりの回転角」を表すので、
-    // 1フレーム分の回転を 軸+角度 から作ってクォータニオンとして掛ける
+    //角速度を、Rotationに反映する
+    //角速度ベクトルは「向き = 回転軸、長さ = 1秒あたりの回転角」を表すので、
+    //1フレーム分の回転を 軸+角度 から作ってクォータニオンとして掛ける
     void IntegrateRotation(float deltaTime);
 
 
-    // 法線方向の速度のうち、面にめり込む向きの成分だけを取り除く
-    // 押し出し後に、面へ向かう速度が残ってまためり込むのを防ぐのが目的
+    //法線方向の速度のうち、面にめり込む向きの成分だけを取り除く
+    //押し出し後に、面へ向かう速度が残ってまためり込むのを防ぐのが目的
     void RemoveVelocityAlongNormal(const Vector3& normal);
 
 
@@ -89,7 +89,7 @@ public:
         _lockedAxis[static_cast<int>(axis)] = value;
     }
 
-    // 固定を外す
+    //固定を外す
     void ClearAxisLock(Axis axis) { _lockedAxis[static_cast<int>(axis)].reset(); }
     void ClearAllAxisLock() { _lockedAxis.fill(std::nullopt); }
 
@@ -101,12 +101,12 @@ public:
 	void SetIsGravity(bool useGravity) { isGravity = useGravity; }
 	bool GetUseGravity()const { return isGravity; }
 
-    // 重力トルク(重心が関節からずれているぶん、重い側を下に向ける力)を使うかの設定
-    // 自由落下している間は、重力は回転を生まないので、falseにする
+    //重力トルク(重心が関節からずれているぶん、重い側を下に向ける力)を使うかの設定
+    //自由落下している間は、重力は回転を生まないので、falseにする
     void SetUseGravityTorque(bool use) { useGravityTorque = use; }
     bool GetUseGravityTorque() const { return useGravityTorque; }
 
-    // 線形速度の上限(発散を防ぐ安全弁)。発射のときだけ上げて、終わったら戻す
+    //線形速度の上限(発散を防ぐ安全弁)。発射のときだけ上げて、終わったら戻す
     void SetMaxSpeed(float maxSpeed) { _maxSpeed = maxSpeed; }
     void ResetMaxSpeed() { _maxSpeed = RagdollTuning::maxVelocitySpeed; }
 
@@ -143,7 +143,7 @@ public:
     //めり込み時の速度取得関数
     Vector3 GetPseudoVelocity() const { return PseudoVelocity; }
 
-    // 動いていない時間(秒)。箱など、ラグドール以外の物を眠らせる判定に使う(SetSleepingで0に戻る)
+    //動いていない時間(秒)。箱など、ラグドール以外の物を眠らせる判定に使う(SetSleepingで0に戻る)
     float GetRestTime() const { return _sleepTimer; }
     void AddRestTime(float seconds) { _sleepTimer += seconds; }
     void ResetRestTime() { _sleepTimer = 0.0f; }

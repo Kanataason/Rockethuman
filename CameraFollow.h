@@ -5,14 +5,14 @@
 
 class Ragdoll;
 
-// 発射したラグドールを、カメラが追いかける
+//発射したラグドールを、カメラが追いかける
 class CameraFollow : public Component
 {
 public:
-	void Initialize(ServiceLocator& context)override;
+	void Initialize(ServiceLocator& locator)override;
 	void Update(float deltaTime)override;
 
-	// 追いかける相手(借りるだけ。所有者はシーンのGameObject)
+	//追いかける相手(借りるだけ。所有者はシーンのGameObject)
 	void SetTarget(Ragdoll* target) { _target = target; }
 
 	void StartFollow();
@@ -40,7 +40,7 @@ private:
 	Ragdoll* _target = nullptr;
 	Mode _mode = Mode::Idle;
 
-	DirectX::XMFLOAT3 _startPosition{};  // カメラの最初の位置(戻る先)
-	float _startRootY = 0.0f;            // 追い始めたときの、ラグドールの腰の高さ
-	bool _hasBeenFast = false;           // 追い始めてから、一度でも速くなったか(なったあとで、遅くなったら寄る)
+	DirectX::XMFLOAT3 _startPosition{}; //カメラの最初の位置(戻る先)
+	float _startRootY = 0.0f; //追い始めたときの、ラグドールの腰の高さ
+	bool _hasBeenFast = false; //追い始めてから、一度でも速くなったか(なったあとで、遅くなったら寄る)
 };

@@ -63,7 +63,7 @@ struct BaseSceneData
 struct StageData
 {
 	int shotCount = 3;
-	std::array<int, 3 > starThresholds = { 1500, 3500, 6000 };   // JSONに書かなかったときの値(0だと、0点でも星3つになる)
+	std::array<int, 3 > starThresholds = { 1500, 3500, 6000 }; //JSONに書かなかったときの値(0だと、0点でも星3つになる)
 };
 //Jsonからのデータを入れる構造体
 struct ObjectData
@@ -76,15 +76,15 @@ struct ObjectData
 	std::string materialName = "";
 	Transform transform = {};
 	DirectX::XMFLOAT3 direction = { 0,0,0 };
-	float score = 100.0f;   // 的の基本点(Jsonの"score"。省略時は100)
+	float score = 100.0f; //的の基本点(Jsonの"score"。省略時は100)
 	float colliderScale = 1.0f;
-	float bounceRestitution = 1.0f;   // 地面で強く跳ねるときの反発係数(プレイヤー用)
-	int bounceCount = 0;              // 強く跳ねられる回数。0なら、ふつう
+	float bounceRestitution = 1.0f; //地面で強く跳ねるときの反発係数(プレイヤー用)
+	int bounceCount = 0; //強く跳ねられる回数。0なら、ふつう
 	bool startAsleep = true;
 
-	// 同じ物を並べる指定(Jsonの"count"と"step")。XYZの各方向に、何個ずつ、どれだけ離して並べるか
+	//同じ物を並べる指定(Jsonの"count"と"step")。XYZの各方向に、何個ずつ、どれだけ離して並べるか
 	DirectX::XMINT3 repeatCount = { 1, 1, 1 };
-	DirectX::XMFLOAT3 repeatStep = { 0, 0, 0 };   // 省略すると、大きさ(scale)と同じ間隔(ぴったり並ぶ)
+	DirectX::XMFLOAT3 repeatStep = { 0, 0, 0 }; //省略すると、大きさ(scale)と同じ間隔(ぴったり並ぶ)
 
 	std::vector<AnimationData> animationDatas;
 };

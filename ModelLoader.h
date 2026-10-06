@@ -30,22 +30,22 @@ public :
 	static std::shared_ptr<Mesh> CreateBottomPivotBox();
 private:
 
-	// 1メッシュ分の頂点・インデックス・ボーンウェイトをMeshInfoに追加
+	//1メッシュ分の頂点・インデックス・ボーンウェイトをMeshInfoに追加
 	void GetFbxObjectData(MeshInfo& mesh, const aiMesh* aimesh, const std::unordered_map<std::string, int>& boneMap);
 
-	// マテリアルのDiffuseカラーとテクスチャパスを取得
+	//マテリアルのDiffuseカラーとテクスチャパスを取得
 	void GetFbxMaterialData(std::shared_ptr<Material>& material, aiMaterial* aimaterial);
 
-	// FBXの先頭アニメーションをキーフレームデータとして取得
+	//FBXの先頭アニメーションをキーフレームデータとして取得
 	void GetFbxAnimationData(const aiScene* scene, Animation& animation, Skeleton& skeleton);
 
-	// ノード階層からボーンとして使われているものだけを抽出し
+	//ノード階層からボーンとして使われているものだけを抽出し
 	void BuildSkeleton(aiNode* node, Skeleton& skeleton, const std::unordered_map<std::string, aiBone*>& boneMap,
 		std::unordered_map<std::string, int>& boneIndexMap, int parentIndex);
 
-	// ノード階層を再帰的に辿り、Skeletonへ全ノードを登録する
+	//ノード階層を再帰的に辿り、Skeletonへ全ノードを登録する
 	int CreateBoneNode(const aiNode* node, Skeleton&, int parentIndex);
 
-	// 全メッシュを走査し、ボーン名→aiBoneの対応表を作成
+	//全メッシュを走査し、ボーン名→aiBoneの対応表を作成
 	void CollectBones(const aiScene* scene, std::unordered_map<std::string, aiBone*>& boneMap);
 };

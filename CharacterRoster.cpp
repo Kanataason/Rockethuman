@@ -25,7 +25,7 @@ void CharacterRoster::Load(const std::string& jsonPath)
 		return;
 	}
 
-	// 第3引数 false: 書き方を間違えていても、例外を投げずに、discarded(空)で返す
+	//書き方を間違えていても、例外を投げずに空で返す
 	const json root = json::parse(file, nullptr, false);
 	if (root.is_discarded() || !root.is_object() || !root.contains("Characters") || !root["Characters"].is_array())
 	{
@@ -41,7 +41,7 @@ void CharacterRoster::Load(const std::string& jsonPath)
 		CharacterData character;
 		character.modelPath = entry.value("path", "");
 		if (character.modelPath.empty())
-			continue;   // モデルのないキャラクターは、選べても出せないので、飛ばす
+			continue; //モデルのないキャラクターは、選べても出せないので、飛ばす
 
 		character.name = StringUtility::ToWide(entry.value("name", character.modelPath));
 		character.scale = entry.value("scale", character.scale);
@@ -63,7 +63,6 @@ void CharacterRoster::Load(const std::string& jsonPath)
 			}
 		}
 
-		// "sounds": { "shot": "shot_elvis", ... }。出来事の名前 → 専用の音の名前
 		if (entry.contains("sounds") && entry["sounds"].is_object())
 		{
 			for (const auto& item : entry["sounds"].items())

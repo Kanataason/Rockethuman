@@ -13,7 +13,7 @@ constexpr size_t MaxBones = 128;
 
 namespace
 {
-    // リソース作成失敗時の共通エラー表示
+    //リソース作成失敗時の共通エラー表示
     void ShowCreationError(const wchar_t* target)
     {
         std::wstring message = std::wstring(target) + L"作成失敗";
@@ -25,16 +25,16 @@ void Renderer::CreateRasterizer()
 {
     D3D11_RASTERIZER_DESC desc = {};
 
-    // 通常のポリゴン描画
+    //通常のポリゴン描画
     desc.FillMode = D3D11_FILL_SOLID;
 
-    // 裏面をカリング
+    //裏面をカリング
     desc.CullMode = D3D11_CULL_BACK;
 
-    // 頂点の並び順を時計回りとして扱う
+    //頂点の並び順を時計回りとして扱う
     desc.FrontCounterClockwise = FALSE;
 
-    // 深度範囲外のプリミティブをクリップ
+    //深度範囲外のプリミティブをクリップ
     desc.DepthClipEnable = TRUE;
 
     HRESULT hr = _device->CreateRasterizerState(
@@ -47,7 +47,7 @@ void Renderer::CreateRasterizer()
         return;
     }
 
-    // 作成したラスタライザステートを描画に使用
+    //作成したラスタライザステートを描画に使用
     _context->RSSetState(_rasterizer.Get());
 }
 
@@ -72,23 +72,23 @@ void Renderer::CreateConstantBuffer()
 }
 
 
-// アニメーション用ボーンバッファの作成
+//アニメーション用ボーンバッファの作成
 void Renderer::CreateAnimationBoneBuffer()
 {
     D3D11_BUFFER_DESC desc = {};
 
-    // 最大128本のボーン行列を格納
+    //最大128本のボーン行列を格納
     desc.ByteWidth =
         sizeof(BoneMatrix) * MaxBones;
 
     desc.Usage =
         D3D11_USAGE_DEFAULT;
 
-    // VertexShaderからShaderResourceとして参照
+    //VertexShaderからShaderResourceとして参照
     desc.BindFlags =
         D3D11_BIND_SHADER_RESOURCE;
 
-    // 構造化バッファとして使用
+    //構造化バッファとして使用
     desc.MiscFlags =
         D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 
@@ -106,10 +106,10 @@ void Renderer::CreateAnimationBoneBuffer()
         return;
     }
 
-    // ShaderResourceViewの設定
+    //ShaderResourceViewの設定
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 
-    // 構造化バッファなのでUNKNOWNを指定
+    //構造化バッファなのでUNKNOWNを指定
     srvDesc.Format =
         DXGI_FORMAT_UNKNOWN;
 
@@ -119,7 +119,7 @@ void Renderer::CreateAnimationBoneBuffer()
     srvDesc.Buffer.FirstElement = 0;
     srvDesc.Buffer.NumElements = MaxBones;
 
-    // VertexShaderからボーン行列を参照するためのView
+    //VertexShaderからボーン行列を参照するためのView
     hr = _device->CreateShaderResourceView(
         _boneBuffer.Get(),
         &srvDesc,
@@ -136,11 +136,11 @@ void Renderer::CreateSampleState()
 {
     D3D11_SAMPLER_DESC desc = {};
 
-    // ミップマップを含めた線形補間
+    //ミップマップを含めた線形補間
     desc.Filter =
         D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 
-    // テクスチャ座標が範囲外の場合は繰り返す
+    //テクスチャ座標が範囲外の場合は繰り返す
     desc.AddressU =
         D3D11_TEXTURE_ADDRESS_WRAP;
 
@@ -170,7 +170,7 @@ bool Renderer::CompileShader()
     ComPtr<ID3DBlob> vsError;
     ComPtr<ID3DBlob> psError;
 
-    // VertexShaderをコンパイル
+    //VertexShaderをコンパイル
     HRESULT hr = D3DCompileFromFile(
         L"VertexShader.hlsl",
         nullptr,
@@ -187,7 +187,7 @@ bool Renderer::CompileShader()
         return false;
     }
 
-    // PixelShaderをコンパイル
+    //PixelShaderをコンパイル
     hr = D3DCompileFromFile(
         L"PixelShader.hlsl",
         nullptr,
@@ -338,7 +338,7 @@ void Renderer::UpdateConstantBuffer(
         XMMatrixTranspose(
             transform.GetWorldMatrix());
 
-    // CPU側のデータをGPUへ転送
+    //CPU側のデータをGPUへ転送
     _context->UpdateSubresource(
         _constantBuffer.Get(),
         0,
@@ -350,8 +350,8 @@ void Renderer::UpdateConstantBuffer(
     ID3D11Buffer* buffer =
         _constantBuffer.Get();
 
-    // VertexShader / PixelShaderから
-    // ConstantBufferを参照できるように設定
+    //VertexShader / PixelShaderから
+    //ConstantBufferを参照できるように設定
     _context->VSSetConstantBuffers(
         0,
         1,
@@ -369,18 +369,18 @@ void Renderer::Draw(
     const Material& material,
     const Transform& transform)
 {
-    _context->OMSetBlendState(nullptr, nullptr, 0xffffffff);   // 標準の、不透明合成に戻す
+    _context->OMSetBlendState(nullptr, nullptr, 0xffffffff); //標準の、不透明合成に戻す
     _context->OMSetDepthStencilState(nullptr, 0);
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
 
-    // テクスチャサンプラーを設定
+    //テクスチャサンプラーを設定
     _context->PSSetSamplers(
         0,
         1,
         _sampleState.GetAddressOf());
 
-    // マテリアルにテクスチャがあれば設定
+    //マテリアルにテクスチャがあれば設定
     auto& texture = material.GetTexture();
 
     if (texture)
@@ -397,12 +397,12 @@ void Renderer::Draw(
     UINT indexCount =
         mesh.GetIndexCount();
 
-    // オブジェクトごとの描画情報をGPUへ転送
+    //オブジェクトごとの描画情報をGPUへ転送
     UpdateConstantBuffer(
         material,
         transform);
 
-    // 頂点バッファを設定
+    //頂点バッファを設定
     _context->IASetVertexBuffers(
         0,
         1,
@@ -410,21 +410,21 @@ void Renderer::Draw(
         &stride,
         &offset);
 
-    // インデックスバッファを設定
+    //インデックスバッファを設定
     _context->IASetIndexBuffer(
         indexBuffer,
         DXGI_FORMAT_R32_UINT,
         0);
 
-    // 頂点入力レイアウトを設定
+    //頂点入力レイアウトを設定
     _context->IASetInputLayout(
         _inputLayout.Get());
 
-    // 三角形単位で描画
+    //三角形単位で描画
     _context->IASetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    // シェーダーを設定
+    //シェーダーを設定
     _context->VSSetShader(
         _verticesShader.Get(),
         nullptr,
@@ -435,7 +435,7 @@ void Renderer::Draw(
         nullptr,
         0);
 
-    // インデックスバッファを使用して描画
+    //インデックスバッファを使用して描画
     _context->DrawIndexed(
         indexCount,
         0,
@@ -451,23 +451,23 @@ void Renderer::Initialize(
         device,
         context);
 
-    // GPU描画に必要なリソースを作成
+    //GPU描画に必要なリソースを作成
     CreateRasterizer();
     CreateAnimationBoneBuffer();
     CreateConstantBuffer();
     CreateSampleState();
 
-    // HLSLをコンパイル
+    //HLSLをコンパイル
     if (!CompileShader())
     {
         return;
     }
 
-    // コンパイルしたシェーダーから
-    // GPUで使用するオブジェクトを作成
+    //コンパイルしたシェーダーから
+    //GPUで使用するオブジェクトを作成
     CreateShader();
 
-    // 頂点データとシェーダーの入力形式を対応付け
+    //頂点データとシェーダーの入力形式を対応付け
     CreateInputLayout();
 }
 
@@ -475,7 +475,7 @@ void Renderer::Initialize(
 //ここから先は ConstantBufferの情報をアップデートする関数
 
 
-// ライト情報の設定
+//ライト情報の設定
 void Renderer::SetLight(const Light& light)
 {
     _ConstantBufferData.light.Color =
@@ -511,19 +511,19 @@ void Renderer::SetAnimationBone(
 {
     XMFLOAT4X4 matrices[MaxBones] = {};
 
-    // GPU側の最大ボーン数を超えないように制限
+    //GPU側の最大ボーン数を超えないように制限
     const size_t count =
         std::min(
             finalTransforms.size(),
             MaxBones);
 
-    // CPU側の最終ボーン行列をGPU転送用配列へコピー
+    //CPU側の最終ボーン行列をGPU転送用配列へコピー
     std::copy_n(
         finalTransforms.begin(),
         count,
         matrices);
 
-    // ボーン行列をGPUへ転送
+    //ボーン行列をGPUへ転送
     _context->UpdateSubresource(
         _boneBuffer.Get(),
         0,
@@ -532,7 +532,7 @@ void Renderer::SetAnimationBone(
         0,
         0);
 
-    // VertexShaderのt1スロットへ設定
+    //VertexShaderのt1スロットへ設定
     _context->VSSetShaderResources(
         1,
         1,

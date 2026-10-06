@@ -11,9 +11,9 @@ using namespace UiInfo;
 
 namespace
 {
-	constexpr float dimAlpha = 0.55f;   // 後ろのゲーム画面を暗くする濃さ
+	constexpr float dimAlpha = 0.55f; //後ろのゲーム画面を暗くする濃さ
 
-	// ---- パネルの中の配置(パネルの上端からの距離。1280x720基準) ----
+	//---- パネルの中の配置(パネルの上端からの距離。1280x720基準) ----
 	constexpr float titleY = 60.0f;
 	constexpr float buttonTop = 130.0f;
 	constexpr float buttonWidth = 280.0f;
@@ -46,7 +46,7 @@ void PausePanel::Update()
 	if (_input->GetKeyDown('S') || _input->GetKeyDown(VK_DOWN))
 		_selectedIndex = (_selectedIndex + 1) % buttonCount;
 
-	// ESCは「つづける」と同じ(もう一度押すと、閉じる)
+	//ESCは「つづける」と同じ(もう一度押すと、閉じる)
 	if (_input->GetKeyDown(VK_ESCAPE))
 	{
 		_visible = false;
@@ -56,7 +56,7 @@ void PausePanel::Update()
 
 	if (_input->GetKeyDown(VK_SPACE) || _input->GetKeyDown(VK_RETURN))
 	{
-		// 1回選んだら、パネルは閉じる(シーンの切り替えは、受け取った側が予約する)
+		//1回選んだら、パネルは閉じる(シーンの切り替えは、受け取った側が予約する)
 		_visible = false;
 		switch (_selectedIndex)
 		{
@@ -77,12 +77,12 @@ void PausePanel::Draw()
 		return;
 	const PanelData& panel = it->second;
 
-	// 後ろのゲーム画面を、少し暗くする
+	//後ろのゲーム画面を、少し暗くする
 	_uiRenderer->DrawRect(0.0f, 0.0f, UiRenderer::VirtualWidth, UiRenderer::VirtualHeight,
 		DirectX::XMVectorSet(0, 0, 0, dimAlpha));
 
 	DirectX::XMFLOAT4 fill = panel.fillColor;
-	fill.w = (std::max)(fill.w, 0.8f);   // 後ろが透けすぎて、文字が読みにくくならないように
+	fill.w = (std::max)(fill.w, 0.8f); //後ろが透けすぎて、文字が読みにくくならないように
 	_uiRenderer->DrawRect(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
 		XMLoadFloat4(&fill));
 	_uiRenderer->DrawFrame(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,

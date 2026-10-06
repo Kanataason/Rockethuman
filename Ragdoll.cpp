@@ -17,9 +17,9 @@
 #include "HingeJoint.h"
 using namespace RagdollData;
 
-void Ragdoll::Initialize(ServiceLocator& loacator)
+void Ragdoll::Initialize(ServiceLocator& locator)
 {
-    _physicsSystem = loacator.physicsSystem;
+    _physicsSystem = locator.physicsSystem;
     InitializeBoneLength();
     AddRagDoll();
 
@@ -33,7 +33,7 @@ void Ragdoll::RegisterIgnoredCollisionPairs()
             const RagdollBone& boneA = _bones[boneIndexA];
             const RagdollBone& boneB = _bones[boneIndexB];
 
-            // 親子で隣り合うボーン
+            //親子で隣り合うボーン
             const bool isAdjacent =
                 boneA.parentIndex == static_cast<int>(boneIndexB) ||
                 boneB.parentIndex == static_cast<int>(boneIndexA);
@@ -54,11 +54,11 @@ void Ragdoll::CreateBone(int boneNameIndex)
 
     const int nodeIndex = _skeleton->FindNode(boneName);
     if (nodeIndex == -1)
-        return; // ノードが見つからなかったので作らない
+        return; //ノードが見つからなかったので作らない
 
     RagdollBone bone;
     bone.nodeIndex = nodeIndex;
-    bone.parentIndex = parentIndices[boneNameIndex]; // 一旦boneNames上のインデックスのまま保持
+    bone.parentIndex = parentIndices[boneNameIndex]; //一旦boneNames上のインデックスのまま保持
     bone.name = boneName;
 
     bone.rigidBody = std::make_unique<RigidBody>();
@@ -78,8 +78,8 @@ void Ragdoll::CreateBone(int boneNameIndex)
     }
 
     PhysicsBody body;
-    // RagdollBoneの所有権(rigidBody/collider/joint)は持たせず、データだけコピーする
-    // (bone自体の所有は、このあとmoveでRagdoll::_bonesに移る)
+    //RagdollBoneの所有権(rigidBody/collider/joint)は持たせず、データだけコピーする
+    //(bone自体の所有は、このあとmoveでRagdoll::_bonesに移る)
     body.ragdollBone.name = bone.name;
     body.ragdollBone.nodeIndex = bone.nodeIndex;
     body.ragdollBone.parentIndex = bone.parentIndex;
@@ -101,7 +101,7 @@ void Ragdoll::InitializeBoneLength()
     if (head < 0 || foot < 0 || hips < 0)
     {
         _bodyScale = 1.0f;
-        _hipHeight = 0.0f;       // 測れないときは、足元を、そのまま砲身の位置に置く
+        _hipHeight = 0.0f; //測れないときは、足元を、そのまま砲身の位置に置く
         return;
     }
     const auto& nodes = _skeleton->GetNode();
@@ -109,8 +109,8 @@ void Ragdoll::InitializeBoneLength()
     const float height = nodes[head].BindGlobalTransform._42 - nodes[foot].BindGlobalTransform._42;
     const float heightMeters = height * scaleY;
 
-    // 足元(モデルの原点)から腰までの高さ(m)。Transformの大きさを掛けて、メートルにする。
-    // 分割されたノードのモデルでも、本体のバインドのグローバルは、位置を含んだ値になる
+    //足元(モデルの原点)から腰までの高さ(m)。Transformの大きさを掛けて、メートルにする。
+    //分割されたノードのモデルでも、本体のバインドのグローバルは、位置を含んだ値になる
     _hipHeight = nodes[hips].BindGlobalTransform._42 * scaleY;
 
     _bodyScale = heightMeters / referenceHeight;
@@ -141,37 +141,37 @@ void Ragdoll::InitializeRootBone(RagdollBone& bone, const WorldPose& nodePose)
     bone.collider->SetPosition(Vector::fromV3ToF3(nodePose.position));
     bone.collider->SetRotation(nodePose.rotation);
     bone.colliderLocalOffset = Vector3(0.0f, 0.0f, 0.0f);
-    bone.colliderLocalRotOffset = Quaternion(0, 0, 0, 1); // Identity
+    bone.colliderLocalRotOffset = Quaternion(0, 0, 0, 1); //Identity
 }
 void Ragdoll::SetupLeafCapsule(RagdollBone& bone, WorldPose& nodePose, const Vector3& axisFromParent)
 {
     //足先や手先の固定の長さ
     float leafHeight = RagdollTuning::leafHeight * _bodyScale;
 
-    // 手など、短い末端ボーンは、名前ごとの長さを使う
+    //手など、短い末端ボーンは、名前ごとの長さを使う
     if (const auto heightIt = leafHeights.find(bone.name); heightIt != leafHeights.end())
         leafHeight = heightIt->second * _bodyScale;
 
-    // ボーンのローカルY軸(伸びる方向)をワールド空間へ
+    //ボーンのローカルY軸(伸びる方向)をワールド空間へ
     Vector3 leafAxis = nodePose.rotation * Vector3(0.0f, 1.0f, 0.0f);
 
     if (Vector::Dot(leafAxis, axisFromParent) < -0.5f)
         leafAxis = -leafAxis;
 
-    // 関節位置から、伸びる方向へ半分の高さぶんずらした位置を中心にする
+    //関節位置から、伸びる方向へ半分の高さぶんずらした位置を中心にする
     const Vector3 leafCenter = nodePose.position + leafAxis * (leafHeight * 0.5f);
 
     bone.collider->SetPosition(Vector::fromV3ToF3(leafCenter));
     bone.collider->SetHeight(leafHeight);
     bone.collider->SetRotation(nodePose.rotation);
 
-    // 中心をずらした分、オフセットもゼロではなくなる
+    //中心をずらした分、オフセットもゼロではなくなる
     bone.colliderLocalOffset =
         nodePose.rotation.Inverse() * (leafCenter - nodePose.position); 
     bone.colliderLocalRotOffset = Quaternion(0, 0, 0, 1);
 
-    // PhysicsSystem 側のコピーにも、オフセットと「重心が信頼できるか」を反映する
-    // 前腕・手・足は、末端でも重力トルクを使う(だらんと下げるため)
+    //PhysicsSystem 側のコピーにも、オフセットと「重心が信頼できるか」を反映する
+    //前腕・手・足は、末端でも重力トルクを使う(だらんと下げるため)
     _physicsSystem->UpdateRagdollBoneOffsets(
         bone.rigidBody.get(), bone.colliderLocalOffset, bone.colliderLocalRotOffset,
         RagdollTuning::kLeafBoneGravityTorque ||
@@ -187,7 +187,7 @@ void Ragdoll::SetupParentCapsule(RagdollBone& parent, WorldPose& parentPose,
     parent.collider->SetHeight(lengthFromParent);
     parent.collider->SetRotation(capsuleRotation);
 
-    // RigidBody基準のローカルオフセット(capsuleRotation確定後に計算)
+    //RigidBody基準のローカルオフセット(capsuleRotation確定後に計算)
     parent.colliderLocalOffset =
         parentPose.rotation.Inverse() * (center - parentPose.position);
     parent.colliderLocalRotOffset =
@@ -226,18 +226,18 @@ Quaternion Ragdoll::ComputeCapsuleRotation(const Vector3& axisFromParent)
     const Vector3 capsuleLocalAxis = { 0.0f, 1.0f, 0.0f };
     const float dot = std::clamp(Vector::Dot(capsuleLocalAxis, axisFromParent), -1.0f, 1.0f);
 
-    // すでに同じ向き
+    //すでに同じ向き
     if (dot > 0.99999f)
         return Quaternion(0, 0, 0, 1);
 
-    // 真逆の向き: 回転軸が定まらないので、X軸まわりに180度回す
+    //真逆の向き: 回転軸が定まらないので、X軸まわりに180度回す
     if (dot < -0.99999f)
     {
         const Vector3 rotationAxis = { 1.0f, 0.0f, 0.0f };
         return QuaternionMath::CreateFromAxisAngle(rotationAxis, XM_PI);
     }
 
-    // 一般の場合: 2つのベクトルの外積が回転軸、内積が角度(cos)
+    //一般の場合: 2つのベクトルの外積が回転軸、内積が角度(cos)
     Vector3 rotationAxis = Vector::Cross(capsuleLocalAxis, axisFromParent);
     rotationAxis.Normalize();
     return QuaternionMath::CreateFromAxisAngle(rotationAxis, std::acos(dot));
@@ -260,7 +260,7 @@ bool Ragdoll::CalculateBoneAxis(const Vector3& nodePosition, const Vector3& pare
     Vector3 direction = nodePosition - parentPosition;
     float length = std::sqrt(Vector::SqMagnitude(direction));
 
-    if (length <= EPSILON) // 0除算をなくすため
+    if (length <= EPSILON) //0除算をなくすため
         return false;
 
     outLength = length;
@@ -299,13 +299,13 @@ void Ragdoll::InitializeBonePoses()
             continue;
         }
 
-        // 親の関節のワールド座標
+        //親の関節のワールド座標
         RagdollBone& parent = _bones[bone.parentIndex];
         const BoneNode& parentNode = _skeleton->GetNode()[parent.nodeIndex];
         WorldPose parentPose = GetWorldPose(parentNode, worldMatrix);
 
 
-        // 親->自分の向きと長さ
+        //親->自分の向きと長さ
         float lengthFromParent = 0.0f;
         Vector3 axisFromParent;
         if (!CalculateBoneAxis(nodePose.position, parentPose.position, lengthFromParent, axisFromParent))
@@ -319,17 +319,17 @@ void Ragdoll::InitializeBonePoses()
         const Quaternion capsuleRotation = ComputeCapsuleRotation(axisFromParent);
 
 
-        // ジョイントの基準回転
+        //ジョイントの基準回転
         bone.initialRelativeRotation = ComputeBindRelativeRotation(parentNode, node);
 
 
-        // 親のcapsuleと重心オフセット(最初の子だけが設定する)
+        //親のcapsuleと重心オフセット(最初の子だけが設定する)
         if (!IsPrimaryChild(boneIndex))
             continue;
 
         SetupParentCapsule(parent, parentPose, nodePose.position, lengthFromParent, capsuleRotation);
     }
-    // 通常に戻るとき、動いた距離を求めるために、始めたときの Hips の位置を覚えておく
+    //通常に戻るとき、動いた距離を求めるために、始めたときの Hips の位置を覚えておく
     if (!_bones.empty() && _bones[0].rigidBody)
         _ragdollStartRootPosition = _bones[0].rigidBody->GetPosition();
 }
@@ -390,11 +390,11 @@ void Ragdoll::CreateJoints()
     {
         RagdollBone& child = _bones[boneIndex];
 
-        // ルートは親がいないのでジョイントなし
+        //ルートは親がいないのでジョイントなし
         if (child.parentIndex < 0)
             continue;
 
-        // すでにジョイントがあるボーンは作らない(P を押すたびに、同じジョイントが重なって増えるのを防ぐ)
+        //すでにジョイントがあるボーンは作らない(P を押すたびに、同じジョイントが重なって増えるのを防ぐ)
         if (child.joint)
             continue;
 
@@ -427,7 +427,7 @@ void Ragdoll::ApplyRandomStartPush()
     static std::mt19937 randomEngine{ std::random_device{}() };
     std::uniform_real_distribution<float> angleDistribution(0.0f, XM_2PI);
 
-    // 水平面上のランダムな向き
+    //水平面上のランダムな向き
     const float angle = angleDistribution(randomEngine);
     const Vector3 pushDirection(std::cos(angle), 0.0f, std::sin(angle));
 
@@ -436,7 +436,7 @@ void Ragdoll::ApplyRandomStartPush()
         if (!bone.rigidBody)
             continue;
 
-        // 上半身(胸・頭)だけを押す
+        //上半身(胸・頭)だけを押す
         const std::string& boneName = bone.name;
         if (boneName == "mixamorig:Spine2" || boneName == "mixamorig:Head")
         {
@@ -449,9 +449,9 @@ void Ragdoll::ApplyRandomStartPush()
 //--------------ラグドール有効時の処理--------------------
 void Ragdoll::InitializePhysicsTransform()
 {
-    InitializeBonePoses();      // ボーンごとの位置・回転・collider
-    CreateJoints();             // ジョイント(全ボーンの位置が決まってから作る)
-    ApplyRandomStartPush();     // 開始時のランダムな押し
+    InitializeBonePoses(); //ボーンごとの位置・回転・collider
+    CreateJoints(); //ジョイント(全ボーンの位置が決まってから作る)
+    ApplyRandomStartPush(); //開始時のランダムな押し
 }
 
 
@@ -466,17 +466,17 @@ void Ragdoll::StartFall()
             bone.rigidBody->ResetMaxSpeed();
         }
     }
-    // ボーンを今のアニメーションのポーズに合わせて、ジョイントを作り(すでにあれば作らない)、少し押す
+    //ボーンを今のアニメーションのポーズに合わせて、ジョイントを作り(すでにあれば作らない)、少し押す
     InitializePhysicsTransform();
 
-    // 倒れて落ち着いたら止まる処理を有効にして、その状態をリセットする
+    //倒れて落ち着いたら止まる処理を有効にして、その状態をリセットする
     if (_physicsSystem)
     {
         _physicsSystem->ResetRagdollTimer();
         _physicsSystem->SetRagdollRestEnabled(true);
     }
 
-    // 重力を入れて、ラグドールを有効にする。全身が重力で地面に倒れる
+    //重力を入れて、ラグドールを有効にする。全身が重力で地面に倒れる
     SetFlying(false);
     _isWaitingSettle = false;
     Enable();
@@ -484,8 +484,8 @@ void Ragdoll::StartFall()
 
 void Ragdoll::StartHanging()
 {
-    // ラグドールがまだ動いていない(アニメーション中)ときだけ、ボーンをアニメーションのポーズに合わせる。
-    // すでに動いている(倒れている)ときは、その姿勢のまま持ち上げる
+    //ラグドールがまだ動いていない(アニメーション中)ときだけ、ボーンをアニメーションのポーズに合わせる。
+    //すでに動いている(倒れている)ときは、その姿勢のまま持ち上げる
     if (!_enabled)
     {
         InitializeBonePoses();
@@ -494,10 +494,10 @@ void Ragdoll::StartHanging()
             _ragdollStartRootPosition = _bones[0].rigidBody->GetPosition();
     }
 
-    // ジョイントを作る(すでにあるジョイントは作り直さない)
+    //ジョイントを作る(すでにあるジョイントは作り直さない)
     CreateJoints();
 
-    // 吊る骨を探して Kinematic にする。Kinematic の骨は、重力や衝突で動かず、入力でだけ動く
+    //吊る骨を探して Kinematic にする。Kinematic の骨は、重力や衝突で動かず、入力でだけ動く
     _hangingBoneIndex = -1;
     for (size_t boneIndex = 0; boneIndex < _bones.size(); ++boneIndex)
     {
@@ -508,7 +508,7 @@ void Ragdoll::StartHanging()
             auto& holdBody = _bones[boneIndex].rigidBody;
             holdBody->EnableKinematic();
 
-            // 倒れていたときの勢いが残らないようにして、その場でぴたりと持ち上げる
+            //倒れていたときの勢いが残らないようにして、その場でぴたりと持ち上げる
             holdBody->SetVelocity(Vector3(0.0f, 0.0f, 0.0f));
             holdBody->SetAngularVelocity(Vector3(0.0f, 0.0f, 0.0f));
             break;
@@ -518,14 +518,14 @@ void Ragdoll::StartHanging()
     _hangingInputVelocity = Vector3(0.0f, 0.0f, 0.0f);
     _hangingDriftVelocity = Vector3(0.0f, 0.0f, 0.0f);
 
-    // 吊り下げているあいだは、静止して止まる処理を使わない(止まると、ぶらぶらが止まってしまう)
+    //吊り下げているあいだは、静止して止まる処理を使わない(止まると、ぶらぶらが止まってしまう)
     if (_physicsSystem)
     {
         _physicsSystem->ResetRagdollTimer();
         _physicsSystem->SetRagdollRestEnabled(false);
     }
 
-    // 全身のラグドールを有効にする(すでに有効なら、寝ている骨を起こすだけ)。吊る骨以外は、重力でぶら下がる
+    //全身のラグドールを有効にする(すでに有効なら、寝ている骨を起こすだけ)。吊る骨以外は、重力でぶら下がる
     Enable();
 }
 
@@ -536,7 +536,7 @@ void Ragdoll::ReleaseHanging()
 
     auto& holdBody = _bones[_hangingBoneIndex].rigidBody;
 
-    // 吊る骨を、ふつうの骨(Kinematic ではない)に戻す。飛ばされた勢いが残っていれば、その速度で落ち始める
+    //吊る骨を、ふつうの骨(Kinematic ではない)に戻す。飛ばされた勢いが残っていれば、その速度で落ち始める
     holdBody->DisableKinematic();
     holdBody->SetVelocity(_hangingInputVelocity + _hangingDriftVelocity);
 
@@ -544,7 +544,7 @@ void Ragdoll::ReleaseHanging()
     _hangingInputVelocity = Vector3(0.0f, 0.0f, 0.0f);
     _hangingDriftVelocity = Vector3(0.0f, 0.0f, 0.0f);
 
-    // 落ちて、倒れて、落ち着いたら止まる処理を、また有効にする
+    //落ちて、倒れて、落ち着いたら止まる処理を、また有効にする
     if (_physicsSystem)
     {
         _physicsSystem->ResetRagdollTimer();
@@ -559,11 +559,11 @@ void Ragdoll::MoveHangingBone(const Vector3& delta, float deltaTime)
 
     auto& body = _bones[_hangingBoneIndex].rigidBody;
 
-    // 位置を直接動かす
+    //位置を直接動かす
     body->SetPosition(body->GetPosition() + delta);
 
-    // 動かした速度も覚えておく。ジョイントの速度の拘束が、子の骨を一緒に引っ張るために使う。
-    // (速度が 0 のままだと、子は「吊る骨は止まっている」と見なして、置いていかれる)
+    //動かした速度も覚えておく。ジョイントの速度の拘束が、子の骨を一緒に引っ張るために使う。
+    //(速度が 0 のままだと、子は「吊る骨は止まっている」と見なして、置いていかれる)
     _hangingInputVelocity += Vector3(delta.x / deltaTime, delta.y / deltaTime, delta.z / deltaTime);
 }
 
@@ -574,14 +574,14 @@ void Ragdoll::UpdateHanging(float deltaTime)
 
     auto& body = _bones[_hangingBoneIndex].rigidBody;
 
-    // 飛ばされた勢いで動く。時間とともに弱まる
+    //飛ばされた勢いで動く。時間とともに弱まる
     body->SetPosition(body->GetPosition() + _hangingDriftVelocity * deltaTime);
     _hangingDriftVelocity *= std::exp(-RagdollTuning::kHangingDriftDamping * deltaTime);
 
-    // 物理側からは、吊る骨は「この速度で動いている」ように見える
+    //物理側からは、吊る骨は「この速度で動いている」ように見える
     body->SetVelocity(_hangingInputVelocity + _hangingDriftVelocity);
 
-    // 入力による速度は、毎フレームつくり直す
+    //入力による速度は、毎フレームつくり直す
     _hangingInputVelocity = Vector3(0.0f, 0.0f, 0.0f);
 }
 
@@ -595,9 +595,9 @@ void Ragdoll::StopRagdoll(bool includeHeight)
             bone.rigidBody->ResetMaxSpeed();
         }
     }
-    // ラグドール中は、プレイヤーの Transform を動かしていない(ボーンは世界座標で動く)。
-    // アニメーションに戻すと、体は Transform の位置に描かれるので、Hips が動いた分だけ Transform を動かして、
-    // アニメーションの体を、ラグドールの体があった位置に移す
+    //ラグドール中は、プレイヤーの Transform を動かしていない(ボーンは世界座標で動く)。
+    //アニメーションに戻すと、体は Transform の位置に描かれるので、Hips が動いた分だけ Transform を動かして、
+    //アニメーションの体を、ラグドールの体があった位置に移す
     if (!_bones.empty() && _bones[0].rigidBody)
     {
         const Vector3 movedDistance = _bones[0].rigidBody->GetPosition() - _ragdollStartRootPosition;
@@ -608,7 +608,7 @@ void Ragdoll::StopRagdoll(bool includeHeight)
         ownerPosition.z += movedDistance.z;
     }
 
-    // 吊る骨を、ふつうの骨(Kinematic ではない)に戻す
+    //吊る骨を、ふつうの骨(Kinematic ではない)に戻す
     if (_hangingBoneIndex >= 0)
     {
         _bones[_hangingBoneIndex].rigidBody->DisableKinematic();
@@ -617,14 +617,14 @@ void Ragdoll::StopRagdoll(bool includeHeight)
     _hangingInputVelocity = Vector3(0.0f, 0.0f, 0.0f);
     _hangingDriftVelocity = Vector3(0.0f, 0.0f, 0.0f);
 
-    // 静止して止まる処理を、また有効に戻す(次に倒れるときのため)
+    //静止して止まる処理を、また有効に戻す(次に倒れるときのため)
     if (_physicsSystem)
     {
         _physicsSystem->ResetRagdollTimer();
         _physicsSystem->SetRagdollRestEnabled(true);
     }
 
-    // ラグドールを止める。全ボーンが寝て、速度と角速度が 0 に戻る
+    //ラグドールを止める。全ボーンが寝て、速度と角速度が 0 に戻る
     SetFlying(false);
     _isWaitingSettle = false;
     Disable();
@@ -648,11 +648,11 @@ XMMATRIX Ragdoll::WorldPoseToOwnerLocalMatrix(const Vector3& worldPosition, cons
 }
 void Ragdoll::WritePhysicsPoseToNodes()
 {
-    // オーナーの変換は、ループの中で変わらないので最初に1回だけ求める
+    //オーナーの変換は、ループの中で変わらないので最初に1回だけ求める
     const XMMATRIX ownerWorld = _owner->GetTransform().GetWorldMatrix();
     const XMMATRIX ownerInverseWorld = XMMatrixInverse(nullptr, ownerWorld);
-    // ownerWorldには拡大縮小(Scale)が入っている。Scaleが入った行列から、直接クォータニオンを取ると
-    // 回転が不正確になる(Rotationが0のときだけ、たまたま合う)ので、Decomposeで回転だけを取り出す
+    //ownerWorldには拡大縮小(Scale)が入っている。Scaleが入った行列から、直接クォータニオンを取ると
+    //回転が不正確になる(Rotationが0のときだけ、たまたま合う)ので、Decomposeで回転だけを取り出す
     XMVECTOR ownerWorldScale, ownerWorldRotation, ownerWorldTranslation;
     XMMatrixDecompose(&ownerWorldScale, &ownerWorldRotation, &ownerWorldTranslation, ownerWorld);
 
@@ -680,11 +680,11 @@ void Ragdoll::UpdateNonRagdollNodes()
     {
         BoneNode& node = _skeleton->GetNode()[nodeIndex];
 
-        // ragdollのボーンはWritePhysicsPoseToNodes()で決まっているので触らない
+        //ragdollのボーンはWritePhysicsPoseToNodes()で決まっているので触らない
         if (ragdollNodeIndices.contains(nodeIndex))
             continue;
 
-        // 親がいない(スケルトンのルート)ものは、そのまま
+        //親がいない(スケルトンのルート)ものは、そのまま
         if (node.ParentIndex < 0)
             continue;
 
@@ -706,9 +706,9 @@ void Ragdoll::CopyNodeTransformsToSkeletonBones()
 }
 void Ragdoll::UpdateBonesFromPhysics()
 {
-    WritePhysicsPoseToNodes();          // ragdollのボーン: 物理の結果を書き込む
-    UpdateNonRagdollNodes();            // ragdoll以外のノード: 親に追従させる
-    CopyNodeTransformsToSkeletonBones();// スキニング用のボーン行列にコピーする
+    WritePhysicsPoseToNodes(); //ragdollのボーン: 物理の結果を書き込む
+    UpdateNonRagdollNodes(); //ragdoll以外のノード: 親に追従させる
+    CopyNodeTransformsToSkeletonBones();//スキニング用のボーン行列にコピーする
 }
 
 //----------------------押し出し処理------------------
@@ -717,7 +717,7 @@ void Ragdoll::SetFlying(bool flying)
 {
     _isFlying = flying;
 
-    // 自由落下中は重力がトルクを生まないので、飛んでいる間だけ止める(止めないと体がくの字に折れる)
+    //自由落下中は重力がトルクを生まないので、飛んでいる間だけ止める(止めないと体がくの字に折れる)
     for (auto& bone : _bones)
         if (bone.rigidBody)
             bone.rigidBody->SetUseGravityTorque(!flying);
@@ -760,7 +760,7 @@ bool Ragdoll::AllBonesSleeping() const
 
 void Ragdoll::Update(float deltaTime)
 {
-    // どれかのボーンが地面に着いているか
+    //どれかのボーンが地面に着いているか
     bool grounded = false;
     for (const auto& bone : _bones)
     {
@@ -771,13 +771,13 @@ void Ragdoll::Update(float deltaTime)
         }
     }
 
-    // 地面に着いたら、飛行を終える(あとは今までどおり重力で倒れる)
+    //地面に着いたら、飛行を終える(あとは今までどおり重力で倒れる)
     if (_isFlying && grounded)
         SetFlying(false);
 
-    // 発射したあと、空中から地面に着くたびに知らせる(着地の音など)
-    //   着きっぱなしのときは出さない。着いて離れてを、細かく繰り返しても、短い間に連続では出さない
-    //   発射した直後に、台に触れているだけのときも、出さない
+    //発射したあと、空中から地面に着くたびに知らせる(着地の音など)
+    //着きっぱなしのときは出さない。着いて離れてを、細かく繰り返しても、短い間に連続では出さない
+    //発射した直後に、台に触れているだけのときも、出さない
     if (_isWaitingSettle)
     {
         constexpr float minFlySeconds = 0.15f;
@@ -792,13 +792,13 @@ void Ragdoll::Update(float deltaTime)
     }
     _wasGrounded = grounded;
 
-    // 発射したあと、全ボーンが静止(スリープ)したら、1回だけ通知する
+    //発射したあと、全ボーンが静止(スリープ)したら、1回だけ通知する
     if (!_isWaitingSettle)
         return;
 
     _settleElapsed += deltaTime;
 
-    // 静止しないままのとき(揺れ続けるなど)に、ゲームが進まなくなるのを防ぐ保険
+    //静止しないままのとき(揺れ続けるなど)に、ゲームが進まなくなるのを防ぐ保険
     constexpr float maxWaitSeconds = 20.0f;
     if (AllBonesSleeping() || _settleElapsed >= maxWaitSeconds)
     {
@@ -823,11 +823,11 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
             bone.rigidBody->SetMaxSpeed(RagdollTuning::kLaunchMaxVelocitySpeed);
         }
 
-    // 体ぜんたいで「ぴょん」と跳ねる回数を、発射のたびに戻す(回数0のキャラクターは、ふつうのバウンドのまま)
+    //体ぜんたいで「ぴょん」と跳ねる回数を、発射のたびに戻す(回数0のキャラクターは、ふつうのバウンドのまま)
     if (_physicsSystem)
         _physicsSystem->SetRagdollHop(_bounceRestitution, _bounceCount);
 
-    // 各ボーンを、今のZで固定する(2D)。全ボーン分を1回で設定する
+    //各ボーンを、今のZで固定する(2D)。全ボーン分を1回で設定する
     SetLockZ(true);
 
     //スリープタイマーをリセット
@@ -835,10 +835,10 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
         _physicsSystem->ResetRagdollTimer();
 
     static std::mt19937 rng{ std::random_device{}() };
-    std::uniform_real_distribution<float> unit(-1.0f, 1.0f);   // -1～1
-    std::uniform_real_distribution<float> chance(0.0f, 1.0f);  // 0～1
+    std::uniform_real_distribution<float> unit(-1.0f, 1.0f); //-1～1
+    std::uniform_real_distribution<float> chance(0.0f, 1.0f); //0～1
 
-    // ---- 発射の向きと速さを、少しずらす(XY平面の中で) ----
+    //---- 発射の向きと速さを、少しずらす(XY平面の中で) ----
     const float angleJitter = DirectX::XMConvertToRadians(RagdollTuning::kLaunchAngleJitterDeg) * unit(rng);
     const float cosJitter = std::cos(angleJitter);
     const float sinJitter = std::sin(angleJitter);
@@ -853,7 +853,7 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
     if (!_bones.empty() && _bones[0].rigidBody)
         rootPosition = _bones[0].rigidBody->GetPosition();
 
-    // ---- 全身の回転: 飛ぶ向き(右なら前転)に合わせるが、たまに逆回り。速さも毎回変わる ----
+    //---- 全身の回転: 飛ぶ向き(右なら前転)に合わせるが、たまに逆回り。速さも毎回変わる ----
     float spinDirection = (launchDirection.x >= 0.0f) ? -1.0f : 1.0f;
     if (chance(rng) < RagdollTuning::kLaunchSpinReverseChance)
         spinDirection = -spinDirection;
@@ -871,11 +871,11 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
             continue;
         }
 
-        // 全身の回転ぶんの速度(腰から離れているほど、速く動く)
+        //全身の回転ぶんの速度(腰から離れているほど、速く動く)
         const Vector3 relative = bone.rigidBody->GetPosition() - rootPosition;
         Vector3 velocity = launchVelocity + Vector::Cross(tumble, relative);
 
-        // ボーンごとのランダムな速度。腰(ルート)は動かさず、手足や頭は大きく散らす
+        //ボーンごとのランダムな速度。腰(ルート)は動かさず、手足や頭は大きく散らす
         const bool isRoot = bone.parentIndex < 0;
         if (!isRoot)
         {
@@ -891,7 +891,7 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
         }
         bone.rigidBody->SetVelocity(velocity);
 
-        // ボーンごとのランダムな回転(Zまわり)
+        //ボーンごとのランダムな回転(Zまわり)
         const Vector3 flail(0.0f, 0.0f, unit(rng));
         bone.rigidBody->SetAngularVelocity(tumble + flail * RagdollTuning::kLaunchFlailSpeed);
     }
@@ -983,7 +983,7 @@ void Ragdoll::ApplyLaunchImpulse(const Vector3& pushDirIn, RagdollBone& hitBone,
             continue;
 
 
-        // 吊る骨(Kinematic)は物理で動かせないので、飛ばされた勢いは別に持たせて、UpdateHanging で動かす
+        //吊る骨(Kinematic)は物理で動かせないので、飛ばされた勢いは別に持たせて、UpdateHanging で動かす
         if (_hangingBoneIndex >= 0 && &bone == &_bones[_hangingBoneIndex])
         {
             _hangingDriftVelocity = launchVelocity;
@@ -1021,7 +1021,7 @@ void Ragdoll::OnCollisionEnter(Collider* other, const CollisionResult& result)
     if (!IsPushCollider(other))
         return;
 
-    // ラグドールが無効のとき(アニメーション再生中)は、飛ばさない
+    //ラグドールが無効のとき(アニメーション再生中)は、飛ばさない
     if (!_enabled)
         return;
 

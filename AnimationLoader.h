@@ -57,7 +57,7 @@ public:
                 channel->mNodeName.C_Str();
 
             auto resultName = NormalizeBoneName(nodeName);
-            // Boneだけでなく全Nodeと照合する
+            //Boneだけでなく全Nodeと照合する
             if (skeleton.FindNode(resultName) < 0)
             {
                 continue;
@@ -119,12 +119,12 @@ public:
         {
             name.erase(pos);
 
-            // LeftArm_$AssimpFbx$*Rotation → LeftArm
+            //LeftArm_$AssimpFbx$*Rotation → LeftArm
             if (!name.empty() && name.back() == '_')
                 name.pop_back();
         }
 
-        // mixamorig9:Hips → mixamorig:Hips(モデル側の名前も、同じようにそろえている)
+        //mixamorig9:Hips → mixamorig:Hips(モデル側の名前も、同じようにそろえている)
         return BoneNameUtility::NormalizeMixamoPrefix(std::move(name));
     }
 

@@ -17,14 +17,14 @@
 
 namespace
 {
-    // 腰のノード名。Assimpがノードを分割するモデルでは、位置は、…_Translation という別のノードが持つ
+    //腰のノード名。Assimpがノードを分割するモデルでは、位置は、…_Translation という別のノードが持つ
     const std::string hipsName = "mixamorig:Hips";
     const std::string hipsTranslationNodeName = "mixamorig:Hips_$AssimpFbx$_Translation";
 }
 
-void Animator::Initialize(ServiceLocator& loacator)
+void Animator::Initialize(ServiceLocator& locator)
 {
-    _physicsSystem = loacator.physicsSystem;
+    _physicsSystem = locator.physicsSystem;
     _ragDoll = GetOwner()->GetComponent<Ragdoll>();
 
     _hasHipsTranslationNode = _skeleton && _skeleton->FindNode(hipsTranslationNodeName) >= 0;
@@ -35,6 +35,7 @@ void Animator::Initialize(ServiceLocator& loacator)
 
 void Animator::SetIk()
 {
+    //Ikように右足と左足のnodeをとる
     _leftChain.rootNode = _skeleton->FindNode("mixamorig:LeftUpLeg");
     _leftChain.middleNode = _skeleton->FindNode("mixamorig:LeftLeg");
     _leftChain.endNode = _skeleton->FindNode("mixamorig:LeftFoot");
@@ -51,12 +52,12 @@ void Animator::Update(float deltaTime)
     if (_isStopAnimation)
         return;
 
-    // 再生時間を進める
+    //再生時間を進める
     UpdateAnimationTime(_animation->TicksPerSecond, _animation->Duration, _currentTime, deltaTime);
 
     if (!_ragDoll->IsActive())
     {
-        // 通常アニメーション
+        //通常アニメーション
         UpdateLocalTransform(deltaTime);
         UpdateGlobalTransform();
 
@@ -67,14 +68,14 @@ void Animator::Update(float deltaTime)
     }
     else
     {
-        // ラグドール中は物理シミュレーション結果をボーンに反映
+        //ラグドール中は物理シミュレーション結果をボーンに反映
         _ragDoll->UpdateBonesFromPhysics();
     }
 
-    // スキニング用の最終行列を計算
+    //スキニング用の最終行列を計算
     UpdateFinalTransform();
 
-    // ブレンド完了判定
+    //ブレンド完了判定
     if (_isBlending && _blendTime >= _blendDuraction)
     {
         _isBlending = false;
@@ -95,23 +96,23 @@ void Animator::PlayAnimation(const std::string& name,const float& duration =0.0f
 
     const auto& nextAnimation = found->second;
 
-    // 初回再生 or ブレンド無しの場合は時間をリセット
+    //初回再生 or ブレンド無しの場合は時間をリセット
     if (_animation == nullptr || duration <= 0.0f)
     {
         _currentTime = 0.0f;
         _isBlending = false;
     }
 
-    // 同じアニメーションを再生し直す必要はない
+    //同じアニメーションを再生し直す必要はない
     if (_animation == nextAnimation)
         return;
 
-    // ブレンド元として現在の状態を退避
+    //ブレンド元として現在の状態を退避
     _blendSorceTime = _currentTime;
     _blendAnimationMap = std::move(_animationMap);
     _blendSource = _animation;
 
-    // 新しいアニメーションに切り替え
+    //新しいアニメーションに切り替え
     _animation = nextAnimation;
     _currentTime = 0.0f;
     SetMap(_animation->Bones);
@@ -138,23 +139,22 @@ void Animator::UpdateAnimationTime(const double& tickPerSecond, const double& du
 }
 void Animator::UpdateIk(const IkChain& chain)
 {
-    // ボーンの名前が見つからなかった(-1)キャラクターは、足のIKをしない
-    // (そのまま配列を引くと、vector subscript out of range で落ちる)
+    //ボーンの名前が見つからなかった(-1)キャラクターは、足のIKをしない
     if (chain.rootNode < 0 || chain.middleNode < 0 || chain.endNode < 0)
         return;
 
     XMFLOAT3 hitPos, footPos;
     auto& nodes = _skeleton->GetNode();
 
-    // 足先のワールド座標を算出
+    //足先のワールド座標を算出
     const auto& mat = XMLoadFloat4x4(&nodes[chain.endNode].GlobalTransform);
     const auto& pos = GetOwner()->GetTransform().GetWorldMatrix();
     const auto& world = XMMatrixMultiply(mat, pos);
     XMVECTOR foots = world.r[3];
     XMStoreFloat3(&footPos, foots);
-    footPos.y += 0.2f; // レイの開始位置を少し浮かせる
+    footPos.y += 0.2f; //レイの開始位置を少し浮かせる
 
-    // 足元に地面があるかレイキャストで確認
+    //足元に地面があるかレイキャストで確認
     if (_physicsSystem->RayCast(footPos, { 0.0f, -1.0f, 0.0f }, 1.0f, hitPos))
     {
         XMFLOAT4X4 root, middle, end;
@@ -169,7 +169,7 @@ void Animator::SolveIk(const IkChain& chain, const XMFLOAT3& pos,const XMFLOAT4X
 {
     auto& nodes = _skeleton->GetNode();
 
-    // Root/Middle/EndのワールドPositionを取得
+    //Root/Middle/EndのワールドPositionを取得
     XMFLOAT3 r, m, e;
     r = MatrixUtility::GetTransform<MatrixUtility::ReturnTransform::Position>(root);
     m = MatrixUtility::GetTransform<MatrixUtility::ReturnTransform::Position>(middle);
@@ -178,14 +178,14 @@ void Animator::SolveIk(const IkChain& chain, const XMFLOAT3& pos,const XMFLOAT4X
     XMVECTOR middlePos = XMLoadFloat3(&m);
     XMVECTOR endPos = XMLoadFloat3(&e);
 
-    // ターゲット位置（少し浮かせて地面にめり込まないように）
+    //ターゲット位置（少し浮かせて地面にめり込まないように）
     XMVECTOR targetPos = XMLoadFloat3(&pos) + XMVectorSet(0.0f, 0.3f, 0.0f, 0.0f);
 
     float upperLength = XMVectorGetX(XMVector3Length(middlePos - rootPos));
     float lowerLength = XMVectorGetX(XMVector3Length(endPos - middlePos));
     float targetLength = XMVectorGetX(XMVector3Length(targetPos - rootPos));
 
-    // 脚の長さで届かない場合は補正しない
+    //脚の長さで届かない場合は補正しない
     if (targetLength > upperLength + lowerLength)
         return;
 
@@ -195,7 +195,7 @@ void Animator::SolveIk(const IkChain& chain, const XMFLOAT3& pos,const XMFLOAT4X
         return;
     }
 
-    // Middle→End と Middle→Target のなす角を求め、その差分だけMiddleを回転
+    //Middle→End と Middle→Target のなす角を求め、その差分だけMiddleを回転
     XMVECTOR toEnd = MathUtility::Normalize(middlePos, endPos);
     XMVECTOR toTarget = MathUtility::Normalize(middlePos, targetPos);
 
@@ -204,7 +204,7 @@ void Animator::SolveIk(const IkChain& chain, const XMFLOAT3& pos,const XMFLOAT4X
     float angle = acosf(dot);
     XMVECTOR rotation = XMQuaternionRotationAxis(axis, angle);
 
-    // ワールド回転量をMiddleNodeのローカル空間に変換して適用
+    //ワールド回転量をMiddleNodeのローカル空間に変換して適用
     XMMATRIX middleLocal = XMLoadFloat4x4(&nodes[chain.middleNode].LocalTransform);
     XMVECTOR currentRotation = XMQuaternionRotationMatrix(middleLocal);
 
@@ -221,7 +221,7 @@ void Animator::SolveIk(const IkChain& chain, const XMFLOAT3& pos,const XMFLOAT4X
 
     XMVECTOR newRotation = XMQuaternionNormalize(XMQuaternionMultiply(currentRotation, localIkRotation));
 
-    // Scale/Positionは維持したままRotationだけ差し替えてLocalTransformを再構築
+    //Scale/Positionは維持したままRotationだけ差し替えてLocalTransformを再構築
     XMFLOAT3 scale = MatrixUtility::GetTransform<MatrixUtility::ReturnTransform::Scale>(nodes[chain.middleNode].LocalTransform);
     XMFLOAT3 position = MatrixUtility::GetTransform<MatrixUtility::ReturnTransform::Position>(nodes[chain.middleNode].LocalTransform);
 
@@ -237,7 +237,7 @@ void Animator::UpdateLocalTransform(const float& deltaTime)
 { 
     float blendRate = 1.0f;
 
-    // ブレンド中はソース側のアニメーション時間も進める
+    //ブレンド中はソース側のアニメーション時間も進める
     if (_isBlending)
     {
         _blendTime += deltaTime;
@@ -250,9 +250,9 @@ void Animator::UpdateLocalTransform(const float& deltaTime)
         const BoneAnimation* currentTrack = nullptr;
         const BoneAnimation* sorceTrack = nullptr;
 
-        node.LocalTransform = node.BindTransform; // 一旦バインド姿勢に戻す
+        node.LocalTransform = node.BindTransform; //一旦バインド姿勢に戻す
 
-        // 腰の位置だけを持つ別ノード(…_Translation)は、アニメーションの名前が、本体の 'mixamorig:Hips' なので、そちらの動きを使う
+        //腰の位置だけを持つ別ノード(…_Translation)は、アニメーションの名前が、本体の 'mixamorig:Hips' なので、そちらの動きを使う
         const std::string& trackName = (node.Name == hipsTranslationNodeName) ? hipsName : node.Name;
 
         if (const auto it = _animationMap.find(trackName); it != _animationMap.end())
@@ -272,7 +272,7 @@ void Animator::UpdateLocalTransform(const float& deltaTime)
             continue;
         }
 
-        // ブレンド元とブレンド先をSRTに分解して補間（回転のみSlerp）
+        //ブレンド元とブレンド先をSRTに分解して補間（回転のみSlerp）
         const XMMATRIX sorceLocal = SampleLocalTransform(node, sorceTrack, _blendSorceTime);
 
         XMVECTOR sorceScale, sorceRotation, sorcePosition;
@@ -294,7 +294,7 @@ void Animator::UpdateLocalTransform(const float& deltaTime)
 }
 void Animator::UpdateGlobalTransform()
 {
-    // 親から子へ順にLocal×ParentGlobalでGlobalを算出
+    //親から子へ順にLocal×ParentGlobalでGlobalを算出
     for (size_t i = 0; i < _skeleton->GetNode().size(); i++)
     {
         BoneNode& node = _skeleton->GetNode()[i];
@@ -312,7 +312,7 @@ void Animator::UpdateGlobalTransform()
         }
     }
 
-    // 計算したNodeのGlobalTransformをBoneにも反映
+    //計算したNodeのGlobalTransformをBoneにも反映
     auto& nodes = _skeleton->GetNode();
     for (auto& bone : _skeleton->GetBones())
     {
@@ -321,7 +321,7 @@ void Animator::UpdateGlobalTransform()
 }
 void Animator::UpdateFinalTransform()
 {
-    // スキニング行列 = Offset * Global * GlobalInverse（転置してシェーダ用に格納）
+    //スキニング行列 = Offset * Global * GlobalInverse（転置してシェーダ用に格納）
     _finalTransforms.resize(_skeleton->GetBones().size());
 
     for (size_t i = 0; i < _skeleton->GetBones().size(); ++i)
@@ -343,31 +343,27 @@ XMMATRIX Animator::SampleLocalTransform(const BoneNode& node, const BoneAnimatio
 {
     XMVECTOR scale, rotation, position;
 
-    // まずバインド姿勢をSRTに分解（アニメーションが無いボーン用のデフォルト値）
+    //まずバインド姿勢をSRTに分解（アニメーションが無いボーン用のデフォルト値）
     XMMatrixDecompose(&scale, &rotation, &position, XMLoadFloat4x4(&node.BindTransform));
 
-    // アニメーションデータがあれば各成分を上書き
+    //アニメーションデータがあれば各成分を上書き
     if (nodeAnimation != nullptr)
     {
-        // 腰の「位置」を担当するノード。
-        //   ・ふつうのモデル(レミー): 'mixamorig:Hips' 本体が、位置を持つ
-        //   ・Assimpが、ノードを分割するモデル: 位置は '…Hips_$AssimpFbx$_Translation' が持ち、本体の位置は0
-        //     このとき、アニメーションの位置を本体に足すと、位置が二重になり、腰が、ありえない高さに出る
+        //・Assimpが、ノードを分割するモデル: 位置は '…Hips_$AssimpFbx$_Translation' が持ち、本体の位置は0
+        //このとき、アニメーションの位置を本体に足すと、位置が二重になり、腰が、ありえない高さに出る
         const bool isHipsTranslationNode = (node.Name == hipsTranslationNodeName);
         const bool holdsHipsTranslation =
             isHipsTranslationNode || (node.Name == hipsName && !_hasHipsTranslationNode);
 
         if (!nodeAnimation->Positions.empty() && holdsHipsTranslation)
         {
-            // アニメーション(Idle/Walk)は、レミーの骨の長さで作られている。そのまま位置を使うと、
-            // 骨の長さや単位が違うキャラクターは、腕や足が伸び縮みする。
-            // そこで、体の高さ(Hips)以外は、キャラクター自身の骨の位置(バインド姿勢)を使い、回転だけをアニメーションに従う
+            //骨の長さや単位が違うキャラクターは、腕や足が伸び縮みする。
+            //そこで、体の高さ(Hips)以外は、キャラクター自身の骨の位置(バインド姿勢)を使い、回転だけをアニメーションに従う
             auto p = AnimationMath::InterpolatePosition(nodeAnimation->Positions, time);
 
-            // Hipsは、体ぜんたいの高さの動き。キャラクターの腰の高さと、アニメーションの腰の高さの比で、大きさを合わせる
-            // (ほぼ同じ体格のとき=比が1に近いときは、そのまま)
+            //Hipsは、体ぜんたいの高さの動き。キャラクターの腰の高さと、アニメーションの腰の高さの比で、大きさを合わせる
             const float animationHeight = nodeAnimation->Positions.front().Value.y;
-            const float bindHeight = XMVectorGetY(position);   // このノードの、バインドの高さ(位置を持つノードなので、腰の高さ)
+            const float bindHeight = XMVectorGetY(position); //このノードの、バインドの高さ(位置を持つノードなので、腰の高さ)
             float ratio = 1.0f;
             if (std::fabs(animationHeight) > 1e-4f && std::fabs(bindHeight) > 1e-4f)
             {
@@ -377,9 +373,9 @@ XMMATRIX Animator::SampleLocalTransform(const BoneNode& node, const BoneAnimatio
             }
             position = XMVectorSet(p.x * ratio, p.y * ratio, p.z * ratio, 0.0f);
         }
-        // それ以外のノードは、positionをバインド姿勢のままにする
+        //それ以外のノードは、positionをバインド姿勢のままにする
 
-        // 位置だけを担当するノードには、回転と大きさを入れない(それらは、本体のノードに入る)
+        //位置だけを担当するノードには、回転と大きさを入れない(それらは、本体のノードに入る)
         if (!isHipsTranslationNode)
         {
             if (!nodeAnimation->Rotations.empty())

@@ -26,7 +26,7 @@ void StageRoster::Load(const std::string& jsonPath)
 		return;
 	}
 
-	// 第3引数 false: 書き方を間違えていても、例外を投げずに、discarded(空)で返す
+	//書き方を間違えていても、例外を投げずに、空で返す
 	const json root = json::parse(file, nullptr, false);
 	if (root.is_discarded() || !root.is_object() || !root.contains("Stages") || !root["Stages"].is_array())
 	{
@@ -42,7 +42,7 @@ void StageRoster::Load(const std::string& jsonPath)
 		StageEntry stage;
 		stage.path = entry.value("path", "");
 		if (stage.path.empty())
-			continue;   // JSONのパスがないステージは、選べても始められないので、飛ばす
+			continue; //JSONのパスがないステージは、選べても始められないので、飛ばす
 
 		stage.name = StringUtility::ToWide(entry.value("name", stage.path));
 		_stages.push_back(std::move(stage));

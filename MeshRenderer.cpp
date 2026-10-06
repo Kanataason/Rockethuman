@@ -5,13 +5,13 @@
 #include "Mesh.h"
 #include "Animator.h"
 
-void MeshRenderer::Initialize(ServiceLocator& context)
+void MeshRenderer::Initialize(ServiceLocator& locator)
 {
 	_animator = GetOwner()->GetComponent<Animator>();
 	//描写のベースを作る
 	for (auto& mesh : _model->meshes)
 	{
-		mesh.mesh->CreateMeshInfo(context.device);
+		mesh.mesh->CreateMeshInfo(locator.device);
 	}
 
 }

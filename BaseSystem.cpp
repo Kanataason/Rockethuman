@@ -8,7 +8,7 @@
 
 void BaseSystem::CreateDepthStencil()
 {
-    // 深度・ステンシルバッファの設定を作成
+    //深度・ステンシルバッファの設定を作成
     D3D11_TEXTURE2D_DESC depthDesc = {};
     depthDesc.Width = SCREEN_WIDTH;
     depthDesc.Height = SCREEN_HEIGHT;
@@ -18,7 +18,7 @@ void BaseSystem::CreateDepthStencil()
     depthDesc.SampleDesc.Count = 1;
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-    // 深度・ステンシル用テクスチャをGPU上に作成
+    //深度・ステンシル用テクスチャをGPU上に作成
     ComPtr<ID3D11Texture2D> depthTexture;
     HRESULT hr = _device->CreateTexture2D(
         &depthDesc,
@@ -31,7 +31,7 @@ void BaseSystem::CreateDepthStencil()
         return;
     }
 
-    // 深度・ステンシルテクスチャを描画に使用するためのViewを作成
+    //深度・ステンシルテクスチャを描画に使用するためのViewを作成
     hr = _device->CreateDepthStencilView(
         depthTexture.Get(),
         nullptr,
@@ -45,7 +45,7 @@ void BaseSystem::CreateDepthStencil()
 }
 void BaseSystem::ClearScreen()
 {
-    // カラーバッファをクリア
+    //カラーバッファをクリア
     const float clearColor[4] =
     {
         0.0f,
@@ -58,15 +58,15 @@ void BaseSystem::ClearScreen()
         _renderTargetView.Get(),
         clearColor);
 
-    // 深度バッファを初期化
-    // 1.0fは「最も遠い深度」を表す
+    //深度バッファを初期化
+    //1.0fは「最も遠い深度」を表す
     _context->ClearDepthStencilView(
         _depthStencil.Get(),
         D3D11_CLEAR_DEPTH,
         1.0f,
         0);
 
-    // 今フレームで使用する描画先を設定
+    //今フレームで使用する描画先を設定
     _context->OMSetRenderTargets(
         1,
         _renderTargetView.GetAddressOf(),
@@ -93,20 +93,20 @@ void BaseSystem::SetScreenInfo(int width, int height, HWND hwnd)
     _swapChainDesc.BufferDesc.Height = height;
     _swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    // バックバッファを描画先として使用
+    //バックバッファを描画先として使用
     _swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     _swapChainDesc.BufferCount = 1;
 
-    // 描画対象となるウィンドウ
+    //描画対象となるウィンドウ
     _swapChainDesc.OutputWindow = hwnd;
 
-    // マルチサンプリングは使用しない
+    //マルチサンプリングは使用しない
     _swapChainDesc.SampleDesc.Count = 1;
 
-    // ウィンドウモードで起動
+    //ウィンドウモードで起動
     _swapChainDesc.Windowed = TRUE;
 
-    // Present時にバックバッファを破棄する方式
+    //Present時にバックバッファを破棄する方式
     _swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 }
 
@@ -115,7 +115,7 @@ void BaseSystem::Present()
 {
     if (_swapChain)
     {
-        // 垂直同期を1回待って画面を更新
+        //垂直同期を1回待って画面を更新
         _swapChain->Present(1, 0);
     }
 }
@@ -123,16 +123,16 @@ void BaseSystem::Release()//cmtpを使っているので不要
 {
 }
 
-// DirectXの初期化
+//DirectXの初期化
 void BaseSystem::Initialize(HWND hwnd)
 {
-    // スワップチェーンに使用する画面情報を設定
+    //スワップチェーンに使用する画面情報を設定
     SetScreenInfo(
         SCREEN_WIDTH,
         SCREEN_HEIGHT,
         hwnd);
 
-    // GPUデバイス・コンテキスト・スワップチェーンを作成
+    //GPUデバイス・コンテキスト・スワップチェーンを作成
     CreateDeviceAndSwapChain();
 
     if (!_device || !_context || !_swapChain)
@@ -141,10 +141,10 @@ void BaseSystem::Initialize(HWND hwnd)
         return;
     }
 
-    // 深度バッファを作成
+    //深度バッファを作成
     CreateDepthStencil();
 
-    // 描画領域を設定
+    //描画領域を設定
     SetViewPort(
         SCREEN_WIDTH,
         SCREEN_HEIGHT,

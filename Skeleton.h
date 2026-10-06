@@ -19,13 +19,13 @@ public:
     const std::vector<BoneNode>& GetNode()const { return _nodes; }
     void SetNode(const BoneNode& node) { _nodes.push_back(node); }
 
-    // モデル空間からボーン空間への変換に使用する
+    //モデル空間からボーン空間への変換に使用する
     DirectX::XMFLOAT4X4& GetGlobalInverseTransform() { return _globalInverseTransform; }
     const DirectX::XMFLOAT4X4& GetGlobalInverseTransform() const { return _globalInverseTransform; }
 
 
-    // 名前からBoneのインデックスを検索
-    // 見つからない場合は-1を返す
+    //名前からBoneのインデックスを検索
+    //見つからない場合は-1を返す
     int FindBone(const std::string& name)
     {
         for (int i = 0; i < static_cast<int>(_bones.size()); ++i)
@@ -37,8 +37,8 @@ public:
         return -1;
     }
 
-    // 名前からNodeのインデックスを検索
-    // 見つからない場合は-1を返す
+    //名前からNodeのインデックスを検索
+    //見つからない場合は-1を返す
     int FindNode(const std::string& name)
     {
         for (int i = 0; i < static_cast<int>(_nodes.size()); ++i)
@@ -51,12 +51,12 @@ public:
     }
 
 private:
-    // モデル全体の逆変換行列
+    //モデル全体の逆変換行列
     DirectX::XMFLOAT4X4 _globalInverseTransform;
 
-    // アニメーション階層を構成するNode
+    //アニメーション階層を構成するNode
     std::vector<BoneNode> _nodes;
 
-    // スキニングに使用するBone
+    //スキニングに使用するBone
     std::vector<Bone> _bones;
 };

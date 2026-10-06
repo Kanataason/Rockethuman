@@ -31,7 +31,7 @@ class Mesh
 			if (_indexBuffer)_indexBuffer->Release();
 		}
 
-		// 頂点バッファとインデックスバッファを作成する。
+		//頂点バッファとインデックスバッファを作成する。
 		void CreateMeshInfo(ID3D11Device* device);
 
 		//ゲッターとセッター
@@ -45,10 +45,10 @@ class Mesh
 		 MeshInfo& GetMeshInfos() { return _meshInfo; }
 		 const MeshInfo& GetMeshInfos() const { return _meshInfo; }
 private:
-	// 頂点バッファを作成する
+	//頂点バッファを作成する
 	void CreateDrawBuffer(ID3D11Device* device);
 
-	// インデックスバッファを作成する
+	//インデックスバッファを作成する
 	void CreateIndexBuffer(ID3D11Device* device);
 
 private:
@@ -122,13 +122,13 @@ namespace Primitive
 			float h = size * 0.5f;
 			meshinfo.vertices =
 			{
-				// Front
+				//Front
 				{ {-h,-h,-h}, {0,0,-1}, {0,1} },
 				{ {-h, h,-h}, {0,0,-1}, {0,0} },
 				{ { h, h,-h}, {0,0,-1}, {1,0} },
 				{ { h,-h,-h}, {0,0,-1}, {1,1} },
 
-				// Back
+				//Back
 				{ {-h,-h, h}, {0,0,1}, {0,1} },
 				{ { h,-h, h}, {0,0,1}, {1,1} },
 				{ { h, h, h}, {0,0,1}, {1,0} },
@@ -140,18 +140,18 @@ namespace Primitive
                 { { h, h, h}, {0,1,0}, {1,0} },
                 { { h, h,-h}, {0,1,0}, {1,1} },
 
-				// Right
+				//Right
                 {{ h,-h,-h}, {1,0,0}, {0,1}},
                 {{ h, h,-h}, {1,0,0}, {0,0}},
                 {{ h, h, h}, {1,0,0}, {1,0}},
                 {{ h,-h, h}, {1,0,0}, {1,1}},
 
-				// Left
+				//Left
                 {{-h,-h,-h}, {-1,0,0}, {0,1}},
                 {{-h, h,-h}, {-1,0,0}, {0,0}},
                 {{-h, h, h}, {-1,0,0}, {1,0}},
                 {{-h,-h, h}, {-1,0,0}, {1,1}},
-				// Down
+				//Down
                 { {-h,-h, h}, {0,-1,0}, {0,1} },
                 { { h,-h, h}, {0,-1,0}, {1,1} },
                 { { h,-h,-h}, {0,-1,0}, {1,0} },
@@ -160,26 +160,26 @@ namespace Primitive
 
 			meshinfo.indices =
 			{
-				// Front
+				//Front
 				0,1,2,
 				0,2,3,
-				// Back
+				//Back
 				4,5,6,
 				4,6,7,
 
-				// Up
+				//Up
 				8,9,10,
 				8,10,11,
 
-				// Right
+				//Right
 				12,13,14,
 				12,14,15,
 
-				// Left
+				//Left
 				16,18,17,
 				16,19,18,
 
-				// Down(下から見て時計回りになる順番。他の面と同じ向きにそろえる)
+				//Down(下から見て時計回りになる順番。他の面と同じ向きにそろえる)
 				20,22,21,
 				20,23,22,
 			};

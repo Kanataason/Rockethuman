@@ -20,8 +20,8 @@ void CollisionManager::Intersects()
     {
         auto& collider = it.second;
 
-        // 動いていない物(床・眠っている箱など)は、自分から相手を探さない。
-        // Octreeには入っているので、動いている相手が見つけてくれる(動かない物どうしは、調べなくて済む)
+        //動いていない物(床・眠っている箱など)は、自分から相手を探さない。
+        //Octreeには入っているので、動いている相手が見つけてくれる(動かない物どうしは、調べなくて済む)
         if (!collider->IsMoving())
             continue;
 
@@ -34,6 +34,8 @@ void CollisionManager::Intersects()
         {
             auto colliderA = collider;
             auto colliderB = other;
+
+            //必ず小さい->大きいの順番にする
             if (GetColliderPriority(colliderA->GetType()) > GetColliderPriority(colliderB->GetType()))
             {
                 std::swap(colliderA, colliderB);
@@ -98,7 +100,7 @@ bool CollisionManager::CheckShouldCollider(
 
 void CollisionManager::ResolveEvent()
 {
-    // Enter / Stay 通知
+    //Enter / Stay 通知
     for (const auto& pair : _currentCollisions)
     {
         bool wasColliding = _previousCollisions.contains(pair);
@@ -127,7 +129,7 @@ void CollisionManager::ResolveEvent()
             if (ownerB) ownerB->OnCollisionEnter(colliderA, result);
         }
     }
-    // Exit
+    //Exit
     //---------------------
 
     for (const auto& pair : _previousCollisions)
@@ -168,8 +170,8 @@ void CollisionManager::ReleaseCollider(int id)
 {
     _colliderMap.erase(id);
 
-    // Octreeは次のIntersects()まで前回の生ポインタを持ち続けるので、
-    // 破棄済みのColliderをRayCastが触らないように空にしておく(次のInsertOctreeで再構築される)
+    //Octreeは次のIntersects()まで前回の生ポインタを持ち続けるので、
+    //破棄済みのColliderをRayCastが触らないように空にしておく(次のInsertOctreeで再構築される)
     _octree.Clear();
 }
 
@@ -177,7 +179,7 @@ void CollisionManager::InsertOctree()
 {
     _octree.Clear();
 
-    // ColliderをOctreeに登録
+    //ColliderをOctreeに登録
     for (auto& collider : _colliderMap)
     {
         _octree.Insert(collider.second);
@@ -199,7 +201,7 @@ bool CollisionManager::RayCast(const XMFLOAT3& origin, const XMFLOAT3& dir, floa
 {
     std::vector<Collider*> candidates;
 
-    // Rayに対してOctreeから候補を取得
+    //Rayに対してOctreeから候補を取得
     _octree.QueryRay(origin, dir, candidates);
 
     float closestDistance = maxDistance;
@@ -227,7 +229,7 @@ bool CollisionManager::RayCast(const XMFLOAT3& origin,
 {
     std::vector<Collider*> candidates;
 
-    // Rayに対してOctreeから候補を取得
+    //Rayに対してOctreeから候補を取得
     _octree.QueryRay(origin, direction, candidates);
 
     float closestDistance = maxDistance;

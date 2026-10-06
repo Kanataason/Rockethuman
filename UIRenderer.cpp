@@ -7,7 +7,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    // SpriteBatch の既定ブレンドは乗算済みアルファなので、RGB にアルファを掛けておく
+    //SpriteBatch の既定ブレンドは乗算済みアルファなので、RGB にアルファを掛けておく
     XMVECTOR ToPremultiplied(FXMVECTOR straightColor)
     {
         XMFLOAT4 color;
@@ -23,13 +23,13 @@ bool UiRenderer::Initialize(ID3D11Device* device, ID3D11DeviceContext* context,
     _context = context;
     _spriteBatch = std::make_unique<SpriteBatch>(context);
 
-    // フォントファイルが見つからない場合は例外が投げられる
+    //フォントファイルが見つからない場合は例外が投げられる
     _font = std::make_unique<SpriteFont>(device, fontFilePath);
 
-    // フォントに含まれない文字を描くと例外になるので、代わりに '?' を表示させる
+    //フォントに含まれない文字を描くと例外になるので、代わりに '?' を表示させる
     _font->SetDefaultCharacter(L'?');
 
-    // 四角形（パネル・ゲージ）描画用の 1x1 の白テクスチャ
+    //四角形（パネル・ゲージ）描画用の 1x1 の白テクスチャ
     const uint32_t whitePixel = 0xFFFFFFFF;
 
     D3D11_TEXTURE2D_DESC textureDesc = {};
@@ -69,7 +69,7 @@ void UiRenderer::OnResize(float screenWidth, float screenHeight)
 
 void UiRenderer::Begin()
 {
-    // 仮想解像度 -> 実際の画面サイズへの拡大縮小
+    //仮想解像度 -> 実際の画面サイズへの拡大縮小
     const XMMATRIX virtualToScreen = XMMatrixScaling(
         _screenWidth / VirtualWidth, _screenHeight / VirtualHeight, 1.0f);
 
@@ -84,7 +84,7 @@ void UiRenderer::End()
 
 void UiRenderer::DrawRect(float left, float top, float width, float height, FXMVECTOR color)
 {
-    // 1x1 の白テクスチャを width x height に引き伸ばして描く
+    //1x1 の白テクスチャを width x height に引き伸ばして描く
     _spriteBatch->Draw(_whiteTexture.Get(), XMFLOAT2(left, top), nullptr,
         ToPremultiplied(color), 0.0f, XMFLOAT2(0.0f, 0.0f),
         XMFLOAT2(width, height));
@@ -93,11 +93,11 @@ void UiRenderer::DrawRect(float left, float top, float width, float height, FXMV
 void UiRenderer::DrawFrame(float left, float top, float width, float height,
     float thickness, FXMVECTOR color)
 {
-    DrawRect(left, top, width, thickness, color);                                       // 上
-    DrawRect(left, top + height - thickness, width, thickness, color);                  // 下
-    DrawRect(left, top + thickness, thickness, height - thickness * 2.0f, color);       // 左
+    DrawRect(left, top, width, thickness, color); //上
+    DrawRect(left, top + height - thickness, width, thickness, color); //下
+    DrawRect(left, top + thickness, thickness, height - thickness * 2.0f, color); //左
     DrawRect(left + width - thickness, top + thickness, thickness,
-        height - thickness * 2.0f, color);                                         // 右
+        height - thickness * 2.0f, color); //右
 }
 
 void UiRenderer::DrawString(const std::wstring& text, float x, float y, float scale,
@@ -117,7 +117,7 @@ void UiRenderer::DrawStringWithOutline(const std::wstring& text, float x, float 
     FXMVECTOR color, FXMVECTOR outlineColor,
     float outlineThickness, TextAlign align)
 {
-    // 8方向にずらして縁の色で描いてから、本体を上に描く
+    //8方向にずらして縁の色で描いてから、本体を上に描く
     static const XMFLOAT2 outlineDirections[] =
     {
         { -1.0f, -1.0f }, { 0.0f, -1.0f }, { 1.0f, -1.0f },
@@ -176,7 +176,7 @@ ComPtr<ID3D11ShaderResourceView> UiRenderer::LoadTexture(const wchar_t* filePath
 void UiRenderer::DrawTexture(ID3D11ShaderResourceView* texture, float left, float top,
     float width, float height, FXMVECTOR color)
 {
-    // 読み込みに失敗した画像(nullptr)は、何も描かない
+    //読み込みに失敗した画像(nullptr)は、何も描かない
     if (!texture)
         return;
 
@@ -190,8 +190,8 @@ void UiRenderer::DrawTexture(ID3D11ShaderResourceView* texture, float left, floa
 
 bool UiRenderer::HitTest(float left, float top, float width, float height, const POINT& clientPos) const
 {
-    // 実際の画面(ウィンドウ)座標 → 仮想解像度(1280x720)の座標へ変換する
-    // (Begin() で使っている virtualToScreen の、ちょうど逆の計算)
+    //実際の画面(ウィンドウ)座標 → 仮想解像度(1280x720)の座標へ変換する
+    //(Begin() で使っている virtualToScreen の、ちょうど逆の計算)
     const float virtualX = clientPos.x * (VirtualWidth / _screenWidth);
     const float virtualY = clientPos.y * (VirtualHeight / _screenHeight);
 

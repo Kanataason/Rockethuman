@@ -24,11 +24,11 @@ public:
 	BaseScene() = default;
 	virtual ~BaseScene() = default;
 
-	virtual void Initialize(ServiceLocator& context);
+	virtual void Initialize(ServiceLocator& locator);
 	virtual void Update(float deltaTime);
 	virtual void Draw(Renderer& renderer);
 	virtual void DrawUi() {};
-	// 所有しているComponentを解放する(unique_ptrの破棄で、RigidBody/Colliderの登録解除も自動的に行われる)
+	//所有しているComponentを解放する(unique_ptrの破棄で、RigidBody/Colliderの登録解除も自動的に行われる)
 	virtual void Release();
 
 	//シーン上のオブジェクトを追加
@@ -48,7 +48,7 @@ public:
 	const virtual std::vector<std::unique_ptr<GameObject>>& GetObjectList() const { return _objects; };
 private:
 	//各オブジェクトを初期化
-	void SetObjectInfo(ServiceLocator& context);
+	void SetObjectInfo(ServiceLocator& locator);
 protected:
     PhysicsSystem* _physicsSystem = nullptr;
 	SceneManager* _sceneManager = nullptr;

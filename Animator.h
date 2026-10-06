@@ -23,7 +23,7 @@ class Animator:public Component
 		int endNode;
 	};
 public: 
-	void Initialize(ServiceLocator& loacator)override;
+	void Initialize(ServiceLocator& locator)override;
 
 	void SetAnimationInfo(const std::shared_ptr<Animation> animation, const std::shared_ptr<Skeleton>& skeleton,
 		const std::vector<std::shared_ptr<Animation>>& animations)
@@ -110,7 +110,7 @@ private:
 	InputSystem* _input = nullptr;
 	Ragdoll* _ragDoll = nullptr;
 
-	bool _hasHipsTranslationNode = false;   // 腰の位置が、別ノード(…_Translation)に分かれているモデルか
+	bool _hasHipsTranslationNode = false; //腰の位置が、別ノード(…_Translation)に分かれているモデルか
 
 	IkChain _rightChain{};
 	IkChain _leftChain{};

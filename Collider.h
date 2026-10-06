@@ -9,7 +9,7 @@ using namespace DirectX;
 
 class PhysicsSystem;
 
-// Colliderの形状種別
+//Colliderの形状種別
 enum ColliderType
 {
     CapsuleColliderType,
@@ -29,7 +29,7 @@ enum class CollisionGroup
 class Collider : public Component
 {
 public:
-    // CollisionManagerが割り振る一意なID(未登録時は-1)
+    //CollisionManagerが割り振る一意なID(未登録時は-1)
     void SetID(int id)
     {
         _id = id;
@@ -40,13 +40,13 @@ public:
         return _id;
     }
 
-    // 登録先のPhysicsSystemを覚えておく(デストラクタで、自動的に登録解除するため)
+    //登録先のPhysicsSystemを覚えておく(デストラクタで、自動的に登録解除するため)
     void SetRegistry(PhysicsSystem* registry)
     {
         _registry = registry;
     }
 
-    // 同じグループ同士の衝突可否などに使う分類ID
+    //同じグループ同士の衝突可否などに使う分類ID
     void SetCollisionGroup(CollisionGroup group)
     {
         _collisionGroup = group;
@@ -57,13 +57,13 @@ public:
         return _collisionGroup;
     }
 
-    // 今、動いているか(動く物で、眠っていない)。動いていない物は、自分から相手を探しに行かない
-    // (動いている相手が、動かない物を見つけてくれるので、組み合わせは漏れない)
-    // PhysicsSystemが、毎サブステップ更新する。RigidBodyのない物(床など)は、いつもfalse
+    //今、動いているか(動く物で、眠っていない)。動いていない物は、自分から相手を探しに行かない
+    //(動いている相手が、動かない物を見つけてくれるので、組み合わせは漏れない)
+    //PhysicsSystemが、毎サブステップ更新する。RigidBodyのない物(床など)は、いつもfalse
     void SetMoving(bool moving) { _isMoving = moving; }
     bool IsMoving() const { return _isMoving; }
 
-    // トリガー化する(当たり判定はするが物理的な押し出しをしない)
+    //トリガー化する(当たり判定はするが物理的な押し出しをしない)
     void OnTrigger() { isTrigger = true; }
     void OffTrigger() { isTrigger = false; }
     bool GetTrigger() const { return isTrigger; }
@@ -74,20 +74,20 @@ public:
     void SetRotation(const Quaternion& rotation) { Rotation = rotation; }
     virtual const Quaternion& GetRotation() const { return Rotation; }
 
-    // デバッグ用のワイヤーフレーム描画(形状ごとに実装)
+    //デバッグ用のワイヤーフレーム描画(形状ごとに実装)
     virtual void DrawDebug(DebugDraw* debugDraw) const = 0;
 
-    // Positionからのオフセット(中心をずらしたい場合に使う)をセットする
+    //Positionからのオフセット(中心をずらしたい場合に使う)をセットする
     void SetCenter(const XMFLOAT3& offset) { _center = offset; }
 
-    // ローカルの基準軸(カプセルの伸びる方向など)をセットする
+    //ローカルの基準軸(カプセルの伸びる方向など)をセットする
     void SetLocalAxis(const Vector3& axis)
     {
         _localAxis = axis;
         _localAxis.Normalize();
     }
 
-    // Position + _center = 実際の中心座標
+    //Position + _center = 実際の中心座標
     virtual XMFLOAT3 GetCenter()const
     {
         return
@@ -98,17 +98,17 @@ public:
         };
     }
 
-    // AABBの最小/最大座標(形状ごとに実装)
+    //AABBの最小/最大座標(形状ごとに実装)
     virtual XMFLOAT3 GetMin()const = 0;
     virtual XMFLOAT3 GetMax()const = 0;
 
-    // 登録済みのCollisionManagerがあれば、自動的に登録を解除する(定義はCollider.cpp)
+    //登録済みのCollisionManagerがあれば、自動的に登録を解除する(定義はCollider.cpp)
     virtual ~Collider();
 
-    // 形状種別を返す(衝突判定の関数テーブルのキーとして使われる)
+    //形状種別を返す(衝突判定の関数テーブルのキーとして使われる)
     virtual ColliderType GetType() const = 0;
 
-    // このColliderとRayとの交差判定(形状ごとに実装)
+    //このColliderとRayとの交差判定(形状ごとに実装)
     virtual bool RayCast(
         const XMFLOAT3& origin,
         const XMFLOAT3& direction,

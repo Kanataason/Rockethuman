@@ -3,9 +3,9 @@
 
 class Collider;
 
-/// <summary>
-/// コライダー同士の当たり判定の結果構造体
-/// </summary>
+///<summary>
+///コライダー同士の当たり判定の結果構造体
+///</summary>
 struct CollisionResult
 {
     Collider* colliderA;

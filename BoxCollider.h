@@ -24,10 +24,10 @@ public:
 	void SetSize(const DirectX::XMFLOAT3& size) { _size = size; }
 	const DirectX::XMFLOAT3& GetSize() const { return _size; }
 
-	// 各軸の半分のサイズ(中心からの距離)
+	//各軸の半分のサイズ(中心からの距離)
 	DirectX::XMFLOAT3 GetHalfSize()const { return { _size.x * HALF,_size.y * HALF,_size.z * HALF }; }
 
-	// AABBの最小座標(中心 - 半サイズ)
+	//AABBの最小座標(中心 - 半サイズ)
 	DirectX::XMFLOAT3 GetMin() const override
 	{
 		auto center = GetCenter();
@@ -41,12 +41,12 @@ public:
 		};
 	}
 
-	// Rayとこのボックス(AABB)との交差判定
-	// origin: レイの始点
-	// direction: レイの方向
-	// distance: ヒットした場合、始点からの距離が入る
-	// hitPosition: ヒットした場合、ワールド座標が入る
-	// 戻り値: 交差していればtrue
+	//Rayとこのボックス(AABB)との交差判定
+	//origin: レイの始点
+	//direction: レイの方向
+	//distance: ヒットした場合、始点からの距離が入る
+	//hitPosition: ヒットした場合、ワールド座標が入る
+	//戻り値: 交差していればtrue
 	bool RayCast(const XMFLOAT3& origin, const XMFLOAT3& direction, float& distance, XMFLOAT3& hitPosition) override
 	{
 		constexpr float EPSILON = 0.00001f;
@@ -57,10 +57,10 @@ public:
 		XMFLOAT3 max = GetMax();
 		XMFLOAT3 min = GetMin();
 
-		// X軸方向のスラブ判定
+		//X軸方向のスラブ判定
 		if (std::abs(direction.x) < EPSILON)
 		{
-			// レイがX軸に対して平行な場合、始点がX範囲内かだけ確認
+			//レイがX軸に対して平行な場合、始点がX範囲内かだけ確認
 			if (origin.x < min.x || origin.x > max.x)
 			{
 				return false;
@@ -81,7 +81,7 @@ public:
 				return false;
 		}
 
-		// Y軸方向のスラブ判定
+		//Y軸方向のスラブ判定
 		if (std::abs(direction.y) < EPSILON)
 		{
 			if (origin.y < min.y || origin.y > max.y)
@@ -104,7 +104,7 @@ public:
 				return false;
 		}
 
-		// Z軸方向のスラブ判定
+		//Z軸方向のスラブ判定
 		if (std::abs(direction.z) < EPSILON)
 		{
 			if (origin.z < min.z || origin.z > max.z)
@@ -127,7 +127,7 @@ public:
 				return false;
 		}
 
-		// 交差区間の手前側(tMin)が最初にヒットする位置
+		//交差区間の手前側(tMin)が最初にヒットする位置
 		distance = tMin;
 
 		XMVECTOR o = XMLoadFloat3(&origin);
@@ -141,7 +141,7 @@ public:
 		return true;
 	};
 
-	// AABBの最大座標(中心 + 半サイズ)
+	//AABBの最大座標(中心 + 半サイズ)
 	DirectX::XMFLOAT3 GetMax()const override
 	{
 		auto center = GetCenter();
@@ -155,7 +155,7 @@ public:
 		};
 	}
 
-	// デバッグ用にAABBをワイヤーフレームで描画(緑色固定)
+	//デバッグ用にAABBをワイヤーフレームで描画(緑色固定)
 	void DrawDebug(DebugDraw* debugDraw) const override
 	{
 		debugDraw->DrawBox(GetMin(), GetMax(), { 0,1,0,1 });

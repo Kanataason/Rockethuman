@@ -5,7 +5,7 @@ using namespace DirectX;
 
 namespace
 {
-    // Rotationから回転行列を作成する共通処理
+    //Rotationから回転行列を作成する共通処理
     XMMATRIX MakeRotationMatrix(const XMFLOAT3& rotation)
     {
         return XMMatrixRotationRollPitchYaw(
@@ -32,7 +32,7 @@ DirectX::XMMATRIX Transform::GetWorldMatrix() const
             Position.y,
             Position.z);
 
-    // 見た目だけの回転は、拡大のあと・ゲーム上の回転の前に掛ける(モデルの中の向きを直してから、物体として回す)
+    //見た目だけの回転は、拡大のあと・ゲーム上の回転の前に掛ける(モデルの中の向きを直してから、物体として回す)
     XMMATRIX modelRotation = MakeRotationMatrix(ModelRotation);
 
     return scale * modelRotation * rotation * translation;
@@ -52,7 +52,7 @@ DirectX::XMFLOAT3 Transform::GetRight() const
 {
 
     XMMATRIX rot = MakeRotationMatrix(Rotation);
-    // ローカルの+X軸を回転行列で変換
+    //ローカルの+X軸を回転行列で変換
     XMVECTOR right =
         XMVector3TransformNormal(XMVectorSet(1, 0, 0, 0),rot);
 

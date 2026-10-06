@@ -14,7 +14,7 @@ class Component
 public:
     virtual ~Component() {}
 
-    virtual void Initialize(ServiceLocator& context) {}
+    virtual void Initialize(ServiceLocator& locator) {}
     virtual void Update(float deltaTime) {}
     virtual void Draw(Renderer& renderer) {}
     virtual void Release() {}

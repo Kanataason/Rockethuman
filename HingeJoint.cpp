@@ -30,7 +30,7 @@ void HingeJoint::Solve(float deltaTime)
     _bodyA->AddPseudoVelocity(pseudoVelocityA);
     _bodyB->AddPseudoVelocity(pseudoVelocityB);
 
-    // アンカー点の相対速度を、全部ではなく一部(この強さ)だけ消す。
+    //アンカー点の相対速度を、全部ではなく一部(この強さ)だけ消す。
     constexpr float velocityConstraintStrength = RagdollTuning::velocityConstraintStrength;
     SolveAnchorVelocity(_bodyA, _bodyB, bodyARot * _localAnchorA, bodyBRot * _localAnchorB, velocityConstraintStrength);
 }
@@ -93,16 +93,16 @@ void HingeJoint::SolveAngularConstraint()
 
 float HingeJoint::CalculateAngleError(const Quaternion& relativeRotation)
 {
-    // 初期姿勢分を引いて、初期姿勢からの変化だけにする
+    //初期姿勢分を引いて、初期姿勢からの変化だけにする
     Quaternion delta = _initialRelativeRotation.Inverse() * relativeRotation;
     delta.Normalize();
 
-    // 変化をヒンジ軸まわりの回転(twist)とそれ以外(swing)に分ける。
+    //変化をヒンジ軸まわりの回転(twist)とそれ以外(swing)に分ける。
     Quaternion swing, twist;
     QuaternionMath::DecomposeSwingTwist(delta, _hingeAxis, swing, twist);
 
     //クオータニオンはマイナスと正が同じ回転と解釈させるのでそこの対策
-    // w が正になる側にそろえて角度を一意にする
+    //w が正になる側にそろえて角度を一意にする
     if (twist.w < 0.0f) { twist.x = -twist.x; twist.y = -twist.y; twist.z = -twist.z; twist.w = -twist.w; }
 
     //twistから角度(ラジアン)を取り出す
@@ -113,7 +113,7 @@ float HingeJoint::CalculateAngleError(const Quaternion& relativeRotation)
     if (twistAngle > XM_PI)
         twistAngle -= 2.0f * XM_PI;
 
-    // 軸と逆向きに回っているときは、負の角度にする
+    //軸と逆向きに回っているときは、負の角度にする
     if (Vector::Dot(twistVector, _hingeAxis) < 0.0f)
         twistAngle = -twistAngle;
 
@@ -137,18 +137,18 @@ void HingeJoint::RemovePerpendicularAngularVelocity(const Vector3& worldHingeAxi
     Vector3 angularVelocityB = _bodyB->GetAngularVelocity();
     Vector3 relativeAngularVelocity = angularVelocityB - angularVelocityA;
 
-    // 相対角速度から軸方向の成分を引くと、軸に垂直な成分だけが残る
+    //相対角速度から軸方向の成分を引くと、軸に垂直な成分だけが残る
     Vector3 perpendicularAngularVelocity =
         relativeAngularVelocity - worldHingeAxis * Vector::Dot(relativeAngularVelocity, worldHingeAxis);
 
-    // 質量ではなく慣性で分配する。角速度の変えやすさは慣性で決まるため
+    //質量ではなく慣性で分配する。角速度の変えやすさは慣性で決まるため
     float invInertiaA = _bodyA->IsKinematic() ? 0.0f : 1.0f / _bodyA->GetInertia();
     float invInertiaB = _bodyB->IsKinematic() ? 0.0f : 1.0f / _bodyB->GetInertia();
     float invInertiaSum = invInertiaA + invInertiaB;
     if (invInertiaSum <= 0.0f)
         return;
 
-    // 全部ではなく一部だけ消して、複数パスで収束させる
+    //全部ではなく一部だけ消して、複数パスで収束させる
     constexpr float angularVelocityStrength = 0.5f;
     _bodyB->SetAngularVelocity(angularVelocityB - perpendicularAngularVelocity * (angularVelocityStrength * invInertiaB / invInertiaSum));
     _bodyA->SetAngularVelocity(angularVelocityA + perpendicularAngularVelocity * (angularVelocityStrength * invInertiaA / invInertiaSum));
@@ -160,7 +160,7 @@ void HingeJoint::RemoveAngularVelocityBeyondLimit(float hingeAngle, const Vector
     Vector3 relativeAngVel = _bodyB->GetAngularVelocity() - _bodyA->GetAngularVelocity();
     float angVelAlongAxis = Vector::Dot(relativeAngVel, worldHingeAxis);
 
-    // 「さらに外へ向かっている」場合だけ消す。戻る向きの角速度は残して、自然に戻れるようにする。
+    //「さらに外へ向かっている」場合だけ消す。戻る向きの角速度は残して、自然に戻れるようにする。
     bool movingFurtherOutOfLimit =
         (hingeAngle >= _maxAngle && angVelAlongAxis > 0.0f) ||
         (hingeAngle <= _minAngle && angVelAlongAxis < 0.0f);
@@ -195,15 +195,15 @@ void HingeJoint::CorrectHingeRotation(const Quaternion& bodyARot,const Quaternio
 
     float angularBeta = isOutOfLimit ? angularBetaOutOfLimit : angularBetaInLimit;
 
-    // 現在の姿勢から目標の姿勢へ、割合(angularBeta)だけ近づける。
-    // 一度に目標へ合わせず少しずつ近づけるのは、位置側の_betaと同じく、急な補正による跳ねを避けるため。
+    //現在の姿勢から目標の姿勢へ、割合(angularBeta)だけ近づける。
+    //一度に目標へ合わせず少しずつ近づけるのは、位置側の_betaと同じく、急な補正による跳ねを避けるため。
     Quaternion blendedRelativeRotation =
         QuaternionMath::Nlerp(currentRelative, limitedRelativeRotation, angularBeta);
     blendedRelativeRotation.Normalize();
     //補正するのはBだけ
     Quaternion newBodyBRot = bodyARot * blendedRelativeRotation;
     newBodyBRot.Normalize();
-    // B が Kinematic(吊られている骨)のときは、B は動かさず、A を回して相対回転を合わせる
+    //B が Kinematic(吊られている骨)のときは、B は動かさず、A を回して相対回転を合わせる
     if (_bodyB->IsKinematic())
     {
         if (!_bodyA->IsKinematic())

@@ -10,11 +10,11 @@ using namespace DirectX;
 class MatrixUtility
 {
 public:
-	/// <summary>
-	/// aiのMatrixをXMFLOAT4＊4に変換
-	/// </summary>
-	/// <param name="matrix"></param>
-	/// <returns></returns>
+	///<summary>
+	///aiのMatrixをXMFLOAT4＊4に変換
+	///</summary>
+	///<param name="matrix"></param>
+	///<returns></returns>
 	static XMFLOAT4X4 ConvertMatrix(const aiMatrix4x4& matrix)
     {
         DirectX::XMFLOAT4X4 result;
@@ -43,12 +43,12 @@ public:
     }
 
  
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T ReturnTransformの値を指定"></typeparam>
-    /// <param name="matrix"></param>
-    /// <returns></returns>
+    ///<summary>
+    ///
+    ///</summary>
+    ///<typeparam name="T ReturnTransformの値を指定"></typeparam>
+    ///<param name="matrix"></param>
+    ///<returns></returns>
     
     static XMFLOAT3 GetPosition(const XMFLOAT4X4& matrix)
     {

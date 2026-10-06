@@ -5,9 +5,9 @@
 #include <vector>
 #include <DirectXMath.h>
 
-// 画面の「どこに、何を置くか」の定義。描く仕組み(UiRenderer)とは分けてある。
-// ・座標はすべて 1280x720 の仮想解像度
-// ・表の実体は UiLayout.cpp にある(ここには宣言だけ)。画面を増やすときは、.cpp の表に足す
+//画面の「どこに、何を置くか」の定義。描く仕組み(UiRenderer)とは分けてある。
+//・座標はすべて 1280x720 の仮想解像度
+//・表の実体は UiLayout.cpp にある(ここには宣言だけ)。画面を増やすときは、.cpp の表に足す
 
 enum class TextType
 {
@@ -47,7 +47,7 @@ enum class PanelType
     None
 };
 
-// 上から下への並び順。W/Sで選ぶ順番になる
+//上から下への並び順。W/Sで選ぶ順番になる
 struct MenuEntry
 {
     TextType text;
@@ -63,7 +63,7 @@ struct ButtonData
     float height = 0.0f;
     float thickness = 2.0f;//枠の太さ
 
-    DirectX::XMFLOAT4 frameColor = { 1, 1, 1, 1 };  //枠の色
+    DirectX::XMFLOAT4 frameColor = { 1, 1, 1, 1 }; //枠の色
 };
 
 struct TextData
@@ -84,19 +84,19 @@ struct TextData
 
 struct PanelData
 {
-    ButtonData frame;                           // パネルの位置・大きさ・枠の太さ・枠の色
-    DirectX::XMFLOAT4 fillColor = { 0, 0, 0, 0.6f };  // 塗りの色(アルファで透け具合)
-    std::vector<MenuEntry> items;               // ボタン+文字の組
+    ButtonData frame; //パネルの位置・大きさ・枠の太さ・枠の色
+    DirectX::XMFLOAT4 fillColor = { 0, 0, 0, 0.6f }; //塗りの色(アルファで透け具合)
+    std::vector<MenuEntry> items; //ボタン+文字の組
 };
 
 namespace UiInfo
 {
-    // 実体は UiLayout.cpp(ヘッダーに実体を書くと、includeした数だけ作られてしまうため)
+    //実体は UiLayout.cpp(ヘッダーに実体を書くと、includeした数だけ作られてしまうため)
     extern const std::unordered_map<TextType, TextData> textList;
     extern const std::unordered_map<ButtonType, ButtonData> buttonList;
     extern const std::unordered_map<PanelType, PanelData> panelList;
 
-    // タイトルのメニュー。constexprなので、ヘッダーに置く(MenuCountを定数として使うため)
+    //タイトルのメニュー。constexprなので、ヘッダーに置く(MenuCountを定数として使うため)
     inline constexpr std::array<MenuEntry, 3> MenuEntries =
     { {
         { TextType::Start,   ButtonType::Box},

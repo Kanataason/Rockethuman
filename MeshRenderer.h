@@ -10,7 +10,7 @@ class Animator;
 class MeshRenderer:public Component
 {
 public :
-	void Initialize(ServiceLocator& context)override;
+	void Initialize(ServiceLocator& locator)override;
 
 	void Draw(Renderer& renderer) ;
 

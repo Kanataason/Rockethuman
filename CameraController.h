@@ -10,10 +10,10 @@ class InputSystem;
 class CameraController :public Component
 {
 public :
-	void Initialize(ServiceLocator& context)override;
+	void Initialize(ServiceLocator& locator)override;
 	void Update(float deltaTime)override;
 
-	// falseにすると、WASDでの移動をしなくなる(タイトルのメニュー選択でW/Sを使うため)
+	//falseにすると、WASDでの移動をしなくなる(タイトルのメニュー選択でW/Sを使うため)
 	void SetMoveEnabled(bool enabled) { _moveEnabled = enabled; }
 private:
 	void MoveCamera(const DirectX::XMFLOAT3& direction, float speed);

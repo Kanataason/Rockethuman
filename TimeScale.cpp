@@ -7,7 +7,7 @@ void TimeScale::Request(float scale, float seconds)
 	if (seconds <= 0.0f)
 		return;
 
-	// 0にすると、時間が完全に止まるので、下限を決める
+	//0にすると、時間が完全に止まるので、下限を決める
 	const float minScale = 0.02f;
 	scale = (std::clamp)(scale, minScale, 1.0f);
 
@@ -26,7 +26,7 @@ void TimeScale::Update(float realDeltaTime)
 
 	const float t = (std::min)(_elapsed / _duration, 1.0f);
 
-	// t*t で戻す: 最初は遅いまま、後半で一気に元の速さへ戻る(スローを長く味わえる)
+	//t*t で戻す: 最初は遅いまま、後半で一気に元の速さへ戻る
 	_current = _startScale + (1.0f - _startScale) * t * t;
 
 	if (t >= 1.0f)

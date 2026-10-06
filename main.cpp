@@ -7,9 +7,9 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 
-/// <summary>
-/// Windowのメッセージ処理
-/// </summary>
+///<summary>
+///Windowのメッセージ処理
+///</summary>
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -53,8 +53,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        windowRect.right - windowRect.left,    // 補正後の、外側の幅
-        windowRect.bottom - windowRect.top,    // 補正後の、外側の高さ
+        windowRect.right - windowRect.left, //補正後の、外側の幅
+        windowRect.bottom - windowRect.top, //補正後の、外側の高さ
         nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);

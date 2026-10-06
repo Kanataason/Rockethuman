@@ -15,7 +15,7 @@ public:
         virtual ~State() = default;
 
     protected:
-        // 継承先のStateから使える
+        //継承先のStateから使える
         StateMachine<TOwner>& stateMachine() {
             return *_stateMachine;
         }
@@ -24,7 +24,7 @@ public:
             return _stateMachine->owner();
         }
 
-        // 継承先で必要なものだけ override する
+        //継承先で必要なものだけ override する
         virtual void OnEnter(State* previousState) {}
         virtual void OnUpdate() {}
         virtual void OnFixedUpdate() {}
@@ -38,7 +38,7 @@ public:
         std::unordered_map<int, State*> _transitions;
         std::unordered_map<State*, int> _reverseTransitions;
 
-        // StateMachineだけが呼べる
+        //StateMachineだけが呼べる
         void Enter(State* previousState) {
             OnEnter(previousState);
         }
@@ -181,7 +181,7 @@ private:
     }
 
     TOwner _owner;
-    State* _currentState = nullptr; // statesList_が所有するため非所有ポインタ
+    State* _currentState = nullptr; //statesList_が所有するため非所有ポインタ
     int _nextStateEventId = -1;
 
     std::list<std::unique_ptr<State>> _statesList;

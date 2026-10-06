@@ -4,19 +4,19 @@
 #include "ConsoleUtility.h"
 #include "GameObject.h"
 
-// 地面との接触。地面は動かないので、自分の速度だけを変える。
+//地面との接触。地面は動かないので、自分の速度だけを変える。
 static void ApplyGroundContactImpulse(RigidBody& body, const Vector3& contactPoint, const Vector3& normal)
 {
-    // ボーン原点から接触点までのベクトル
+    //ボーン原点から接触点までのベクトル
     Vector3 contactArm = contactPoint - body.GetPosition();
     Vector3 linearVelocity = body.GetVelocity();
     Vector3 angularVelocity = body.GetAngularVelocity();
 
-    // 接触点の実際の速度(回転による速度も含む)
+    //接触点の実際の速度(回転による速度も含む)
     const Vector3 contactPointVelocity = linearVelocity + Vector::Cross(angularVelocity, contactArm);
     const float approachSpeed = Vector::Dot(contactPointVelocity, normal);
 
-    // 0以上なら地面から離れる向きなので、何もしない
+    //0以上なら地面から離れる向きなので、何もしない
     if (approachSpeed >= 0.0f)
         return;
 
@@ -27,17 +27,17 @@ static void ApplyGroundContactImpulse(RigidBody& body, const Vector3& contactPoi
     if (effectiveInverseMass <= 0.0f)
         return;
 
-    // ここでは、地面に向かう速さを消すだけ(バウンドは、ResolveGroundContactで別に足す)
+    //ここでは、地面に向かう速さを消すだけ(バウンドは、ResolveGroundContactで別に足す)
     const float impulseMagnitude = -approachSpeed / effectiveInverseMass;
-    // 線形速度は法線方向に、角速度は (腕 x 法線) 方向に変化する
+    //線形速度は法線方向に、角速度は (腕 x 法線) 方向に変化する
     body.SetVelocity(linearVelocity + normal * (impulseMagnitude * inverseMass));
     body.SetAngularVelocity(angularVelocity + armCrossNormal * (impulseMagnitude * inverseInertia));
 }
 
-// ボーン同士の接触。地面と違い、相手も動くので、双方に逆向きのインパルスを分配する。
+//ボーン同士の接触。地面と違い、相手も動くので、双方に逆向きのインパルスを分配する。
 static void ApplyBoneContactImpulse(RigidBody& self, RigidBody* other, const Vector3& contactPoint, const Vector3& normal)
 {
-    // それぞれの、接触点までの腕・線形速度・角速度
+    //それぞれの、接触点までの腕・線形速度・角速度
     Vector3 selfContactArm = contactPoint - self.GetPosition();
     Vector3 selfLinearVelocity = self.GetVelocity();
     Vector3 selfAngularVelocity = self.GetAngularVelocity();
@@ -51,7 +51,7 @@ static void ApplyBoneContactImpulse(RigidBody& self, RigidBody* other, const Vec
         otherAngularVelocity = other->GetAngularVelocity();
     }
 
-    // 接触点での、それぞれの実際の速度と、その差(相対速度)
+    //接触点での、それぞれの実際の速度と、その差(相対速度)
     Vector3 selfContactPointVelocity =
         selfLinearVelocity + Vector::Cross(selfAngularVelocity, selfContactArm);
     const Vector3 otherContactPointVelocity =
@@ -59,7 +59,7 @@ static void ApplyBoneContactImpulse(RigidBody& self, RigidBody* other, const Vec
     const Vector3 relativeContactVelocity = selfContactPointVelocity - otherContactPointVelocity;
     const float relativeApproachSpeed = Vector::Dot(relativeContactVelocity, normal);
 
-    // 離れていく向きなら何もしない
+    //離れていく向きなら何もしない
     if (relativeApproachSpeed >= 0.0f)
         return;
 
@@ -67,7 +67,7 @@ static void ApplyBoneContactImpulse(RigidBody& self, RigidBody* other, const Vec
     const Vector3 otherArmCrossNormal = Vector::Cross(otherContactArm, normal);
     const float selfInverseMass = 1.0f / self.GetMass();
     const float selfInverseInertia = 1.0f / self.GetInertia();
-    // other がいないときは逆質量・逆慣性を 0(=無限に重い)として扱う
+    //other がいないときは逆質量・逆慣性を 0(=無限に重い)として扱う
     const float otherInverseMass = other ? 1.0f / other->GetMass() : 0.0f;
     const float otherInverseInertia = other ? 1.0f / other->GetInertia() : 0.0f;
     const float effectiveInverseMass =
@@ -81,7 +81,7 @@ static void ApplyBoneContactImpulse(RigidBody& self, RigidBody* other, const Vec
     self.SetAngularVelocity(selfAngularVelocity + selfArmCrossNormal * (impulseMagnitude * selfInverseInertia));
     if (other)
     {
-        // 作用・反作用: 相手には逆向きに加える
+        //作用・反作用: 相手には逆向きに加える
         other->SetVelocity(otherLinearVelocity - normal * (impulseMagnitude * otherInverseMass));
         other->SetAngularVelocity(otherAngularVelocity - otherArmCrossNormal * (impulseMagnitude * otherInverseInertia));
     }
@@ -89,7 +89,7 @@ static void ApplyBoneContactImpulse(RigidBody& self, RigidBody* other, const Vec
 
 void PhysicsSystem::RemoveRigidBody(RigidBody* rigidBody)
 {
-    // RigidBodyのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
+    //RigidBodyのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
     std::erase_if(_rigidBodies, [&](const PhysicsBody& body)
         {
             return body.rigidBody == rigidBody;
@@ -98,12 +98,12 @@ void PhysicsSystem::RemoveRigidBody(RigidBody* rigidBody)
 
 void PhysicsSystem::RemoveCollider(Collider* collider)
 {
-    // Colliderのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
-    // _rigidBodiesの中に、このColliderを指しているエントリが残っていると、
-    // SyncStaticColliders等が破棄済みのColliderを触ってクラッシュするので、先に消す
+    //Colliderのデストラクタから、自動的に呼ばれる(手動で呼ぶ必要はない)
+    //_rigidBodiesの中に、このColliderを指しているエントリが残っていると、
+    //SyncStaticColliders等が破棄済みのColliderを触ってクラッシュするので、先に消す
     //
-    // 注意: デストラクタの中では、派生クラスの部分がもう壊れている。ここで、GetMin() などの仮想関数を呼ぶと、
-    //       純粋仮想関数の呼び出しになって、abort() で落ちる。だから、ここでは、コライダーの形を、触らない
+    //注意: デストラクタの中では、派生クラスの部分がもう壊れている。ここで、GetMin() などの仮想関数を呼ぶと、
+    //純粋仮想関数の呼び出しになって、abort() で落ちる。だから、ここでは、コライダーの形を、触らない
     std::erase_if(_rigidBodies, [&](const PhysicsBody& body)
         {
             return body.collider == collider;
@@ -114,13 +114,13 @@ void PhysicsSystem::RemoveCollider(Collider* collider)
 
 void PhysicsSystem::RemoveColliderAndWakeNear(Collider* collider)
 {
-    // 生きているコライダー用(的を飛ばすときなど)。先に範囲を取ってから消して、近くの眠っている箱だけを起こす
+    //生きているコライダー用(的を飛ばすときなど)。先に範囲を取ってから消して、近くの眠っている箱だけを起こす
     const XMFLOAT3 min = collider->GetMin();
     const XMFLOAT3 max = collider->GetMax();
 
     RemoveCollider(collider);
 
-    // 消えた物を支えにしていた箱が、眠ったまま浮かないように、起こして、落ち着き直させる
+    //消えた物を支えにしていた箱が、眠ったまま浮かないように、起こして、落ち着き直させる
     WakeSleepingBodies(min, max);
 }
 
@@ -139,7 +139,7 @@ void PhysicsSystem::UpdateBodySleep(float deltaTime)
 {
     for (auto& body : _rigidBodies)
     {
-        // ラグドールのボーンは対象外。箱などの、ほかの動く物だけを眠らせる
+        //ラグドールのボーンは対象外。箱などの、ほかの動く物だけを眠らせる
         if (!body.rigidBody || body.ragdollBone.nodeIndex >= 0)
             continue;
         if (body.rigidBody->IsKinematic() || body.rigidBody->IsSleeping())
@@ -160,17 +160,17 @@ void PhysicsSystem::UpdateBodySleep(float deltaTime)
 
 void PhysicsSystem::WakeSleepingBodies(const XMFLOAT3& min, const XMFLOAT3& max)
 {
-    // 起こす対象: 眠っている、動かせる物(箱など)。ラグドールのボーンは、対象外
+    //起こす対象: 眠っている、動かせる物(箱など)。ラグドールのボーンは、対象外
     const auto isSleepingBox = [](const PhysicsBody& body)
         {
             return body.rigidBody && body.collider && body.ragdollBone.nodeIndex < 0
                 && body.rigidBody->IsSleeping() && !body.rigidBody->IsKinematic();
         };
 
-    constexpr float margin = 0.3f;   // 消えた物の範囲を、少し広げて見る(支えにされていた箱を、確実に拾うため)
-    std::vector<PhysicsBody*> wokenBodies;   // 起こした箱。この上に乗っている箱を、順番に探していく
+    constexpr float margin = 0.3f; //消えた物の範囲を、少し広げて見る(支えにされていた箱を、確実に拾うため)
+    std::vector<PhysicsBody*> wokenBodies; //起こした箱。この上に乗っている箱を、順番に探していく
 
-    // 1. 消えた物の範囲に、触れている箱を起こす
+    //1. 消えた物の範囲に、触れている箱を起こす
     for (auto& body : _rigidBodies)
     {
         if (!isSleepingBox(body))
@@ -189,11 +189,11 @@ void PhysicsSystem::WakeSleepingBodies(const XMFLOAT3& min, const XMFLOAT3& max)
         }
     }
 
-    // 2. 起こした箱の上に乗っている箱を、起こす。起こした箱の上も、さらに調べる(上へ上へと伝わる)
-    //    下の箱が落ちると、その上の箱も落ちるので、積み上げた壁の、下をつぶしても、上が浮かない
-    //    横に並んだ箱は、起こさない(支えは、下にあるだけなので)
-    constexpr float contactGap = 0.3f;     // 下の箱の上面から、この距離以内なら、乗っているとみなす
-    constexpr float minOverlapWidth = 0.05f;   // 横(XとZ)に、これ以上重なっていれば、真上にあるとみなす
+    //2. 起こした箱の上に乗っている箱を、起こす。起こした箱の上も、さらに調べる(上へ上へと伝わる)
+    //下の箱が落ちると、その上の箱も落ちるので、積み上げた壁の、下をつぶしても、上が浮かない
+    //横に並んだ箱は、起こさない(支えは、下にあるだけなので)
+    constexpr float contactGap = 0.3f; //下の箱の上面から、この距離以内なら、乗っているとみなす
+    constexpr float minOverlapWidth = 0.05f; //横(XとZ)に、これ以上重なっていれば、真上にあるとみなす
     for (size_t i = 0; i < wokenBodies.size(); ++i)
     {
         const XMFLOAT3 lower = wokenBodies[i]->collider->GetMin();
@@ -223,11 +223,11 @@ void PhysicsSystem::WakeSleepingBodies(const XMFLOAT3& min, const XMFLOAT3& max)
 void PhysicsSystem::FixedUpdate(float deltaTime)
 {
 
-    // 物理の影響を受けないオブジェクトの場所同期処理
+    //物理の影響を受けないオブジェクトの場所同期処理
     SyncKinematicBodies();
     SyncStaticColliders();
 
-    // RigidBody -> Colliderの回転と場所同期
+    //RigidBody -> Colliderの回転と場所同期
     //計算前にColliderの場所を最新の位置にしておく
     SyncCollidersFromRigidBodies();
 
@@ -237,15 +237,15 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
 
     for (int i = 0; i < SubStepCount; ++i)
     {
-        // 重力による加速、速度による位置更新、
+        //重力による加速、速度による位置更新、
         IntegrateDynamics(subDeltaTime);
 
 
-        // ragdoll全体の重心を使って、ルート(腰)に重力トルクを加える。これで全体が倒れる。
+        //ragdoll全体の重心を使って、ルート(腰)に重力トルクを加える。これで全体が倒れる。
         _ragdollSystem.ApplyRootGravityTorque(_rigidBodies, subDeltaTime);
 
 
-        // 前のサブステップの疑似速度(位置補正用)とトルクを消す。
+        //前のサブステップの疑似速度(位置補正用)とトルクを消す。
         for (auto& body : _rigidBodies)
         {
             if (body.rigidBody)
@@ -256,7 +256,7 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
         }
 
      
-        // ジョイントの拘束(位置・角度の制限)を解く
+        //ジョイントの拘束(位置・角度の制限)を解く
         SolveJoints(subDeltaTime);
 
 
@@ -264,16 +264,16 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
         SyncCollidersFromRigidBodies();
 
 
-        // 衝突検出と、衝突イベントの通知
+        //衝突検出と、衝突イベントの通知
         _collisionManager.Intersects();
         _collisionManager.ResolveEvent();
 
 
-        // 衝突の結果に応じて、速度・疑似速度・角速度を更新する
+        //衝突の結果に応じて、速度・疑似速度・角速度を更新する
         SolveCollisions(deltaTime, subDeltaTime);
 
 
-        // 接触処理のあとで、トルク→角速度→回転を更新する
+        //接触処理のあとで、トルク→角速度→回転を更新する
         IntegrateRotations(subDeltaTime);
 
         
@@ -283,15 +283,15 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
         //軸を固定するか見る
         LockRigidBodyAxis();
 
-        // 次のサブステップのために、Colliderを最新にする
+        //次のサブステップのために、Colliderを最新にする
         SyncCollidersFromRigidBodies();
     }
 
 
-    // 箱などが、ほぼ静止したらスリープさせる(積分・接触の解決を飛ばして、軽くする)
+    //箱などが、ほぼ静止したらスリープさせる(積分・接触の解決を飛ばして、軽くする)
     UpdateBodySleep(deltaTime);
 
-    // ragdollが倒れて、ほぼ静止したらスリープさせて凍結する
+    //ragdollが倒れて、ほぼ静止したらスリープさせて凍結する
     _ragdollSystem.UpdateRest(_rigidBodies, deltaTime);
 
 
@@ -356,7 +356,7 @@ void PhysicsSystem::SyncCollidersFromRigidBodies()
         {
             Vector3 rbPos = body.rigidBody->GetPosition();
             Quaternion rbRot = body.rigidBody->GetRotation();
-            // ローカルオフセットを回転させてから足す。
+            //ローカルオフセットを回転させてから足す。
             Vector3 colliderPos =
                 rbPos + rbRot * body.ragdollBone.colliderLocalOffset;
 
@@ -366,7 +366,7 @@ void PhysicsSystem::SyncCollidersFromRigidBodies()
             body.collider->SetPosition(Vector::fromV3ToF3(colliderPos));
             body.collider->SetRotation(colliderRot);
 
-            // 衝突の検出で、「動いている物だけ」が相手を探すために、今の状態を伝えておく
+            //衝突の検出で、「動いている物だけ」が相手を探すために、今の状態を伝えておく
             body.collider->SetMoving(!body.rigidBody->IsKinematic() && !body.rigidBody->IsSleeping());
         }
     }
@@ -385,7 +385,7 @@ void PhysicsSystem::IntegrateDynamics(float subDeltaTime)
             body.rigidBody->FixedUpdate(subDeltaTime);
 
             //設置中かどうかを確認して、信頼できる物だけ重力トルクを与える
-            // 足と手は、接地中は重力トルクを使わない(慣性が小さく、地面の押し戻しとぶつかって震えるため)
+            //足と手は、接地中は重力トルクを使わない(慣性が小さく、地面の押し戻しとぶつかって震えるため)
             const bool isExtremity =
                 body.ragdollBone.name.find("Foot") != std::string::npos ||
                 body.ragdollBone.name.find("Hand") != std::string::npos;
@@ -393,7 +393,7 @@ void PhysicsSystem::IntegrateDynamics(float subDeltaTime)
                 RagdollTuning::kGravityTorqueWhenGrounded &&
                 (!isExtremity || RagdollTuning::kExtremityGravityTorqueWhenGrounded);
 
-            // 発射されて飛んでいる間は、重力トルクを止める(Ragdoll::Launchが切り替える)
+            //発射されて飛んでいる間は、重力トルクを止める(Ragdoll::Launchが切り替える)
             if (body.rigidBody->GetUseGravityTorque() &&
                 body.ragdollBone.hasReliableComOffset &&
                 (torqueWhenGrounded || !body.rigidBody->IsGrounded()))
@@ -416,7 +416,7 @@ void PhysicsSystem::SolveJoints(float subDeltaTime)
             joint->ApplyRestoringTorque();
     }
 
-    // 1つのジョイントを解いて、その結果を即座にボーンの位置へ反映する
+    //1つのジョイントを解いて、その結果を即座にボーンの位置へ反映する
     auto solveJointImmediate = [&](Joint* joint)
         {
             if (!joint) return;
@@ -424,9 +424,9 @@ void PhysicsSystem::SolveJoints(float subDeltaTime)
             if (joint->GetBodyA()->IsSleeping() && joint->GetBodyB()->IsSleeping())
                 return;
 
-            joint->Solve(subDeltaTime);                 // 位置の拘束
-            joint->SolveAngularConstraint();            // 角度の制限
-            joint->RotateBodyByAnchorCorrection();      // アンカーのずれを回転補正
+            joint->Solve(subDeltaTime); //位置の拘束
+            joint->SolveAngularConstraint(); //角度の制限
+            joint->RotateBodyByAnchorCorrection(); //アンカーのずれを回転補正
 
             for (auto& body : { joint->GetBodyA(), joint->GetBodyB() })
             {
@@ -438,13 +438,13 @@ void PhysicsSystem::SolveJoints(float subDeltaTime)
             }
         };
 
-    // 前方(root->末端)
+    //前方(root->末端)
     for (auto it = _jointList.begin(); it != _jointList.end(); ++it)
     {
         solveJointImmediate(*it);
     }
 
-    // 後方(末端->root)
+    //後方(末端->root)
     for (auto it = _jointList.rbegin(); it != _jointList.rend(); ++it)
     {
         solveJointImmediate(*it);
@@ -453,7 +453,7 @@ void PhysicsSystem::SolveJoints(float subDeltaTime)
 
 namespace
 {
-    // 胴体のボーンか(全身で跳ねるきっかけになるのは、これだけ。手足や頭は、きっかけにならない)
+    //胴体のボーンか(全身で跳ねるきっかけになるのは、これだけ。手足や頭は、きっかけにならない)
     bool IsTrunkBone(const std::string& name)
     {
         return name == "mixamorig:Hips" || name == "mixamorig:Spine" ||
@@ -463,7 +463,7 @@ namespace
 
 void PhysicsSystem::SolveCollisions(float deltaTime,float subDeltaTime)
 {
-    // 全身で跳ねたあとの、休みの時間を進める
+    //全身で跳ねたあとの、休みの時間を進める
     _hopCooldown = std::max(0.0f, _hopCooldown - subDeltaTime);
 
     //地面フラグを初期化
@@ -489,7 +489,7 @@ void PhysicsSystem::SolveCollisions(float deltaTime,float subDeltaTime)
                 body.rigidBody->IsKinematic() ||body.rigidBody->IsSleeping())
                 continue;
 
-            // このボーンが今回のペアの当事者かを調べ、法線と地面かどうかを得る
+            //このボーンが今回のペアの当事者かを調べ、法線と地面かどうかを得る
             Vector3 normal;
             bool isGround = false;
             if (!TryGetContactInfo(body, result, normal, isGround))
@@ -514,8 +514,8 @@ void PhysicsSystem::SolveCollisions(float deltaTime,float subDeltaTime)
             //めり込む向きの速度成分を消す
             body.rigidBody->RemoveVelocityAlongNormal(normal);
 
-            // 跳ねた直後(休みの間)の、ラグドールの地面の摩擦は、かけない
-            // (摩擦で、地面に沿った速さが消えると、斜めに跳ね返らず、真上に跳ねてしまう)
+            //跳ねた直後(休みの間)の、ラグドールの地面の摩擦は、かけない
+            //(摩擦で、地面に沿った速さが消えると、斜めに跳ね返らず、真上に跳ねてしまう)
             const bool justHopped = isGround && _hopCooldown > 0.0f && body.ragdollBone.nodeIndex >= 0;
 
             //摩擦(地面とボーン同士で係数を変える)
@@ -531,16 +531,16 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
 {
     RigidBody& rigidBody = *body.rigidBody;
 
-    // ぶつかる前の速度(まだ何も消されていない状態)。ぶつかる前の向きで、跳ね返る向きを決めるために、覚えておく
+    //ぶつかる前の速度(まだ何も消されていない状態)。ぶつかる前の向きで、跳ね返る向きを決めるために、覚えておく
     const Vector3 incomingVelocity = rigidBody.GetVelocity();
 
-    // ぶつかる前の、地面に向かう速さ(中心の速度の法線成分)。バウンドの強さは、これで決める
+    //ぶつかる前の、地面に向かう速さ(中心の速度の法線成分)。バウンドの強さは、これで決める
     const float impactSpeed = -Vector::Dot(incomingVelocity, contactNormal);
 
     constexpr float penetrationCorrectionRate = RagdollTuning::penetrationCorrectionRate;
     constexpr float penetrationSlop = RagdollTuning::penetrationSlop;
     const float correctedPenetration = std::max(0.0f, result.penetration - penetrationSlop);
-    // めり込み量を、サブステップの時間で割って速度にする
+    //めり込み量を、サブステップの時間で割って速度にする
     rigidBody.AddPseudoVelocity(
         contactNormal * (penetrationCorrectionRate * correctedPenetration / subDeltaTime));
 
@@ -550,11 +550,11 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
         std::pow(RagdollTuning::kGroundAngularDampPerFrame, subDeltaTime / deltaTime);
     rigidBody.SetAngularVelocity(rigidBody.GetAngularVelocity() * groundAngularDamp);
 
-    // 先に衝突のインパルスを加える(ここで跳ね返る速度が決まる)。
-    // 先に下向きの速度を消すと、ぶつかった速さが分からなくなり、跳ねなくなる
+    //先に衝突のインパルスを加える(ここで跳ね返る速度が決まる)。
+    //先に下向きの速度を消すと、ぶつかった速さが分からなくなり、跳ねなくなる
     ApplyGroundContactImpulse(rigidBody, result.contactPoint, contactNormal);
 
-    // 回転のせいで、まだ地面に沈む向きの速度が残っているときだけ、消す(平らな地面の前提)
+    //回転のせいで、まだ地面に沈む向きの速度が残っているときだけ、消す(平らな地面の前提)
     Vector3 velocity = rigidBody.GetVelocity();
     if (velocity.y < 0.0f)
     {
@@ -562,11 +562,11 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
         rigidBody.SetVelocity(velocity);
     }
 
-    // バウンド: しきい値を超えた分だけ、反発係数をかけて、地面から離れる向きの速度を足す。
-    // 接触点のインパルスだけでは、当たった位置のずれのぶんが回転に逃げて、ほとんど跳ねないので、
-    // ボーンの中心の速度に、直接足している
-    // 体ぜんたいで「ぴょん」と跳ねる設定のとき(キャラクター固有)は、胴体が地面に当たったときだけ、全身をまとめて跳ねさせる
-    // (手足や頭が当たっただけでは、全身は跳ねない)。跳ねたら、このボーンの、ふつうのバウンドは足さない
+    //バウンド: しきい値を超えた分だけ、反発係数をかけて、地面から離れる向きの速度を足す。
+    //接触点のインパルスだけでは、当たった位置のずれのぶんが回転に逃げて、ほとんど跳ねないので、
+    //ボーンの中心の速度に、直接足している
+    //体ぜんたいで「ぴょん」と跳ねる設定のとき(キャラクター固有)は、胴体が地面に当たったときだけ、全身をまとめて跳ねさせる
+    //(手足や頭が当たっただけでは、全身は跳ねない)。跳ねたら、このボーンの、ふつうのバウンドは足さない
     if (_hopCountLeft > 0 && IsTrunkBone(body.ragdollBone.name))
     {
         if (TryRagdollHop(rigidBody, incomingVelocity, contactNormal))
@@ -586,15 +586,15 @@ void PhysicsSystem::SetRagdollHop(float restitution, int count)
     _hopCooldown = 0.0f;
 }
 
-// 胴体が地面にぶつかったら、ボールが跳ね返るように、入ってきた向きで反射させて、全身をひとつの塊として、跳ね上げる
-// 戻り値: 跳ねたか(休み中や、遅い着地では、跳ねない)
+//胴体が地面にぶつかったら、ボールが跳ね返るように、入ってきた向きで反射させて、全身をひとつの塊として、跳ね上げる
+//戻り値: 跳ねたか(休み中や、遅い着地では、跳ねない)
 bool PhysicsSystem::TryRagdollHop(RigidBody& trigger, const Vector3& incomingVelocity, const Vector3& contactNormal)
 {
-    // 胴体のあちこちが、続けて地面に当たっても、1回だけ跳ねる
+    //胴体のあちこちが、続けて地面に当たっても、1回だけ跳ねる
     if (_hopCooldown > 0.0f)
         return false;
 
-    // 地面に向かう速さ(負が、地面へ向かう向き)と、地面に沿った速さに分ける
+    //地面に向かう速さ(負が、地面へ向かう向き)と、地面に沿った速さに分ける
     const float normalSpeed = Vector::Dot(incomingVelocity, contactNormal);
     const float impactSpeed = -normalSpeed;
     if (impactSpeed < RagdollTuning::hopMinImpactSpeed)
@@ -602,13 +602,13 @@ bool PhysicsSystem::TryRagdollHop(RigidBody& trigger, const Vector3& incomingVel
 
     const Vector3 tangentVelocity = incomingVelocity - contactNormal * normalSpeed;
 
-    // 反射: 地面に沿った速さは、ほぼそのまま(少しだけ減らす)。地面に向かう速さが、反発係数をかけた、離れる速さになる
-    // → 斜めに当たれば、斜めに跳ね返る(入射角と、反射角が、等しくなる)
+    //反射: 地面に沿った速さは、ほぼそのまま(少しだけ減らす)。地面に向かう速さが、反発係数をかけた、離れる速さになる
+    //→ 斜めに当たれば、斜めに跳ね返る(入射角と、反射角が、等しくなる)
     const float outNormalSpeed = std::min(_hopRestitution * impactSpeed, RagdollTuning::hopMaxSpeed);
     const Vector3 outgoingVelocity =
         tangentVelocity * (1.0f - RagdollTuning::hopTangentLoss) + contactNormal * outNormalSpeed;
 
-    // きっかけのボーンの速度が、反射後の速度になるように、速度の変化量を計算して、全ボーンに同じ量を足す(体が、ばらけない)
+    //きっかけのボーンの速度が、反射後の速度になるように、速度の変化量を計算して、全ボーンに同じ量を足す(体が、ばらけない)
     const Vector3 velocityChange = outgoingVelocity - trigger.GetVelocity();
 
     for (auto& other : _rigidBodies)
@@ -630,7 +630,7 @@ void PhysicsSystem::ResolveBoneContact(PhysicsBody& body, const CollisionResult&
     RigidBody& selfRigidBody = *body.rigidBody;
     RigidBody* otherRigidBody = FindOtherRigidBody(body, result);
 
-    // 逆質量で押し出しを分配(軽いボーンが動き、重い腰や胴はほとんど動かない)
+    //逆質量で押し出しを分配(軽いボーンが動き、重い腰や胴はほとんど動かない)
     const float selfInverseMass = 1.0f / selfRigidBody.GetMass();
     const float otherInverseMass = otherRigidBody ? 1.0f / otherRigidBody->GetMass() : 0.0f;
     const float pushShare = selfInverseMass / (selfInverseMass + otherInverseMass);
@@ -652,14 +652,14 @@ RigidBody* PhysicsSystem::FindOtherRigidBody(PhysicsBody& body, const CollisionR
         (body.collider == result.colliderA) ? result.colliderB : result.colliderA;
     for (auto& other : _rigidBodies)
     {
-        // 眠っている相手は、動かない物として扱う(押し戻しを、動くほうが全部引き受ける)
+        //眠っている相手は、動かない物として扱う(押し戻しを、動くほうが全部引き受ける)
         if (other.collider == otherCollider && other.rigidBody &&
             !other.rigidBody->IsKinematic() && !other.rigidBody->IsSleeping())
         {
             return other.rigidBody;
         }
     }
-    return nullptr; // 見つからない
+    return nullptr; //見つからない
 }
 
 
@@ -678,7 +678,7 @@ bool PhysicsSystem::TryGetContactInfo(const PhysicsBody& body, const CollisionRe
         isGround = (result.colliderA->GetCollisionGroup() == CollisionGroup::Ground);
         return true;
     }
-    return false; // このbodyは今回のペアと無関係
+    return false; //このbodyは今回のペアと無関係
 }
 
 
@@ -688,11 +688,11 @@ void PhysicsSystem::ApplyBoneImpactAngularImpulse(PhysicsBody& body, const Colli
     if (velocityAlongNormalBefore >= -0.05f)
         return;
 
-    // 重心
+    //重心
     const Vector3 centerOfMass =
         body.rigidBody->GetPosition() +
         body.rigidBody->GetRotation() * body.ragdollBone.colliderLocalOffset;
-    // ピボットではなく実際の重心から測る
+    //ピボットではなく実際の重心から測る
     const Vector3 contactArm = result.contactPoint - centerOfMass;
 
     const Vector3 linearImpulse =
@@ -733,8 +733,8 @@ bool PhysicsSystem::RayCast(const XMFLOAT3& origin, const XMFLOAT3& direction, c
 
 void PhysicsSystem::AddPhysicsBody(PhysicsBody Body)
 {
-    // 登録先を覚えさせておく。所有者(GameObject)が破棄されてRigidBodyが消えるとき、
-    // デストラクタが自動的にRemoveRigidBodyを呼ぶので、手動の後片付けが不要になる
+    //登録先を覚えさせておく。所有者(GameObject)が破棄されてRigidBodyが消えるとき、
+    //デストラクタが自動的にRemoveRigidBodyを呼ぶので、手動の後片付けが不要になる
     if (Body.rigidBody)
         Body.rigidBody->SetRegistry(this);
 

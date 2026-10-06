@@ -17,7 +17,7 @@ using namespace UiInfo;
 
 namespace
 {
-	// ステージ選択の、名前の行(パネルの中に、上から並べる)。ステージの数が、行の数より多いときは、スクロールする
+	//ステージ選択の、名前の行(パネルの中に、上から並べる)。ステージの数が、行の数より多いときは、スクロールする
 	constexpr int stageVisibleRows = 4;
 	constexpr float stageRowLeft = 490.0f;
 	constexpr float stageRowTop = 225.0f;
@@ -25,9 +25,9 @@ namespace
 	constexpr float stageRowHeight = 56.0f;
 	constexpr float stageRowGap = 10.0f;
 	constexpr float stageRowTextScale = 0.55f;
-	constexpr float stageCounterY = 495.0f;   // 「2 / 5」のように、いま何番目かを出す所
+	constexpr float stageCounterY = 495.0f; //「2 / 5」のように、いま何番目かを出す所
 
-	// キャラクター選択の、名前の行(パネルの中に、上から並べる)
+	//キャラクター選択の、名前の行(パネルの中に、上から並べる)
 	constexpr float characterRowLeft = 490.0f;
 	constexpr float characterRowTop = 250.0f;
 	constexpr float characterRowWidth = 300.0f;
@@ -43,7 +43,7 @@ void Title::Initialize(ServiceLocator& locator)
 	_stages = locator.stages;
 	BaseScene::Initialize(locator);
 
-	// 前に遊んだステージを、選んだままにしておく
+	//前に遊んだステージを、選んだままにしておく
 	if (_stages)
 	{
 		_stageIndex = _stages->GetSelectedIndex();
@@ -53,7 +53,7 @@ void Title::Initialize(ServiceLocator& locator)
 	if (locator.sound)
 		locator.sound->PlayBgm("title");
 
-	// W/Sはメニュー選択に使うので、タイトルのカメラは動かさない
+	//W/Sはメニュー選択に使うので、タイトルのカメラは動かさない
 	for (const auto& object : _objects)
 	{
 		if (auto cameraController = object->GetComponent<CameraController>())
@@ -77,7 +77,7 @@ void Title::Update(float deltaTime)
 		UpdateCharacterSelect();
 		break;
 	default:
-		// Enterで閉じる
+		//Enterで閉じる
 		if (_input->GetKeyDown(VK_RETURN) || _input->GetKeyDown(VK_ESCAPE))
 			_currentPanel = PanelType::None;
 		break;
@@ -100,7 +100,7 @@ void Title::UpdateMenu()
 
 void Title::UpdateStageSelect()
 {
-	// ステージの一覧が空(Stages.jsonがない)ときは、選ぶものがないので、もどるだけ
+	//ステージの一覧が空(Stages.jsonがない)ときは、選ぶものがないので、もどるだけ
 	const int stageCount = _stages ? _stages->GetCount() : 0;
 	if (stageCount > 0)
 	{
@@ -112,7 +112,7 @@ void Title::UpdateStageSelect()
 
 		AdjustStageScroll();
 
-		// 決定: 選んだステージを、遊び始める(シーンの切り替えは予約。次のフレームの頭に入れ替わる)
+		//決定: 選んだステージを、遊び始める(シーンの切り替えは予約。次のフレームの頭に入れ替わる)
 		if (_input->GetKeyDown(VK_SPACE))
 		{
 			_stages->Select(_stageIndex);
@@ -121,14 +121,14 @@ void Title::UpdateStageSelect()
 		}
 	}
 
-	// もどる: メニューに戻る
+	//もどる: メニューに戻る
 	if (_input->GetKeyDown(VK_ESCAPE) || _input->GetKeyDown(VK_RETURN))
 		_currentPanel = PanelType::None;
 }
 
 void Title::UpdateCharacterSelect()
 {
-	// 選ぶと、すぐに「選んでいる人」が変わる(決定は、パネルを閉じるだけ)。ステージを始めるときに、この人が出る
+	//選ぶと、すぐに「選んでいる人」が変わる(決定は、パネルを閉じるだけ)。ステージを始めるときに、この人が出る
 	if (_characters)
 	{
 		if (_input->GetKeyDown('W') || _input->GetKeyDown(VK_UP))
@@ -147,11 +147,11 @@ void Title::ConfirmSelected()
 	switch (MenuEntries[_selectedIndex].text)
 	{
 	case TextType::Start:
-		// 「セレクトステージ」: ステージ選択を開く(前に選んだステージを、覚えたまま)
+		//「セレクトステージ」: ステージ選択を開く(前に選んだステージを、覚えたまま)
 		_currentPanel = PanelType::StageSelect;
 		break;
 	case TextType::Setting:
-		// 「キャラクターセレクト」: キャラクター選択を開く
+		//「キャラクターセレクト」: キャラクター選択を開く
 		_currentPanel = PanelType::CharacterSelect;
 		break;
 	case TextType::End:
@@ -234,7 +234,7 @@ void Title::DrawPanel(PanelType typeIndex, int selectedIndex)
 		DrawMenuItem(panel.items[i], i == selectedIndex);
 }
 
-// 選んでいるステージが、見えている行の中に入るように、スクロールの位置を直す
+//選んでいるステージが、見えている行の中に入るように、スクロールの位置を直す
 void Title::AdjustStageScroll()
 {
 	const int stageCount = _stages ? _stages->GetCount() : 0;
@@ -252,7 +252,7 @@ void Title::DrawStageSelect()
 	DrawPanel(PanelType::StageSelect, -1);
 	DrawText(TextType::StageSelectTitle);
 
-	// ステージの名前を、上から並べる(いま選んでいるステージは、黄色)
+	//ステージの名前を、上から並べる(いま選んでいるステージは、黄色)
 	if (_stages && _stages->GetCount() > 0)
 	{
 		const auto& list = _stages->GetList();
@@ -273,7 +273,7 @@ void Title::DrawStageSelect()
 				XMVectorSet(0, 0, 0, 1));
 		}
 
-		// 見えていない行があるときだけ、いま何番目かを出す
+		//見えていない行があるときだけ、いま何番目かを出す
 		if (stageCount > stageVisibleRows)
 		{
 			_uiRenderer->DrawStringCentered(std::to_wstring(_stageIndex + 1) + L" / " + std::to_wstring(stageCount),
@@ -294,7 +294,7 @@ void Title::DrawCharacterSelect()
 	DrawPanel(PanelType::CharacterSelect, -1);
 	DrawText(TextType::CharacterSelectTitle);
 
-	// キャラクターの名前を、上から並べる(いま選んでいる人は、黄色)
+	//キャラクターの名前を、上から並べる(いま選んでいる人は、黄色)
 	if (_characters && _characters->GetCount() > 0)
 	{
 		const auto& list = _characters->GetList();
@@ -314,7 +314,7 @@ void Title::DrawCharacterSelect()
 	}
 	else
 	{
-		// 一覧が空(Characters.jsonがない)ときは、ステージの標準のキャラクターが出る
+		//一覧が空(Characters.jsonがない)ときは、ステージの標準のキャラクターが出る
 		_uiRenderer->DrawStringCentered(L"キャラクターが ありません", 640.0f, 330.0f, 0.45f,
 			XMVectorSet(1, 1, 1, 1), XMVectorSet(0, 0, 0, 1));
 	}

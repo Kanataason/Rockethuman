@@ -7,7 +7,7 @@ void ModelManager::SetDevice(ID3D11Device* device)
 
 std::shared_ptr<ModelDatas> ModelManager::CheckModel(const ObjectData& data)
 {
-    // Primitive（三角・四角など）は形(shape)でキャッシュ
+    //Primitive（三角・四角など）は形(shape)でキャッシュ
     if (data.attribute == Attribute::Primitive)
     {
         auto itr = primitives.find(data.shape);
@@ -26,7 +26,7 @@ std::shared_ptr<ModelDatas> ModelManager::CheckModel(const ObjectData& data)
 
         auto model = _modelLoader.PrimitiveLoadModel(data.shape);
 
-        // 未対応の形だった場合は失敗として返す
+        //未対応の形だった場合は失敗として返す
         if (!model)
         {
             OutputDebugStringA("PrimitiveLoadModel failed\n");
@@ -43,7 +43,7 @@ std::shared_ptr<ModelDatas> ModelManager::CheckModel(const ObjectData& data)
         return model;
     }
 
-    // FBXモデルはmodelPathでキャッシュ
+    //FBXモデルはmodelPathでキャッシュ
     auto itr = models.find(data.modelPath);
 
     if (itr != models.end())
@@ -53,7 +53,7 @@ std::shared_ptr<ModelDatas> ModelManager::CheckModel(const ObjectData& data)
 
     auto model = _modelLoader.FBXLoadModel(data.modelPath);
 
-    // 読み込み失敗（ファイルが無い・壊れているなど）の場合は失敗として返す
+    //読み込み失敗（ファイルが無い・壊れているなど）の場合は失敗として返す
     if (!model)
     {
         OutputDebugStringA("FBXLoadModel failed\n");

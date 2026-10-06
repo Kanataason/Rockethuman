@@ -14,17 +14,17 @@ using namespace UiInfo;
 
 namespace
 {
-	// ---- 演出のタイミング(秒) ----
-	constexpr float panelPopSeconds = 0.35f;        // パネルが弾んで出る
-	constexpr float scoreCountSeconds = 0.9f;       // スコアが0から数え上がる
-	constexpr float starIntervalSeconds = 0.45f;    // 星が1つずつ出る間隔
+	//---- 演出のタイミング(秒) ----
+	constexpr float panelPopSeconds = 0.35f; //パネルが弾んで出る
+	constexpr float scoreCountSeconds = 0.9f; //スコアが0から数え上がる
+	constexpr float starIntervalSeconds = 0.45f; //星が1つずつ出る間隔
 	constexpr float starPopSeconds = 0.4f;
-	constexpr float buttonDelaySeconds = 0.3f;      // 最後の星が出てから、ボタンが出るまで
+	constexpr float buttonDelaySeconds = 0.3f; //最後の星が出てから、ボタンが出るまで
 
-	constexpr float dimAlpha = 0.55f;               // 後ろのゲーム画面を暗くする濃さ
+	constexpr float dimAlpha = 0.55f; //後ろのゲーム画面を暗くする濃さ
 	constexpr float dimFadeSeconds = 0.3f;
 
-	// ---- パネルの中の配置(パネルの上端からの距離。1280x720基準) ----
+	//---- パネルの中の配置(パネルの上端からの距離。1280x720基準) ----
 	constexpr float titleY = 55.0f;
 	constexpr float scoreLabelY = 125.0f;
 	constexpr float scoreValueY = 195.0f;
@@ -88,7 +88,7 @@ void ResultPanel::Update(float deltaTime)
 
 	_elapsed += deltaTime;
 
-	// ボタンが出るまでは、キーを受け付けない(最後の1発でスペースを連打していても、すぐ決定されないように)
+	//ボタンが出るまでは、キーを受け付けない(最後の1発でスペースを連打していても、すぐ決定されないように)
 	const float buttonStart = panelPopSeconds + scoreCountSeconds
 		+ starIntervalSeconds * _starCount + buttonDelaySeconds;
 	if (_elapsed < buttonStart || !_input)
@@ -108,7 +108,7 @@ void ResultPanel::Update(float deltaTime)
 
 	if (_input->GetKeyDown(VK_SPACE) || _input->GetKeyDown(VK_RETURN))
 	{
-		// 1回選んだら、パネルは閉じる(シーンの切り替えは、受け取った側が予約する)
+		//1回選んだら、パネルは閉じる(シーンの切り替えは、受け取った側が予約する)
 		_visible = false;
 		if (_selectedIndex == 0)
 			OnRetry.Invoke();
@@ -127,12 +127,12 @@ void ResultPanel::Draw()
 		return;
 	const PanelData& panel = it->second;
 
-	// 後ろのゲーム画面を、少し暗くする(ゲーム画面は見えたまま)
+	//後ろのゲーム画面を、少し暗くする(ゲーム画面は見えたまま)
 	const float dim = dimAlpha * Progress(0.0f, dimFadeSeconds);
 	_uiRenderer->DrawRect(0.0f, 0.0f, UiRenderer::VirtualWidth, UiRenderer::VirtualHeight,
 		DirectX::XMVectorSet(0, 0, 0, dim));
 
-	// パネル: 中心を基準に、少し小さいところから弾んで、元の大きさになる
+	//パネル: 中心を基準に、少し小さいところから弾んで、元の大きさになる
 	const float popT = Progress(0.0f, panelPopSeconds);
 	const float scale = 0.8f + 0.2f * EaseOutBack(popT);
 	const float alpha = (std::min)(1.0f, popT * 2.0f);
@@ -145,13 +145,13 @@ void ResultPanel::Draw()
 	const float top = centerY - height * 0.5f;
 
 	DirectX::XMFLOAT4 fill = panel.fillColor;
-	fill.w = (std::max)(fill.w, 0.8f) * alpha;   // 後ろが透けすぎて、文字が読みにくくならないように
+	fill.w = (std::max)(fill.w, 0.8f) * alpha; //後ろが透けすぎて、文字が読みにくくならないように
 	DirectX::XMFLOAT4 edge = panel.frame.frameColor;
 	edge.w *= alpha;
 	_uiRenderer->DrawRect(left, top, width, height, XMLoadFloat4(&fill));
 	_uiRenderer->DrawFrame(left, top, width, height, panel.frame.thickness, XMLoadFloat4(&edge));
 
-	// パネルが出きるまでは、中身は出さない
+	//パネルが出きるまでは、中身は出さない
 	if (_elapsed < panelPopSeconds)
 		return;
 
@@ -162,7 +162,7 @@ void ResultPanel::Draw()
 	_uiRenderer->DrawStringCentered(L"スコア", centerX, panel.frame.top + scoreLabelY, 0.35f,
 		DirectX::XMVectorSet(0.7f, 0.8f, 1.0f, 1.0f), black);
 
-	// スコアは、0から数え上がる(最初が速く、だんだん遅くなる)
+	//スコアは、0から数え上がる(最初が速く、だんだん遅くなる)
 	const float countT = EaseOutCubic(Progress(panelPopSeconds, scoreCountSeconds));
 	const int shownScore = static_cast<int>(_score * countT);
 	_uiRenderer->DrawStringCentered(FormatWithComma(shownScore), centerX, panel.frame.top + scoreValueY,
@@ -181,7 +181,7 @@ void ResultPanel::DrawStars(float centerX, float centerY)
 	{
 		const float x = centerX + (i - 1) * starSpacing;
 
-		// 取れなかった星は、最初から暗い星を出しておく
+		//取れなかった星は、最初から暗い星を出しておく
 		if (i >= _starCount)
 		{
 			_uiRenderer->DrawTexture(_starOff.Get(), x - starSize * 0.5f, centerY - starSize * 0.5f,
@@ -189,7 +189,7 @@ void ResultPanel::DrawStars(float centerX, float centerY)
 			continue;
 		}
 
-		// 取れた星は、順番に、大きく弾んで出る
+		//取れた星は、順番に、大きく弾んで出る
 		const float t = Progress(starsStart + starIntervalSeconds * i, starPopSeconds);
 		if (t <= 0.0f)
 		{

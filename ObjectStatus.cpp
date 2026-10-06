@@ -8,9 +8,9 @@
 #include "PhysicsSystem.h"
 #include "Ragdoll.h"
 
-void ObjectStatus::Initialize(ServiceLocator& context)
+void ObjectStatus::Initialize(ServiceLocator& locator)
 {
-	_physicsSystem = context.physicsSystem;
+	_physicsSystem = locator.physicsSystem;
 }
 
 void ObjectStatus::OnCollisionEnter(Collider* other, const CollisionResult& result)
@@ -24,16 +24,15 @@ void ObjectStatus::OnCollisionEnter(Collider* other, const CollisionResult& resu
 	hit.baseScore = _score;
 	hit.position = result.contactPoint;
 
-	// 念のための保険: 接触点が空(原点)の結果が来たときは、当たったボーンのコライダーの中心を使う
-	// (得点の文字が、世界の原点という、体から遠い場所に出るのを防ぐ)
+	//念のための保険: 接触点が空(原点)の結果が来たときは、当たったボーンのコライダーの中心を使う
 	if (result.colliderA == nullptr || result.colliderB == nullptr)
 	{
 		const XMFLOAT3 center = other->GetCenter();
 		hit.position = Vector3(center.x, center.y, center.z);
 	}
 
-	// 体が飛んでいく向き(右か左か)。
-	// 当たったコライダーが、どのボーンのものかも調べて、頭かどうかを決める
+	//体が飛んでいく向き(右か左か)。
+	//当たったコライダーが、どのボーンのものかも調べて、頭かどうかを決める
 	float directionX = 1.0f;
 	if (auto* owner = other->GetOwner())
 	{
@@ -51,9 +50,10 @@ void ObjectStatus::OnCollisionEnter(Collider* other, const CollisionResult& resu
 
 	OnSendScore.Invoke(hit);
 }
+
 void ObjectStatus::InitializeFly(float directionX)
 {
-	// 飛ぶ速さと回転を決める(毎回少しずつ違う)。2Dの見た目なので、奥(Z)には飛ばさない
+	//飛ぶ速さと回転を決める(毎回少しずつ違う)。2Dの見た目なので、奥(Z)には飛ばさない
 	static std::mt19937 rng{ std::random_device{}() };
 	std::uniform_real_distribution<float> speedScale(0.7f, 1.3f);
 	std::uniform_int_distribution<int> spinSign(0, 1);
@@ -61,7 +61,7 @@ void ObjectStatus::InitializeFly(float directionX)
 	_flyVelocity = { directionX * _flySpeed * speedScale(rng), _flyUpSpeed * speedScale(rng), 0.0f };
 	_spinDegrees = (spinSign(rng) == 0 ? 1.0f : -1.0f) * _flySpinDegrees;
 
-	// 物理の中(衝突の通知の最中)で、物理の登録を変えると危ないので、次のUpdateで外す
+	//物理の中(衝突の通知の最中)で、物理の登録を変えると危ないので、次のUpdateで外す
 	_flyState = FlyState::Requested;
 }
 
@@ -79,7 +79,7 @@ void ObjectStatus::UpdateFly(float deltaTime)
 
 	if (_flyState == FlyState::Requested)
 	{
-		// 物理から外す。これ以降は、ここで位置と向きを動かす(体は通り抜けて、積んであった箱は落ちる)
+		//物理から外す。これ以降は、ここで位置と向きを動かす(体は通り抜けて、積んであった箱は落ちる)
 		if (_physicsSystem)
 		{
 			if (auto* collider = GetOwner()->GetComponent<Collider>())
@@ -93,13 +93,13 @@ void ObjectStatus::UpdateFly(float deltaTime)
 
 	_flyAge += deltaTime;
 
-	// 放物線: 重力で下に引かれながら、飛んでいく
+	//放物線: 重力で下に引かれながら、飛んでいく
 	_flyVelocity.y += GRAVITY * deltaTime;
 	transform.Position.x += _flyVelocity.x * deltaTime;
 	transform.Position.y += _flyVelocity.y * deltaTime;
 	transform.Position.z += _flyVelocity.z * deltaTime;
 
-	// 回りながら、だんだん小さくなって消える(最後に向けて、小さくなる速さが上がる)
+	//回りながら、だんだん小さくなって消える(最後に向けて、小さくなる速さが上がる)
 	transform.Rotation.z += _spinDegrees * deltaTime;
 
 	const float t = (std::min)(_flyAge / _flySeconds, 1.0f);

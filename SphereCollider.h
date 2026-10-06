@@ -3,25 +3,25 @@
 #include "Transform.h"
 #include "DebagUtility.h"
 
-// 球形のCollider
+//球形のCollider
 class SphereCollider : public Collider
 {
 public:
     SphereCollider() = default;
     ~SphereCollider() override = default;
 
-    // Colliderの種類を取得
+    //Colliderの種類を取得
     ColliderType GetType() const override
     {
         return ColliderType::SphereColliderType;
     }
 
-    // Sphereを囲むAABBの最小座標を取得
+    //Sphereを囲むAABBの最小座標を取得
     XMFLOAT3 GetMin() const override
     {
         auto pos = GetCenter();
 
-        // 中心座標から半径分だけ各方向へ広げる
+        //中心座標から半径分だけ各方向へ広げる
         return
         {
             pos.x - _radius,
@@ -30,12 +30,12 @@ public:
         };
     }
 
-    // Sphereを囲むAABBの最大座標を取得
+    //Sphereを囲むAABBの最大座標を取得
     XMFLOAT3 GetMax() const override
     {
         auto pos = GetCenter();
 
-        // 中心座標から半径分だけ各方向へ広げる
+        //中心座標から半径分だけ各方向へ広げる
         return
         {
             pos.x + _radius,
@@ -44,8 +44,8 @@ public:
         };
     }
 
-    // レイとSphereの交差判定
-    // ※現在は未実装
+    //レイとSphereの交差判定
+    //※現在は未実装
     bool RayCast(
         const XMFLOAT3& origin,
         const XMFLOAT3& direction,
@@ -55,7 +55,7 @@ public:
         return false;
     }
 
-    // デバッグ用にSphereを描画
+    //デバッグ用にSphereを描画
     void DrawDebug(DebugDraw* debugDraw) const override
     {
         debugDraw->DrawSphere(
@@ -64,19 +64,19 @@ public:
             { 0, 1, 0, 1 });
     }
 
-    // Sphereの半径を設定
+    //Sphereの半径を設定
     void SetRadius(float radius)
     {
         _radius = radius;
     }
 
-    // Sphereの半径を取得
+    //Sphereの半径を取得
     float GetRadius() const
     {
         return _radius;
     }
 
 private:
-    // Sphereの半径
+    //Sphereの半径
     float _radius = 0.5f;
 };

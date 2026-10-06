@@ -11,11 +11,11 @@
 
 void ModelLoader::GetFbxObjectData(MeshInfo& meshinfo, const aiMesh* aimesh, const std::unordered_map<std::string, int>& boneMap)
 {
-    // 既存メッシュの頂点数を基準に、このメッシュの頂点位置を記録
+    //既存メッシュの頂点数を基準に、このメッシュの頂点位置を記録
     const UINT offset =
         static_cast<UINT>(meshinfo.vertices.size());
 
-    // 必要な容量をあらかじめ確保し、vectorの再確保を抑える
+    //必要な容量をあらかじめ確保し、vectorの再確保を抑える
     meshinfo.vertices.reserve(
         meshinfo.vertices.size() + aimesh->mNumVertices);
 
@@ -40,11 +40,11 @@ void ModelLoader::GetFbxObjectData(MeshInfo& meshinfo, const aiMesh* aimesh, con
             aimesh->mNormals[i].z
         };
 
-        // UVが存在しないメッシュにはデフォルト値を設定
+        //UVが存在しないメッシュにはデフォルト値を設定
         if (aimesh->HasTextureCoords(0))
         {
-            // FBXのUVは、下がV=0(OpenGL式)。DirectXで読み込んだ画像は、上がV=0なので、Vを反転する
-            // (しないと、テクスチャが上下逆に貼られる: 頭に足の模様、など)
+            //FBXのUVは、下がV=0(OpenGL式)。DirectXで読み込んだ画像は、上がV=0なので、Vを反転する
+            //(しないと、テクスチャが上下逆に貼られる: 頭に足の模様、など)
             vertex.UV =
             {
                 aimesh->mTextureCoords[0][i].x,
@@ -59,7 +59,7 @@ void ModelLoader::GetFbxObjectData(MeshInfo& meshinfo, const aiMesh* aimesh, con
         meshinfo.vertices.push_back(vertex);
     }
 
-    // ボーンウェイトを各頂点に設定
+    //ボーンウェイトを各頂点に設定
     for (unsigned boneIndex = 0;
         boneIndex < aimesh->mNumBones;
         ++boneIndex)
@@ -89,7 +89,7 @@ void ModelLoader::GetFbxObjectData(MeshInfo& meshinfo, const aiMesh* aimesh, con
             Vertex& vertex =
                 meshinfo.vertices[offset + vertexId];
 
-            // 最大4つのボーンウェイトを頂点に格納
+            //最大4つのボーンウェイトを頂点に格納
             if (vertex.Weight.x == 0.0f)
             {
                 vertex.BoneIndex.x = skeletonIndex;
@@ -113,7 +113,7 @@ void ModelLoader::GetFbxObjectData(MeshInfo& meshinfo, const aiMesh* aimesh, con
         }
     }
 
-    // Triangulate済みなので、各面は3頂点としてインデックスを追加
+    //Triangulate済みなので、各面は3頂点としてインデックスを追加
     for (unsigned i = 0; i < aimesh->mNumFaces; ++i)
     {
         const aiFace& face = aimesh->mFaces[i];
@@ -131,7 +131,7 @@ int ModelLoader::CreateBoneNode(const aiNode* node,Skeleton& nodes, int parentIn
 {
     BoneNode boneNode;
 
-    // mixamorig9: などの番号つきの名前は、mixamorig: にそろえる(ラグドール・IKが名前で探すため)
+    //mixamorig9: などの番号つきの名前は、mixamorig: にそろえる(ラグドール・IKが名前で探すため)
     boneNode.Name =
         BoneNameUtility::NormalizeMixamoPrefix(node->mName.C_Str());
 
@@ -145,7 +145,7 @@ int ModelLoader::CreateBoneNode(const aiNode* node,Skeleton& nodes, int parentIn
     boneNode.LocalTransform = localTransform;
     if (parentIndex >= 0)
     {
-        // 親の累積済みBindTransformを掛けて、モデル空間での累積値にする
+        //親の累積済みBindTransformを掛けて、モデル空間での累積値にする
         XMMATRIX parentBind =
             XMLoadFloat4x4(&nodes.GetNode()[parentIndex].BindGlobalTransform);
 
@@ -155,7 +155,7 @@ int ModelLoader::CreateBoneNode(const aiNode* node,Skeleton& nodes, int parentIn
     }
     else
     {
-        // ルートは親が無いのでローカル=モデル空間
+        //ルートは親が無いのでローカル=モデル空間
         XMStoreFloat4x4(&boneNode.BindGlobalTransform, localBind);
     }
     boneNode.ParentIndex =
@@ -184,7 +184,7 @@ int ModelLoader::CreateBoneNode(const aiNode* node,Skeleton& nodes, int parentIn
 void ModelLoader::GetFbxMaterialData(std::shared_ptr<Material>& material, aiMaterial* aimaterial)
 {
 
-    // Diffuse Color
+    //Diffuse Color
     aiColor4D color;
 
     if (aiGetMaterialColor(
@@ -205,7 +205,7 @@ void ModelLoader::GetFbxMaterialData(std::shared_ptr<Material>& material, aiMate
     material->SetTexturePath(L"");
 
     aiString path;
-    // Diffuseテクスチャが無ければここで終了
+    //Diffuseテクスチャが無ければここで終了
     if (aimaterial->GetTexture(
         aiTextureType_DIFFUSE,
         0,
@@ -214,7 +214,7 @@ void ModelLoader::GetFbxMaterialData(std::shared_ptr<Material>& material, aiMate
         return;
     }
 
-    // FBX側のパスは無視してファイル名だけ使用し、プロジェクトのAsset配下として組み立てる
+    //FBX側のパスは無視してファイル名だけ使用し、プロジェクトのAsset配下として組み立てる
     std::filesystem::path texturePath(path.C_Str());
     const std::filesystem::path fileName = texturePath.filename();
     const std::filesystem::path resultPath = std::filesystem::path(L"Asset/Texture") / fileName;
@@ -231,10 +231,10 @@ void ModelLoader::BuildSkeleton(aiNode* node, Skeleton& skeleton,
     std::string name = node->mName.C_Str();
 
     auto it = boneMap.find(name);
-    // このノードがボーンとして使われているか確認
+    //このノードがボーンとして使われているか確認
     if (it != boneMap.end())
     {
-        // boneMap / boneIndexMap は、FBXの元の名前で引く。Skeletonの中の名前は、そろえた名前
+        //boneMap / boneIndexMap は、FBXの元の名前で引く。Skeletonの中の名前は、そろえた名前
         const std::string normalizedName = BoneNameUtility::NormalizeMixamoPrefix(name);
 
         Bone bone;
@@ -247,9 +247,9 @@ void ModelLoader::BuildSkeleton(aiNode* node, Skeleton& skeleton,
         const int currentIndex = static_cast<int>(skeleton.GetBones().size());
         boneIndexMap[name] = currentIndex;
 
-        skeleton.SetBone(bone); // TODO: AddBoneなど意図が伝わる名前を検討
+        skeleton.SetBone(bone); //TODO: AddBoneなど意図が伝わる名前を検討
 
-        // 子ノードもこのボーンを親として探索
+        //子ノードもこのボーンを親として探索
         for (unsigned i = 0; i < node->mNumChildren; ++i)
         {
             BuildSkeleton(
@@ -262,7 +262,7 @@ void ModelLoader::BuildSkeleton(aiNode* node, Skeleton& skeleton,
         return;
     }
 
-    // ボーンでなくても、その子にボーンがいる可能性があるので探索を続ける
+    //ボーンでなくても、その子にボーンがいる可能性があるので探索を続ける
     for (unsigned i = 0; i < node->mNumChildren; ++i)
     {
         BuildSkeleton(
@@ -276,7 +276,7 @@ void ModelLoader::BuildSkeleton(aiNode* node, Skeleton& skeleton,
 
 void ModelLoader::GetFbxAnimationData(const aiScene* scene,Animation& animation,Skeleton& skeleton)
 {
-    // アニメーションが存在しない場合は終了
+    //アニメーションが存在しない場合は終了
     if (scene->mNumAnimations == 0)
         return;
 
@@ -291,16 +291,16 @@ void ModelLoader::GetFbxAnimationData(const aiScene* scene,Animation& animation,
     animation.TicksPerSecond =
         aiAnim->mTicksPerSecond;
 
-    // アニメーションチャンネル数分の領域を事前確保
+    //アニメーションチャンネル数分の領域を事前確保
     animation.Bones.reserve(aiAnim->mNumChannels);
 
-    // ボーンごとのキーフレームチャンネルを変換
+    //ボーンごとのキーフレームチャンネルを変換
     for (unsigned i = 0; i < aiAnim->mNumChannels; ++i)
     {
         aiNodeAnim* channel = aiAnim->mChannels[i];
         const std::string nodeName = BoneNameUtility::NormalizeMixamoPrefix(channel->mNodeName.C_Str());
 
-        // Skeletonに存在しないNodeは無視
+        //Skeletonに存在しないNodeは無視
         const int nodeIndex = skeleton.FindNode(nodeName);
         if (nodeIndex < 0)
             continue;
@@ -312,7 +312,7 @@ void ModelLoader::GetFbxAnimationData(const aiScene* scene,Animation& animation,
         boneAnimation.Rotations.reserve(channel->mNumRotationKeys);
         boneAnimation.Scales.reserve(channel->mNumScalingKeys);
 
-        // Position
+        //Position
         for (unsigned k = 0; k < channel->mNumPositionKeys; ++k)
         {
             const auto& key = channel->mPositionKeys[k];
@@ -324,7 +324,7 @@ void ModelLoader::GetFbxAnimationData(const aiScene* scene,Animation& animation,
             boneAnimation.Positions.push_back(keyframe);
         }
 
-        // Rotation
+        //Rotation
         for (unsigned k = 0; k < channel->mNumRotationKeys; ++k)
         {
             const auto& key = channel->mRotationKeys[k];
@@ -336,7 +336,7 @@ void ModelLoader::GetFbxAnimationData(const aiScene* scene,Animation& animation,
             boneAnimation.Rotations.push_back(keyframe);
         }
 
-        // Scale
+        //Scale
         for (unsigned k = 0; k < channel->mNumScalingKeys; ++k)
         {
             const auto& key = channel->mScalingKeys[k];
@@ -371,10 +371,10 @@ std::shared_ptr<ModelDatas> ModelLoader::FBXLoadModel(const std::string& path)
         return nullptr;
     }
 
-    // 動かない物(ボーンもアニメーションもない)は、ノードの位置・回転・拡大を、頂点に焼き込む。
-    // 焼き込まないと、複数のパーツ(車輪・砲身など)が、全部、原点に同じ向きで重なって描かれる
-    // (このゲームは、メッシュの頂点だけを読み、ノードの変換は使わないため)。
-    // ボーンのあるモデル(プレイヤー)は、ノードの変換を、スケルトンとして使うので、そのままにする
+    //動かない物(ボーンもアニメーションもない)は、ノードの位置・回転・拡大を、頂点に焼き込む。
+    //焼き込まないと、複数のパーツ(車輪・砲身など)が、全部、原点に同じ向きで重なって描かれる
+    //(このゲームは、メッシュの頂点だけを読み、ノードの変換は使わないため)。
+    //ボーンのあるモデル(プレイヤー)は、ノードの変換を、スケルトンとして使うので、そのままにする
     bool hasBones = false;
     for (unsigned i = 0; i < scene->mNumMeshes; ++i)
     {
@@ -395,25 +395,25 @@ std::shared_ptr<ModelDatas> ModelLoader::FBXLoadModel(const std::string& path)
     std::unordered_map<std::string, aiBone*> boneNames;
     std::unordered_map<std::string, int> boneIndexMap;
 
-    // ボーン情報を収集
+    //ボーン情報を収集
     CollectBones(scene, boneNames);
 
-    // 全ノードを登録してからSkeleton(ボーンのみ)を構築
+    //全ノードを登録してからSkeleton(ボーンのみ)を構築
     auto skeleton = std::make_shared<Skeleton>();
     CreateBoneNode(scene->mRootNode, *skeleton, -1);
     BuildSkeleton(scene->mRootNode, *skeleton, boneNames, boneIndexMap, -1);
 
-    // ルートのBindTransformからモデル空間への逆行列を算出
+    //ルートのBindTransformからモデル空間への逆行列を算出
     auto rootBind = XMLoadFloat4x4(&skeleton->GetNode()[0].BindTransform);
     XMStoreFloat4x4(&skeleton->GetGlobalInverseTransform(), XMMatrixInverse(nullptr, rootBind));
 
-    // アニメーションデータを取得
+    //アニメーションデータを取得
     auto animation = std::make_shared<Animation>();
     GetFbxAnimationData(scene, *animation, *skeleton);
     data->animation = animation;
     data->skeleton = skeleton;
 
-    // メッシュ・マテリアルを1つずつ変換して登録
+    //メッシュ・マテリアルを1つずつ変換して登録
     for (unsigned i = 0; i < scene->mNumMeshes; ++i)
     {
         aiMesh* sourceMesh = scene->mMeshes[i];
@@ -424,7 +424,7 @@ std::shared_ptr<ModelDatas> ModelLoader::FBXLoadModel(const std::string& path)
         MeshInfo info;
         GetFbxObjectData(info, sourceMesh, boneIndexMap);
 
-        // ボーンウェイトの合計が1になるよう正規化
+        //ボーンウェイトの合計が1になるよう正規化
         for (auto& vertex : info.vertices)
         {
             const float total =
@@ -469,7 +469,7 @@ void ModelLoader::CollectBones(const aiScene* scene,std::unordered_map<std::stri
 
 std::shared_ptr<ModelDatas> ModelLoader::PrimitiveLoadModel(const PrimitiveShape& shape)
 {
-    // 形ごとのメッシュ生成関数(役割=ObjectTypeには依存しない)
+    //形ごとのメッシュ生成関数(役割=ObjectTypeには依存しない)
     static const std::unordered_map<PrimitiveShape, std::function<std::shared_ptr<Mesh>()>> creators =
     {
         { PrimitiveShape::Triangle,       []() { return std::make_shared<Mesh>(Mesh::Create<Primitive::TriangleMesh>(1.0)); } },
@@ -494,7 +494,7 @@ std::shared_ptr<Mesh> ModelLoader::CreateBottomPivotBox()
 {
     auto mesh = std::make_shared<Mesh>(Mesh::Create<Primitive::BoxMesh>(1.0f));
 
-    // 箱の頂点は、中心が原点(Yが -0.5～0.5)。上に0.5ずらして、下端(Y=0)を原点にする
+    //箱の頂点は、中心が原点(Yが -0.5～0.5)。上に0.5ずらして、下端(Y=0)を原点にする
     for (auto& vertex : mesh->GetMeshInfos().vertices)
         vertex.Position.y += 0.5f;
 

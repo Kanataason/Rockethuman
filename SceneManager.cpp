@@ -60,7 +60,7 @@ void SceneManager::RequestScene()
 
 	_currentScene = data.scene();
 
-	// ステージは、選んでいるステージのJSON(Stages.json)を読む。それ以外は、Scene.jsonに書いたJSON
+	//ステージは、選んでいるステージのJSON(Stages.json)を読む。それ以外は、Scene.jsonに書いたJSON
 	std::string path = data.path;
 	if (data.sceneName == SceneName::Stage && _locator.stages)
 		path = _locator.stages->GetSelectedPath();
@@ -81,7 +81,7 @@ void SceneManager::EntryScene()
 		auto data = _jsonLoader.LoadSceneData(scene);
 		
 		const auto& it = MakeSceneFunctionTable.find(data.sceneName);
-		// 作り方が登録されていない名前は飛ばす(returnすると、タイトルへの切り替えまで行われず、最初のシーンが無いまま落ちる)
+		//作り方が登録されていない名前は飛ばす(returnすると、タイトルへの切り替えまで行われず、最初のシーンが無いまま落ちる)
 		if (it == MakeSceneFunctionTable.end())continue;
 
 		data.scene = it->second;	

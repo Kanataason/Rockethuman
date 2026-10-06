@@ -20,32 +20,32 @@ using namespace UiInfo;
 
 namespace
 {
-	// ---- 点が入ったときの演出の調整値 ----
-	constexpr float popupLifetime = 1.3f;       // 「+500」が消えるまでの秒数
-	constexpr float popupRisePixels = 90.0f;    // 浮き上がる高さ(1280x720基準のピクセル)
-	constexpr float popupBaseScale = 0.55f;     // 文字の大きさ
-	constexpr float popupPopSeconds = 0.25f;    // 出た瞬間に弾む時間
-	constexpr float popupFadeStart = 0.5f;      // 寿命のここから先で、だんだん透明になる(0～1)
+	//---- 点が入ったときの演出の調整値 ----
+	constexpr float popupLifetime = 1.3f; //ポイントが消えるまでの秒数
+	constexpr float popupRisePixels = 90.0f; //浮き上がる高さ(1280x720基準のピクセル)
+	constexpr float popupBaseScale = 0.55f; //文字の大きさ
+	constexpr float popupPopSeconds = 0.25f; //出た瞬間に弾む時間
+	constexpr float popupFadeStart = 0.5f; //寿命のここから先で、だんだん透明になる
 
-	// COMBO表示(スコアのパネルの下)
+	//COMBO表示(スコアのパネルの下)
 	constexpr float comboCenterX = 180.0f;
 	constexpr float comboCenterY = 172.0f;
 	constexpr float comboScale = 0.5f;
 	constexpr float comboPopSeconds = 0.3f;
 
-	// クリアボーナスの大きな文字(画面の中央)
-	constexpr float bonusLifetime = 1.45f;       // 消えるまでの秒数(結果パネルが出る前に、消える長さ)
-	constexpr float bonusPopSeconds = 0.4f;      // 小さい所から、ドンと出てくる時間
-	constexpr float bonusFadeStart = 0.75f;      // 寿命のここから先で、だんだん透明になる(0～1)
+	//クリアボーナスの大きな文字(画面の中央)
+	constexpr float bonusLifetime = 1.45f; //消えるまでの秒数(結果パネルが出る前に、消える長さ)
+	constexpr float bonusPopSeconds = 0.4f; //小さい所から、ドンと出てくる時間
+	constexpr float bonusFadeStart = 0.75f; //寿命のここから先で、だんだん透明になる
 	constexpr float bonusCenterX = 640.0f;
 	constexpr float bonusLabelY = 230.0f;
 	constexpr float bonusPointsY = 330.0f;
 	constexpr float bonusLabelScale = 0.6f;
 	constexpr float bonusPointsScale = 1.5f;
 
-	// 威力ゲージ
-	constexpr float dimZoneAlpha = 0.28f;        // まだ届いていない色の帯の、薄さ
-	constexpr float gaugeLabelOffsetY = 22.0f;   // ゲージの下端から、帯の名前までの距離
+	//威力ゲージ
+	constexpr float dimZoneAlpha = 0.28f; //まだ届いていない色の帯の、薄さ
+	constexpr float gaugeLabelOffsetY = 22.0f; //ゲージの下端から、帯の名前までの距離
 	constexpr float gaugeLabelScale = 0.4f;
 }
 
@@ -55,14 +55,22 @@ void GameScene::Initialize(ServiceLocator& locator)
 
 	_timeScale = locator.timeScale;
 	_input = locator.input;
-	SetPaused(false);   // ポーズのまま、シーンが切り替わっても、止まったままにならないように
 	_sound = locator.sound;
 	_characters = locator.characters;
-	if (_sound)
-		_sound->PlayBgm("stage");   // 同じ曲が鳴っていれば、続ける(「もういちど」で、頭に戻らない)
+
+	SetPaused(false); //ポーズのまま、シーンが切り替わっても、止まったままにならないように
+
 	_resultPanel.Initialize(locator);
 	_pausePanel.Initialize(locator);
 
+	SetCannonInfo();
+	SubscribeEvents();
+
+	if (_sound)
+		_sound->PlayBgm("stage"); //同じ曲が鳴っていれば、続ける(「もういちど」で、頭に戻らない)
+}
+void GameScene::SetCannonInfo()
+{
 	auto* cannon = FindGameObject<CannonController>();
 	auto* player = FindGameObject<Player>();
 
@@ -77,29 +85,28 @@ void GameScene::Initialize(ServiceLocator& locator)
 		if (auto* component = obj->GetComponent<ObjectStatus>())
 			_scoreManager.SubScribeEvent(component);
 	}
-
-	SubscribeEvents();
 }
+
 void GameScene::SubscribeEvents()
 {
-	// ラグドールが止まったら、1発ぶんの流れを進める
-	//   止まった瞬間 -> 残りの玉数のアニメーション
-	//   少し待つ     -> ラグドールを大砲に戻して、次の1発へ
+	//ラグドールが止まったら、1発ぶんの流れを進める
+	//止まった瞬間 -> 残りの玉数のアニメーション
+	//少し待つ     -> ラグドールを大砲に戻して、次の1発へ
 	_ragdoll = FindGameObject<Ragdoll>();
 	if (_ragdoll)
 	{
 		_ragdoll->OnSettled.Subscribe([this]() { _roundManager.NotifySettled(); });
 
-		// 発射したあと、地面に着くたびに、ヒット音を鳴らす
+		//発射したあと、地面に着くたびに、ヒット音を鳴らす
 		_ragdoll->OnGroundHit.Subscribe([this]() { PlayCharacterSe("hit"); });
 	}
 
-	// カメラ: 発射したらラグドールを追いかけ、次の1発の準備ができたら最初の位置へ戻る
+	//カメラ: 発射したらラグドールを追いかけ、次の1発の準備ができたら最初の位置へ戻る
 	_cameraFollow = FindGameObject<CameraFollow>();
 	if (_cameraFollow)
 		_cameraFollow->SetTarget(_ragdoll);
 
-	// 点が入ったら、当たった場所に500を出す
+	//点が入ったら、当たった場所に500を出す
 	_scoreManager.OnScoreGained.Subscribe([this](ScoreGain gain)
 		{
 			AddScorePopup(gain);
@@ -113,7 +120,7 @@ void GameScene::SubscribeEvents()
 			if (gain.isHead)
 				PlayCharacterSe("head");
 
-			// 当たった瞬間に、少し遅くする(頭ヒットは、もっと遅く)
+			//当たった瞬間に、少し遅くする(頭ヒットは、もっと遅く)
 			if (_timeScale)
 			{
 				if (gain.isHead)
@@ -127,7 +134,7 @@ void GameScene::SubscribeEvents()
 		{
 			PlayCharacterSe("shot");
 
-			// 発射した位置を覚えておく(止まったときの飛距離の採点に使う)
+			//発射した位置を覚えておく(止まったときの飛距離の採点に使う)
 			if (_ragdoll)
 				_launchRootX = _ragdoll->GetRootPosition().x;
 			if (_cameraFollow)
@@ -137,7 +144,7 @@ void GameScene::SubscribeEvents()
 		{
 			_shotCountPop.Start(0.5f);
 
-			// 1発が終わったら、飛んだ距離を点にして、コンボを途切れさせる
+			//1発が終わったら、飛んだ距離を点にして、コンボを途切れさせる
 			if (_ragdoll)
 				_scoreManager.AddDistanceBonus(std::abs(_ragdoll->GetRootPosition().x - _launchRootX));
 			_scoreManager.ResetCombo();
@@ -156,25 +163,25 @@ void GameScene::SubscribeEvents()
 			_roundManager.NotifyAllCleared();
 		});
 
-	// ボーナスが入ったら、画面の中央に、大きく出す
+	//ボーナスが入ったら、画面の中央に、大きく出す
 	_scoreManager.OnBonusGained.Subscribe([this](float points)
 		{
 			StartBonusPopup(points);
 			PlayCharacterSe("clear");
 		});
-	// 玉を撃ち終えたら、いまのステージの結果を、ゲーム画面の上に出す
+	//玉を撃ち終えたら、いまのステージの結果を、ゲーム画面の上に出す
 	_roundManager.OnFinished.Subscribe([this]()
 		{
 			_sound->PlayBgm("drumRoll");
 			_resultPanel.Show(static_cast<int>(_scoreManager.GetScore()));
 		});
 
-	// 結果パネルの選択。シーンの切り替えは「予約」だけで、実際の入れ替えは次のフレームの頭に行われる
-	// 同じシーン(GameScene)を指定すると、JSONから作り直されるので、スコアも玉数も、的の配置も、最初に戻る
+	//結果パネルの選択。シーンの切り替えは「予約」だけで、実際の入れ替えは次のフレームの頭に行われる
+	//同じシーン(GameScene)を指定すると、JSONから作り直されるので、スコアも玉数も、的の配置も、最初に戻る
 	_resultPanel.OnRetry.Subscribe([this]() { _sceneManager->Reload(); });
 	_resultPanel.OnBackToTitle.Subscribe([this]() { _sceneManager->ChangeScene(SceneName::Title); });
 
-	// ポーズのパネルの選択。シーンを切り替えるときは、先に時間を戻しておく
+	//ポーズのパネルの選択。シーンを切り替えるときは、先に時間を戻しておく
 	_pausePanel.OnResume.Subscribe([this]() { SetPaused(false); });
 	_pausePanel.OnRetry.Subscribe([this]()
 		{
@@ -194,8 +201,8 @@ void GameScene::SetPaused(bool paused)
 		_timeScale->SetPaused(paused);
 }
 
-// 出来事("shot" "hit" "head" "clear")の効果音を鳴らす。選んでいるキャラクターに専用の音があれば、それを鳴らす
-// 専用の音が、設定されていない・読み込めていないときは、標準の音(出来事の名前と同じ音)に戻す
+//出来事("shot" "hit" "head" "clear")の効果音を鳴らす。選んでいるキャラクターに専用の音があれば、それを鳴らす
+//専用の音が、設定されていない・読み込めていないときは、標準の音(出来事の名前と同じ音)に戻す
 void GameScene::PlayCharacterSe(const std::string& eventName)
 {
 	if (!_sound)
@@ -216,14 +223,14 @@ void GameScene::SetStageInfo(StageData data)
 
 void GameScene::Update(float deltaTime)
 {
-	// ポーズ中は、パネルの操作だけ受け付ける(ゲームの入力・更新は、全部止める)
+	//ポーズ中は、パネルの操作だけ受け付ける(ゲームの入力・更新は、全部止める)
 	if (_pausePanel.IsVisible())
 	{
 		_pausePanel.Update();
 		return;
 	}
 
-	// ESCでポーズ。結果パネルが出ているときは、出さない
+	//ESCでポーズ。結果パネルが出ているときは、出さない
 	if (_input && !_resultPanel.IsVisible() && _input->GetKeyDown(VK_ESCAPE))
 	{
 		_pausePanel.Open();
@@ -245,7 +252,7 @@ void GameScene::Update(float deltaTime)
 
 void GameScene::DrawUi()
 {
-	// Begin～Endの間でreturnすると、Endが呼ばれず描画の状態が壊れるので、先に探しておく
+	//Begin～Endの間でreturnすると、Endが呼ばれず描画の状態が壊れるので、先に探しておく
 	auto it = panelList.find(PanelType::Score);
 	if (it == panelList.end())return;
 	const PanelData& panel = it->second;
@@ -259,13 +266,13 @@ void GameScene::DrawUi()
 	DrawBonusPopup();
 	DrawGauge();
 	DrawAimHint();
-	_resultPanel.Draw();   // (出ていないときは、何もしない)
-	_pausePanel.Draw();   // 一番手前
+	_resultPanel.Draw(); //(出ていないときは、何もしない)
+	_pausePanel.Draw(); //一番手前
 
 	_uiRenderer->End();
 }
 
-// 画面の下に、いま何を決めるのかを出す(角度 -> 威力の2段階)
+//画面の下に、いま何を決めるのかを出す(角度 -> 威力の2段階)
 void GameScene::DrawAimHint()
 {
 	std::wstring text;
@@ -293,12 +300,12 @@ void GameScene::DrawGauge()
 
 	auto& panelData = it->second.frame;
 
-	// 背景
+	//背景
 	_uiRenderer->DrawRect(panelData.left, panelData.top, panelData.width,
 		panelData.height, DirectX::XMVectorSet(0, 0, 0, 0.6f));
 
-	// 中身: 量に応じて、下端から上へ伸びる。色の帯ごとに区切って塗る
-	// 帯の位置は固定。まだ届いていない帯も薄く見せて、「上へ行くほど強い」が先にわかるようにする
+	//中身: 量に応じて、下端から上へ伸びる。色の帯ごとに区切って塗る
+	//帯の位置は固定。まだ届いていない帯も薄く見せて、「上へ行くほど強い」が先にわかるようにする
 	float zoneStart = 0.0f;
 	for (const auto& zone : PowerZone::zones)
 	{
@@ -318,7 +325,7 @@ void GameScene::DrawGauge()
 				XMLoadFloat4(&zone.color));
 		}
 
-		// 帯の境目に、白い線を引く(一番上の境目は枠と重なるので、引かない)
+		//帯の境目に、白い線を引く(一番上の境目は枠と重なるので、引かない)
 		if (zone.upTo < 1.0f)
 			_uiRenderer->DrawRect(panelData.left, zoneTop - 1.0f, panelData.width, 2.0f,
 				DirectX::XMVectorSet(1, 1, 1, 0.8f));
@@ -328,7 +335,7 @@ void GameScene::DrawGauge()
 	_uiRenderer->DrawFrame(panelData.left, panelData.top, panelData.width,
 		panelData.height, 2.0f, DirectX::XMVectorSet(1, 1, 1, 1));
 
-	// 威力を決めている間と、発射したあとは、いまの帯の名前を、その色でゲージの下に出す
+	//威力を決めている間と、発射したあとは、いまの帯の名前を、その色でゲージの下に出す
 	if (_roundManager.GetState() != RoundState::AimAngle)
 	{
 		const PowerZone::Zone& zone = PowerZone::ZoneAt(_gaugeAmmount);
@@ -343,7 +350,7 @@ void GameScene::UpdateGauge(float deltaTime)
 	switch (_roundManager.GetState())
 	{
 	case RoundState::AimAngle:
-		// 角度を決めている間は、ゲージを空にして待つ(次の1発も、毎回0から動き出す)
+		//角度を決めている間は、ゲージを空にして待つ(次の1発も、毎回0から動き出す)
 		_gaugeFrame = 0.0f;
 		_gaugeAmmount = 0.0f;
 		break;
@@ -354,11 +361,11 @@ void GameScene::UpdateGauge(float deltaTime)
 		break;
 
 	default:
-		// 発射したあとは、止めた量のまま表示しておく
+		//発射したあとは、止めた量のまま表示しておく
 		break;
 	}
 
-	// 大砲が撃つときに読めるように、今の量を渡しておく
+	//大砲が撃つときに読めるように、今の量を渡しておく
 	_roundManager.SetPowerAmount(_gaugeAmmount);
 }
 
@@ -382,7 +389,7 @@ void GameScene::UpdateScoreEffects(float deltaTime)
 
 	std::erase_if(_scorePopups, [](const ScorePopup& popup) { return popup.age >= popupLifetime; });
 
-	// コンボが増えた瞬間に、COMBOの文字を弾ませる
+	//コンボが増えた瞬間に、COMBOの文字を弾ませる
 	const int combo = _scoreManager.GetCombo();
 	if (combo > _lastCombo)
 		_comboPop.Start(comboPopSeconds);
@@ -404,7 +411,7 @@ void GameScene::StartBonusPopup(float points)
 	_bonusAge = 0.0f;
 }
 
-// 「ぜんぶ たおした!」と、ボーナスの点を、画面の中央に大きく出す
+//「ぜんぶ たおした!」と、ボーナスの点を、画面の中央に大きく出す
 void GameScene::DrawBonusPopup()
 {
 	if (!_bonusActive)
@@ -412,7 +419,7 @@ void GameScene::DrawBonusPopup()
 
 	const float t = _bonusAge / bonusLifetime;
 
-	// 小さい所から、大きく行き過ぎて、元の大きさに戻る(ドンと出る)。そのあとも、少し脈打つ
+	//小さい所から、大きく行き過ぎて、元の大きさに戻る(ドンと出る)。そのあとも、少し脈打つ
 	const float popT = (std::min)(_bonusAge / bonusPopSeconds, 1.0f);
 	const float pulse = 1.0f + 0.04f * std::sin(_bonusAge * 14.0f);
 	const float scale = (0.2f + 0.8f * EaseOutBack(popT)) * pulse;
@@ -429,7 +436,7 @@ void GameScene::DrawBonusPopup()
 		DirectX::XMVectorSet(1.0f, 0.82f, 0.15f, alpha), outline, 8.0f);
 }
 
-// 当たった場所から浮き上がって、消える文字。当たった場所は世界座標なので、カメラが動いても場所についていく
+//当たった場所から浮き上がって、消える文字。当たった場所は世界座標なので、カメラが動いても場所についていく
 void GameScene::DrawScorePopups()
 {
 	if (!_camera)
@@ -449,7 +456,7 @@ void GameScene::DrawScorePopups()
 		const float rise = popupRisePixels * EaseOutCubic(t);
 		const float alpha = t < popupFadeStart ? 1.0f : 1.0f - (t - popupFadeStart) / (1.0f - popupFadeStart);
 
-		// 出た瞬間に大きく弾んで、元の大きさに戻る。頭ヒットは、さらに大きくて金色
+		//出た瞬間に大きく弾んで、元の大きさに戻る。頭ヒットは、さらに大きくて金色
 		const float popT = (std::min)(popup.age / popupPopSeconds, 1.0f);
 		const float scale = popupBaseScale * (popup.isHead ? 1.3f : 1.0f) * (1.0f + 0.5f * (1.0f - EaseOutBack(popT)));
 
@@ -462,7 +469,7 @@ void GameScene::DrawScorePopups()
 	}
 }
 
-// 「COMBO x3」(2コンボ以上のときだけ)
+//「COMBO x3」(2コンボ以上のときだけ)
 void GameScene::DrawComboText()
 {
 	const int combo = _scoreManager.GetCombo();
@@ -474,7 +481,7 @@ void GameScene::DrawComboText()
 		comboScale * pop, DirectX::XMVectorSet(1.0f, 0.55f, 0.2f, 1.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-// パネルの塗り・枠・見出しの文字を描く(スコアと残りの数で共通)
+//パネルの塗り・枠・見出しの文字を描く(スコアと残りの数で共通)
 void GameScene::DrawPanelBase(const PanelData& panel)
 {
 	_uiRenderer->DrawRect(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
@@ -494,7 +501,7 @@ void GameScene::DrawPanelBase(const PanelData& panel)
 	}
 }
 
-// 画面の上の中央に、残りの発数を出す
+//画面の上の中央に、残りの発数を出す
 void GameScene::DrawShotCountPanel()
 {
 	auto it = panelList.find(PanelType::ShotCount);
@@ -506,12 +513,12 @@ void GameScene::DrawShotCountPanel()
 
 	constexpr float valueScale = 0.55f;
 	constexpr float valueTop = 58.0f;
-	constexpr float fontLineHeight = 96.0f;   // UIFont.spritefont の行の高さ(scale 1.0のとき)
+	constexpr float fontLineHeight = 96.0f; //UIFont.spritefont の行の高さ(scale 1.0のとき)
 
-	// ラグドールが止まった直後は、1.6倍から弾んで元の大きさに戻る
+	//ラグドールが止まった直後は、1.6倍から弾んで元の大きさに戻る
 	const float pop = 1.0f + 0.6f * (1.0f - EaseOutBack(_shotCountPop.T()));
 
-	// 拡大しても数字の中心がずれないように、中心を基準に描く
+	//拡大しても数字の中心がずれないように、中心を基準に描く
 	const float centerX = panel.frame.left + panel.frame.width * 0.5f;
 	const float centerY = valueTop + fontLineHeight * valueScale * 0.5f;
 	_uiRenderer->DrawStringCentered(std::to_wstring(_roundManager.GetShotCount()), centerX, centerY,
@@ -522,8 +529,8 @@ void GameScene::UpdateScorePanel(const PanelData& panel)
 {
 	DrawPanelBase(panel);
 
-	// 位置は固定なのでここで設定,
-	// 現在のスコア
+	//位置は固定なのでここで設定,
+	//現在のスコア
 	constexpr float valueScale = 0.55f;
 	constexpr float valueTop = 58.0f;
 	constexpr float rightPadding = 20.0f;

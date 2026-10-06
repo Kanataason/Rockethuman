@@ -4,7 +4,7 @@
 
 namespace
 {
-	// JSON上の文字列とObjectTypeの対応表
+	//JSON上の文字列とObjectTypeの対応表
 	const std::unordered_map<std::string, ObjectType> ObjectTypeTable =
 	{
 		{"Prop",     ObjectType::Prop},
@@ -15,7 +15,7 @@ namespace
 		{"ScoreObject", ObjectType::ScoreObject}
 	};
 
-	// JSON上の文字列とPrimitiveShapeの対応表
+	//JSON上の文字列とPrimitiveShapeの対応表
 	const std::unordered_map<std::string, PrimitiveShape> PrimitiveShapeTable =
 	{
 		{"Box",            PrimitiveShape::Box},
@@ -24,7 +24,7 @@ namespace
 		{"Triangle",       PrimitiveShape::Triangle}
 	};
 
-	// JSON上の文字列とAttributeの対応表
+	//JSON上の文字列とAttributeの対応表
 	const std::unordered_map<std::string, Attribute> ObjectAttributeTable =
 	{
 		{"File",      Attribute::File},
@@ -41,7 +41,7 @@ namespace
 
 json JsonLoader::LoadJsonData(const std::string& assetPath)const
 {
-	// JSONファイルを開いて内容を読み込む
+	//JSONファイルを開いて内容を読み込む
 	std::ifstream file(assetPath);
 
 	if (!file.is_open())
@@ -65,7 +65,7 @@ ObjectType JsonLoader::LoadObjectType(const json& root)const
 }
 PrimitiveShape JsonLoader::LoadPrimitiveShape(const json& root)const
 {
-	// 省略したときはBox
+	//省略したときはBox
 	if (!root.contains("shape") || !root["shape"].is_string())
 	{
 		return PrimitiveShape::Box;
@@ -86,7 +86,7 @@ Transform JsonLoader::LoadTransform(const json& root)
 {
 	Transform transform{};
 
-	// Position [x, y, z] を読み込む
+	//Position [x, y, z] を読み込む
 	if (root.contains("position") &&
 		root["position"].is_array() &&
 		root["position"].size() >= 3)
@@ -96,7 +96,7 @@ Transform JsonLoader::LoadTransform(const json& root)
 		transform.Position.z = root["position"][2].get<float>();
 	}
 
-	// Scale [x, y, z] を読み込む
+	//Scale [x, y, z] を読み込む
 	if (root.contains("scale") &&
 		root["scale"].is_array() &&
 		root["scale"].size() >= 3)
@@ -106,7 +106,7 @@ Transform JsonLoader::LoadTransform(const json& root)
 		transform.Scale.z = root["scale"][2].get<float>();
 	}
 
-	// ModelRotation [x, y, z](度)を読み込む。見た目だけの回転
+	//ModelRotation [x, y, z](度)を読み込む。見た目だけの回転
 	if (root.contains("modelRotation") &&
 		root["modelRotation"].is_array() &&
 		root["modelRotation"].size() >= 3)
@@ -144,7 +144,7 @@ void JsonLoader::LoadAnimationPath(const json& root, std::vector<AnimationData>&
 
 		const std::string path =animation.value("path", "");
 
-		// 名前またはパスが無効なアニメーションは登録しない
+		//名前またはパスが無効なアニメーションは登録しない
 		if (name.empty() || path.empty())
 		{
 			continue;
@@ -190,10 +190,10 @@ ObjectData JsonLoader::LoadGameObjectData(const json& root)
 
 void JsonLoader::LoadRepeat(const json& root, ObjectData& data)const
 {
-	// 省略したときの間隔は、大きさと同じ(箱を、すき間なく並べられる)
+	//省略したときの間隔は、大きさと同じ(箱を、すき間なく並べられる)
 	data.repeatStep = data.transform.Scale;
 
-	// "count": [横, 縦, 奥行き] 。0以下は1にそろえる
+	//"count": [横, 縦, 奥行き] 。0以下は1にそろえる
 	if (root.contains("count") && root["count"].is_array() && root["count"].size() >= 3)
 	{
 		data.repeatCount.x = (std::max)(1, root["count"][0].get<int>());
@@ -201,7 +201,7 @@ void JsonLoader::LoadRepeat(const json& root, ObjectData& data)const
 		data.repeatCount.z = (std::max)(1, root["count"][2].get<int>());
 	}
 
-	// "step": [x, y, z] 1個ごとの間隔
+	//"step": [x, y, z] 1個ごとの間隔
 	if (root.contains("step") && root["step"].is_array() && root["step"].size() >= 3)
 	{
 		data.repeatStep.x = root["step"][0].get<float>();
@@ -212,7 +212,7 @@ void JsonLoader::LoadRepeat(const json& root, ObjectData& data)const
 
 std::vector<ObjectData> JsonLoader::ExpandRepeat(const ObjectData& base)const
 {
-	// 指定を間違えても、ゲームが固まらないようにする上限
+	//指定を間違えても、ゲームが固まらないようにする上限
 	constexpr int maxTotalCount = 500;
 
 	std::vector<ObjectData> list;

@@ -40,8 +40,8 @@ POINT InputSystem::GetMouseDelta()const
     delta.x = current.x - center.x;
     delta.y = center.y - current.y;
 
-    // カーソルを中央へ戻す
-   // SetCursorPos(center.x, center.y);
+    //カーソルを中央へ戻す
+   //SetCursorPos(center.x, center.y);
 
     return delta;
 }
@@ -56,7 +56,7 @@ POINT InputSystem::GetMouseClientPosition()const
     POINT current;
     GetCursorPos(&current);
 
-    // スクリーン座標(画面全体)から、ウィンドウ内の座標に変換する
+    //スクリーン座標(画面全体)から、ウィンドウ内の座標に変換する
     ScreenToClient(_hwnd, &current);
     return current;
 }

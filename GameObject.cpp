@@ -44,11 +44,11 @@ void GameObject::Draw(Renderer& renderer)
 		component->Draw(renderer);
 	}
 }
-void GameObject::Initialize(ServiceLocator& context)
+void GameObject::Initialize(ServiceLocator& locator)
 {
 	for (auto& component : _components)
 	{
-		component->Initialize(context);
+		component->Initialize(locator);
 	}
 
 }

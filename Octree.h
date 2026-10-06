@@ -66,7 +66,7 @@ private:
         float tMin = 0.0f;
         float tMax = FLT_MAX;
 
-        // X
+        //X
         if (std::abs(direction.x) < EPSILON)
         {
             //AAbbの枠に入ってなかったら処理しない
@@ -92,7 +92,7 @@ private:
             tMax = std::min(tMax, tMaxX);
         }
 
-        // Y
+        //Y
         if (std::abs(direction.y) < EPSILON)
         {
             if (origin.y < nodeMin.y ||
@@ -116,7 +116,7 @@ private:
             tMax = std::min(tMax, tMaxY);
         }
 
-        // Z
+        //Z
         if (std::abs(direction.z) < EPSILON)
         {
             if (origin.z < nodeMin.z ||

@@ -4,14 +4,14 @@
 #include "MathUtility.h"
 #include "ConsoleUtility.h"
 
-// デバイス・コンテキストを受け取り、描画に必要な一式を作成する
-void DebugDraw::Initialize(ServiceLocator& loacator)
+//デバイス・コンテキストを受け取り、描画に必要な一式を作成する
+void DebugDraw::Initialize(ServiceLocator& locator)
 {
-    SetDevice(loacator.device);
-    SetContext(loacator.context);
+    SetDevice(locator.device);
+    SetContext(locator.context);
 
     CreateConstantBuffer();
-    CreateVertexBuffer(); // この時点では_verticesが空なのでバッファは作られず、初回Render時に生成される
+    CreateVertexBuffer(); //この時点では_verticesが空なのでバッファは作られず、初回Render時に生成される
     CompileShader();
 
     CreateShader();
@@ -19,7 +19,7 @@ void DebugDraw::Initialize(ServiceLocator& loacator)
     CreateInputLayout();
 }
 
-// コンパイル済みシェーダーバイナリからVertex/PixelShaderオブジェクトを作成
+//コンパイル済みシェーダーバイナリからVertex/PixelShaderオブジェクトを作成
 void DebugDraw::CreateShader()
 {
     _device->CreateVertexShader(_vertexShaderBlob->GetBufferPointer(),
@@ -29,7 +29,7 @@ void DebugDraw::CreateShader()
         _pixelShaderBlob->GetBufferSize(), nullptr, _pixelShader.ReleaseAndGetAddressOf());
 }
 
-// カメラ行列(world/view/projection)を送るためのConstantBufferを作成
+//カメラ行列(world/view/projection)を送るためのConstantBufferを作成
 void DebugDraw::CreateConstantBuffer()
 {
     D3D11_BUFFER_DESC desc{};
@@ -40,11 +40,11 @@ void DebugDraw::CreateConstantBuffer()
     _device->CreateBuffer(&desc, nullptr, _constantBuffer.ReleaseAndGetAddressOf());
 }
 
-// 現在の_verticesの数に合わせて、CPUから書き換え可能な動的VertexBufferを作成
+//現在の_verticesの数に合わせて、CPUから書き換え可能な動的VertexBufferを作成
 void DebugDraw::CreateVertexBuffer()
 {
     _vertexCapacity = _vertices.size();
-    if (_vertices.size() == 0)return; // 頂点が無ければ作る必要が無い
+    if (_vertices.size() == 0)return; //頂点が無ければ作る必要が無い
 
     D3D11_BUFFER_DESC desc{};
 
@@ -54,7 +54,7 @@ void DebugDraw::CreateVertexBuffer()
             sizeof(DebagDrawVertex) * _vertexCapacity);
 
     desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // 毎フレームMapで書き込むためCPUアクセスを許可
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; //毎フレームMapで書き込むためCPUアクセスを許可
 
     _device->CreateBuffer(
         &desc,
@@ -64,18 +64,18 @@ void DebugDraw::CreateVertexBuffer()
     //_vertices.shrink_to_fit();これをもうオブジェクトが増えないタイミングで書く
 }
 
-// デバッグ描画用のVertex/PixelShaderをHLSLファイルからコンパイル
+//デバッグ描画用のVertex/PixelShaderをHLSLファイルからコンパイル
 void DebugDraw::CompileShader()
 {
     ID3DBlob* vsError = nullptr;
     ID3DBlob* psError = nullptr;
 
     HRESULT verticesHr = D3DCompileFromFile(
-        L"DebagVertexShader.hlsl", // ファイル名
-        nullptr,              // マクロ定義
-        nullptr,              // #includeの処理
-        "main",               // HLSLの関数名
-        "vs_5_0",             // VertexShader 5.0
+        L"DebagVertexShader.hlsl", //ファイル名
+        nullptr, //マクロ定義
+        nullptr, //#includeの処理
+        "main", //HLSLの関数名
+        "vs_5_0", //VertexShader 5.0
         0,
         0,
         _vertexShaderBlob.GetAddressOf(),
@@ -130,7 +130,7 @@ void DebugDraw::CompileShader()
     }
 }
 
-// 頂点データ(Position + Color)のレイアウトをGPUに伝えるInputLayoutを作成
+//頂点データ(Position + Color)のレイアウトをGPUに伝えるInputLayoutを作成
 void DebugDraw::CreateInputLayout()
 {
     D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -167,7 +167,7 @@ void DebugDraw::CreateInputLayout()
     }
 }
 
-// 1本の線分を頂点リストに追加する(全てのDraw～関数はこれを組み合わせて描く)
+//1本の線分を頂点リストに追加する(全てのDraw～関数はこれを組み合わせて描く)
 void DebugDraw::DrawLine(const XMFLOAT3& start, const XMFLOAT3& end, const XMFLOAT4& color)
 {
     DebagDrawVertex v;
@@ -181,8 +181,8 @@ void DebugDraw::DrawLine(const XMFLOAT3& start, const XMFLOAT3& end, const XMFLO
     _vertices.push_back(v);
 }
 
-// カプセル(始点・終点・半径)をワイヤーフレームで描画
-// 円柱部分の側面線・両端の半球(近似のリング)で構成される
+//カプセル(始点・終点・半径)をワイヤーフレームで描画
+//円柱部分の側面線・両端の半球(近似のリング)で構成される
 void DebugDraw::DrawCapsule(const XMFLOAT3& s, const XMFLOAT3& e, const float& radius, const XMFLOAT4& color)
 {
     Vector3 start;
@@ -191,22 +191,22 @@ void DebugDraw::DrawCapsule(const XMFLOAT3& s, const XMFLOAT3& e, const float& r
     Vector::fromF3ToV3(s, start);
     Vector::fromF3ToV3(e, end);
 
-    // カプセルの軸方向(正規化)
+    //カプセルの軸方向(正規化)
     Vector3 axis = end - start;
 
     float length = std::sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
 
     if (length <= 0.00001f)
-        return; // 始点と終点がほぼ同じなら描画できない
+        return; //始点と終点がほぼ同じなら描画できない
 
     axis /= length;
 
-    // 軸に垂直な2方向(right, forward)を求め、円周の基準にする
+    //軸に垂直な2方向(right, forward)を求め、円周の基準にする
     Vector3 up = { 0.0f, 1.0f, 0.0f };
 
     if (fabs(Vector::Dot(axis, up)) > 0.99f)
     {
-        // 軸がY軸とほぼ平行だと外積が不安定になるので、基準ベクトルを変える
+        //軸がY軸とほぼ平行だと外積が不安定になるので、基準ベクトルを変える
         up = { 1.0f, 0.0f, 0.0f };
     }
 
@@ -218,7 +218,7 @@ void DebugDraw::DrawCapsule(const XMFLOAT3& s, const XMFLOAT3& e, const float& r
 
     const int segments = 6;
 
-    // 円柱部分: 始点側と終点側の円周、および側面の縦線を描く
+    //円柱部分: 始点側と終点側の円周、および側面の縦線を描く
     for (int i = 0; i < segments; ++i)
     {
         float theta1 = XM_2PI * i / segments;
@@ -247,14 +247,14 @@ void DebugDraw::DrawCapsule(const XMFLOAT3& s, const XMFLOAT3& e, const float& r
         DrawLine(Vector::fromV3ToF3(p1), Vector::fromV3ToF3(p2), color);
         DrawLine(Vector::fromV3ToF3(p3), Vector::fromV3ToF3(p4), color);
 
-        // 円柱の縦線
+        //円柱の縦線
         DrawLine(Vector::fromV3ToF3(p1), Vector::fromV3ToF3(p3), color);
     }
 
 
     const int rings = 2;
 
-    // 始点側の半球を近似リングで描画(軸の内側=マイナス方向へ膨らませる)
+    //始点側の半球を近似リングで描画(軸の内側=マイナス方向へ膨らませる)
     for (int j = 0; j < rings; ++j)
     {
         float phi1 = XM_PIDIV2 * j / rings;
@@ -300,7 +300,7 @@ void DebugDraw::DrawCapsule(const XMFLOAT3& s, const XMFLOAT3& e, const float& r
         }
     }
 
-    // 終点側の半球を近似リングで描画(軸の外側=プラス方向へ膨らませる)
+    //終点側の半球を近似リングで描画(軸の外側=プラス方向へ膨らませる)
     for (int j = 0; j < rings; ++j)
     {
         float phi1 = XM_PIDIV2 * j / rings;
@@ -354,12 +354,12 @@ void DebugDraw::DrawCapsule(const XMFLOAT3& s, const XMFLOAT3& e, const float& r
     }
 }
 
-// 球体を3つの平面(XY/XZ/YZ)の円で近似してワイヤーフレーム描画
+//球体を3つの平面(XY/XZ/YZ)の円で近似してワイヤーフレーム描画
 void DebugDraw::DrawSphere(const XMFLOAT3& position, float radius, const XMFLOAT4& color)
 {
     const int segments = 16;
 
-    // XY平面の円
+    //XY平面の円
     for (int i = 0; i < segments; ++i)
     {
         float theta1 =
@@ -385,7 +385,7 @@ void DebugDraw::DrawSphere(const XMFLOAT3& position, float radius, const XMFLOAT
         DrawLine(p1, p2, color);
     }
 
-    // XZ平面の円
+    //XZ平面の円
     for (int i = 0; i < segments; ++i)
     {
         float theta1 =
@@ -411,7 +411,7 @@ void DebugDraw::DrawSphere(const XMFLOAT3& position, float radius, const XMFLOAT
         DrawLine(p1, p2, color);
     }
 
-    // YZ平面の円
+    //YZ平面の円
     for (int i = 0; i < segments; ++i)
     {
         float theta1 =
@@ -438,7 +438,7 @@ void DebugDraw::DrawSphere(const XMFLOAT3& position, float radius, const XMFLOAT
     }
 }
 
-// AABB(min/max)を12本の線で構成されるボックスとして描画
+//AABB(min/max)を12本の線で構成されるボックスとして描画
 void DebugDraw::DrawBox(
     const XMFLOAT3& min,
     const XMFLOAT3& max,
@@ -446,37 +446,37 @@ void DebugDraw::DrawBox(
 {
     XMFLOAT3 v[8] =
     {
-        { min.x, min.y, min.z }, // 0
-        { max.x, min.y, min.z }, // 1
-        { max.x, max.y, min.z }, // 2
-        { min.x, max.y, min.z }, // 3
+        { min.x, min.y, min.z }, //0
+        { max.x, min.y, min.z }, //1
+        { max.x, max.y, min.z }, //2
+        { min.x, max.y, min.z }, //3
 
-        { min.x, min.y, max.z }, // 4
-        { max.x, min.y, max.z }, // 5
-        { max.x, max.y, max.z }, // 6
-        { min.x, max.y, max.z }  // 7
+        { min.x, min.y, max.z }, //4
+        { max.x, min.y, max.z }, //5
+        { max.x, max.y, max.z }, //6
+        { min.x, max.y, max.z } //7
     };
 
-    // 手前
+    //手前
     DrawLine(v[0], v[1], color);
     DrawLine(v[1], v[2], color);
     DrawLine(v[2], v[3], color);
     DrawLine(v[3], v[0], color);
 
-    // 奥
+    //奥
     DrawLine(v[4], v[5], color);
     DrawLine(v[5], v[6], color);
     DrawLine(v[6], v[7], color);
     DrawLine(v[7], v[4], color);
 
-    // 手前と奥を繋ぐ
+    //手前と奥を繋ぐ
     DrawLine(v[0], v[4], color);
     DrawLine(v[1], v[5], color);
     DrawLine(v[2], v[6], color);
     DrawLine(v[3], v[7], color);
 }
 
-// 始点から方向×最大距離の位置まで1本の線を引く(RayCastの可視化用)
+//始点から方向×最大距離の位置まで1本の線を引く(RayCastの可視化用)
 void DebugDraw::DrawRay(const XMFLOAT3& origin, const XMFLOAT3& direction, const float& maxDistance, const XMFLOAT4& color)
 {
     float t1 = origin.x + direction.x * maxDistance;
@@ -487,7 +487,7 @@ void DebugDraw::DrawRay(const XMFLOAT3& origin, const XMFLOAT3& direction, const
     DrawLine(origin, result, color);
 }
 
-// カメラのview/projection行列をConstantBufferへ書き込む(worldは常に単位行列)
+//カメラのview/projection行列をConstantBufferへ書き込む(worldは常に単位行列)
 void DebugDraw::UpdateConstantBuffer(Camera& camera)
 {
     _constantData.world =
@@ -508,22 +508,22 @@ void DebugDraw::UpdateConstantBuffer(Camera& camera)
         0);
 }
 
-// 溜まった線分データをまとめてGPUに送り、線描画してクリアする
+//溜まった線分データをまとめてGPUに送り、線描画してクリアする
 void DebugDraw::Render(Camera& camera)
 {
     if (_vertices.empty())
         return;
 
-    // 頂点数がバッファ容量を超えていたら作り直す
+    //頂点数がバッファ容量を超えていたら作り直す
     if (_vertices.size() > _vertexCapacity) CreateVertexBuffer();
 
-    // -------------------------
-    // ConstantBuffer更新
-    // -------------------------
+    //-------------------------
+    //ConstantBuffer更新
+    //-------------------------
     UpdateConstantBuffer(camera);
 
-    // VertexBuffer更新
-    // -------------------------
+    //VertexBuffer更新
+    //-------------------------
     D3D11_MAPPED_SUBRESOURCE mapped{};
 
     HRESULT hr = _context->Map(
@@ -536,7 +536,7 @@ void DebugDraw::Render(Camera& camera)
     if (FAILED(hr))
         return;
 
-    // CPU側の頂点データをGPUバッファへコピー
+    //CPU側の頂点データをGPUバッファへコピー
     memcpy(
         mapped.pData,
         _vertices.data(),
@@ -546,7 +546,7 @@ void DebugDraw::Render(Camera& camera)
         _vertecesBlob.Get(),
         0);
 
-    // VertexBuffer設定
+    //VertexBuffer設定
     UINT stride = sizeof(DebagDrawVertex);
     UINT offset = 0;
 
@@ -557,11 +557,11 @@ void DebugDraw::Render(Camera& camera)
         &stride,
         &offset);
 
-    // InputLayout
+    //InputLayout
     _context->IASetInputLayout(
         _inputLayout.Get());
 
-    // Shader
+    //Shader
     _context->VSSetShader(
         _verticesShader.Get(),
         nullptr,
@@ -572,13 +572,13 @@ void DebugDraw::Render(Camera& camera)
         nullptr,
         0);
 
-    // ConstantBuffer
+    //ConstantBuffer
     _context->VSSetConstantBuffers(
         0,
         1,
         _constantBuffer.GetAddressOf());
 
-    // 線分リストとして描画
+    //線分リストとして描画
     _context->IASetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
@@ -586,6 +586,6 @@ void DebugDraw::Render(Camera& camera)
         static_cast<UINT>(_vertices.size()),
         0);
 
-    // 次フレームのために描画済みの頂点リストをクリア
+    //次フレームのために描画済みの頂点リストをクリア
     ClearList();
 }

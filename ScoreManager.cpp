@@ -21,11 +21,10 @@ void ScoreManager::Update(float deltaTime)
 
 void ScoreManager::AddHit(const HitInfo& hit)
 {
-	// 制限時間内に次の的に当たったらコンボ。そうでなければ、1から数え直す
+	//制限時間内に次の的に当たったらコンボ。そうでなければ、1から数え直す
 	_combo = (_comboTimer > 0.0f) ? _combo + 1 : 1;
 	_comboTimer = _comboWindowSeconds;
 
-	// (std::min) と括弧で囲むのは、Windows.h の min/max マクロと名前が衝突しないようにするため
 	const float multiplier = (std::min)(1.0f + _comboStep * static_cast<float>(_combo - 1), _maxMultiplier);
 	float gained = hit.baseScore * multiplier;
 	if (hit.isHead)
