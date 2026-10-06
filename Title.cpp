@@ -1,54 +1,28 @@
 ﻿#include "Title.h"
 
-#include <algorithm>
-#include <array>
-#include <string>
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <Windows.h>
 
-#include "InputSystem.h"
 #include "GameObject.h"
 #include "CameraController.h"
 #include "UiRenderer.h"
 #include "SceneManager.h"
 #include "SoundManager.h"
-#include "CharacterRoster.h"
 #include "StageRoster.h"
-
-using namespace UiInfo;
-
-namespace
-{
-	//ステージ選択の、名前の行(パネルの中に、上から並べる)。ステージの数が、行の数より多いときは、スクロールする
-	constexpr int stageVisibleRows = 4;
-	constexpr float stageRowLeft = 490.0f;
-	constexpr float stageRowTop = 225.0f;
-	constexpr float stageRowWidth = 300.0f;
-	constexpr float stageRowHeight = 56.0f;
-	constexpr float stageRowGap = 10.0f;
-	constexpr float stageRowTextScale = 0.55f;
-	constexpr float stageCounterY = 495.0f; //「2 / 5」のように、いま何番目かを出す所
-
-	//キャラクター選択の、名前の行(パネルの中に、上から並べる)
-	constexpr float characterRowLeft = 490.0f;
-	constexpr float characterRowTop = 250.0f;
-	constexpr float characterRowWidth = 300.0f;
-	constexpr float characterRowHeight = 60.0f;
-	constexpr float characterRowGap = 10.0f;
-	constexpr float characterRowTextScale = 0.5f;
-}
 
 void Title::Initialize(ServiceLocator& locator)
 {
-	_input = locator.input;
-	_characters = locator.characters;
 	_stages = locator.stages;
 	BaseScene::Initialize(locator);
 
-	//前に遊んだステージを、選んだままにしておく
-	if (_stages)
-	{
-		_stageIndex = _stages->GetSelectedIndex();
-		AdjustStageScroll();
-	}
+	_menuPage.Initialize(locator);
+	_stageSelectPage.Initialize(locator);
+	_characterSelectPage.Initialize(locator);
+
+	SubscribeEvents();
+	OpenPage(_menuPage);
 
 	if (locator.sound)
 		locator.sound->PlayBgm("title");
@@ -60,264 +34,51 @@ void Title::Initialize(ServiceLocator& locator)
 			cameraController->SetMoveEnabled(false);
 	}
 }
+void Title::SubscribeEvents()
+{
+	//メニューから、各画面へ
+	_menuPage.OnOpenStageSelect.Subscribe([this]() { OpenPage(_stageSelectPage); });
+	_menuPage.OnOpenCharacterSelect.Subscribe([this]() { OpenPage(_characterSelectPage); });
+
+	//ゲームを終了する。メッセージループが終わって、GameManager::Release の後片付けが行われる
+	_menuPage.OnQuit.Subscribe([this]() { PostQuitMessage(0); });
+
+	//各画面から、メニューへ戻る
+	_stageSelectPage.OnClose.Subscribe([this]() { OpenPage(_menuPage); });
+	_characterSelectPage.OnClose.Subscribe([this]() { OpenPage(_menuPage); });
+
+	//ステージを決定したら、選んだステージを覚えて、始める(シーンの切り替えは予約。次のフレームの頭に入れ替わる)
+	_stageSelectPage.OnStageChosen.Subscribe([this](int index)
+		{
+			if (!_stages)
+				return;
+			_stages->Select(index);
+			_sceneManager->ChangeScene(SceneName::Stage);
+		});
+}
+
+void Title::OpenPage(TitlePage& page)
+{
+	_currentPage = &page;
+	_currentPage->Open();
+}
 
 void Title::Update(float deltaTime)
 {
-	switch (_currentPanel)
-	{
-	case PanelType::None:
-		UpdateMenu();
-		break;
-
-	case PanelType::StageSelect:
-		UpdateStageSelect();
-		break;
-
-	case PanelType::CharacterSelect:
-		UpdateCharacterSelect();
-		break;
-	default:
-		//Enterで閉じる
-		if (_input->GetKeyDown(VK_RETURN) || _input->GetKeyDown(VK_ESCAPE))
-			_currentPanel = PanelType::None;
-		break;
-	}
+	if (_currentPage)
+		_currentPage->Update();
 
 	BaseScene::Update(deltaTime);
-}
-
-void Title::UpdateMenu()
-{
-	if (_input->GetKeyDown('W') || _input->GetKeyDown(VK_UP))
-		_selectedIndex = (_selectedIndex + MenuCount - 1) % MenuCount;
-
-	if (_input->GetKeyDown('S') || _input->GetKeyDown(VK_DOWN))
-		_selectedIndex = (_selectedIndex + 1) % MenuCount;
-
-	if (_input->GetKeyDown(VK_SPACE))
-		ConfirmSelected();
-}
-
-void Title::UpdateStageSelect()
-{
-	//ステージの一覧が空(Stages.jsonがない)ときは、選ぶものがないので、もどるだけ
-	const int stageCount = _stages ? _stages->GetCount() : 0;
-	if (stageCount > 0)
-	{
-		if (_input->GetKeyDown('W') || _input->GetKeyDown(VK_UP))
-			_stageIndex = (_stageIndex + stageCount - 1) % stageCount;
-
-		if (_input->GetKeyDown('S') || _input->GetKeyDown(VK_DOWN))
-			_stageIndex = (_stageIndex + 1) % stageCount;
-
-		AdjustStageScroll();
-
-		//決定: 選んだステージを、遊び始める(シーンの切り替えは予約。次のフレームの頭に入れ替わる)
-		if (_input->GetKeyDown(VK_SPACE))
-		{
-			_stages->Select(_stageIndex);
-			_sceneManager->ChangeScene(SceneName::Stage);
-			return;
-		}
-	}
-
-	//もどる: メニューに戻る
-	if (_input->GetKeyDown(VK_ESCAPE) || _input->GetKeyDown(VK_RETURN))
-		_currentPanel = PanelType::None;
-}
-
-void Title::UpdateCharacterSelect()
-{
-	//選ぶと、すぐに「選んでいる人」が変わる(決定は、パネルを閉じるだけ)。ステージを始めるときに、この人が出る
-	if (_characters)
-	{
-		if (_input->GetKeyDown('W') || _input->GetKeyDown(VK_UP))
-			_characters->SelectPrevious();
-
-		if (_input->GetKeyDown('S') || _input->GetKeyDown(VK_DOWN))
-			_characters->SelectNext();
-	}
-
-	if (_input->GetKeyDown(VK_SPACE) || _input->GetKeyDown(VK_RETURN) || _input->GetKeyDown(VK_ESCAPE))
-		_currentPanel = PanelType::None;
-}
-
-void Title::ConfirmSelected()
-{
-	switch (MenuEntries[_selectedIndex].text)
-	{
-	case TextType::Start:
-		//「セレクトステージ」: ステージ選択を開く(前に選んだステージを、覚えたまま)
-		_currentPanel = PanelType::StageSelect;
-		break;
-	case TextType::Setting:
-		//「キャラクターセレクト」: キャラクター選択を開く
-		_currentPanel = PanelType::CharacterSelect;
-		break;
-	case TextType::End:
-		PostQuitMessage(0);
-		break;
-	default:
-		break;
-	}
 }
 
 void Title::DrawUi()
 {
 	_uiRenderer->Begin();
 
-	switch (_currentPanel)
-	{
-	case PanelType::None:
-		for (int i = 0; i < MenuCount; i++)
-			DrawMenuItem(MenuEntries[i], i == _selectedIndex);
-		break;
-
-	case PanelType::StageSelect:
-		DrawStageSelect();
-		break;
-
-	case PanelType::CharacterSelect:
-		DrawCharacterSelect();
-		break;
-
-	default:
-		DrawPanel(_currentPanel, -1);
-		break;
-	}
+	if (_currentPage)
+		_currentPage->Draw();
 
 	_uiRenderer->DrawString(L"ロケットにんげん", 380.0f, 40.0f, 1.0f,
 		DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 	_uiRenderer->End();
-}
-
-void Title::DrawText(TextType type)
-{
-	auto it = textList.find(type);
-	if (it == textList.end()) return;
-	const auto& textData = it->second;
-
-	_uiRenderer->DrawStringCentered(textData.text, textData.centerX, textData.centerY, textData.scale,
-		XMLoadFloat4(&textData.mainColor), XMLoadFloat4(&textData.outlineColor));
-}
-
-void Title::DrawMenuItem(MenuEntry menu, bool selected)
-{
-	auto buttonIterator = buttonList.find(menu.button);
-	auto textIterator = textList.find(menu.text);
-	if (buttonIterator == buttonList.end() || textIterator == textList.end()) return;
-
-	const auto& buttonData = buttonIterator->second;
-	const auto& textData = textIterator->second;
-
-	_uiRenderer->DrawFrame(buttonData.left, buttonData.top, buttonData.width, buttonData.height,
-		buttonData.thickness,
-		selected ? XMVectorSet(1, 1, 0, 1) : XMLoadFloat4(&buttonData.frameColor));
-
-	_uiRenderer->DrawStringCentered(textData.text, textData.centerX, textData.centerY, textData.scale,
-		selected ? XMVectorSet(1, 1, 0, 1) : XMLoadFloat4(&textData.mainColor),
-		XMLoadFloat4(&textData.outlineColor));
-}
-
-void Title::DrawPanel(PanelType typeIndex, int selectedIndex)
-{
-	auto it = panelList.find(typeIndex);
-	if (it == panelList.end()) return;
-	const PanelData& panel = it->second;
-
-	_uiRenderer->DrawRect(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
-		XMLoadFloat4(&panel.fillColor));
-	_uiRenderer->DrawFrame(panel.frame.left, panel.frame.top, panel.frame.width, panel.frame.height,
-		panel.frame.thickness, XMLoadFloat4(&panel.frame.frameColor));
-
-	for (int i = 0; i < static_cast<int>(panel.items.size()); i++)
-		DrawMenuItem(panel.items[i], i == selectedIndex);
-}
-
-//選んでいるステージが、見えている行の中に入るように、スクロールの位置を直す
-void Title::AdjustStageScroll()
-{
-	const int stageCount = _stages ? _stages->GetCount() : 0;
-
-	if (_stageIndex < _stageScroll)
-		_stageScroll = _stageIndex;
-	if (_stageIndex >= _stageScroll + stageVisibleRows)
-		_stageScroll = _stageIndex - stageVisibleRows + 1;
-
-	_stageScroll = (std::max)(0, (std::min)(_stageScroll, (std::max)(0, stageCount - stageVisibleRows)));
-}
-
-void Title::DrawStageSelect()
-{
-	DrawPanel(PanelType::StageSelect, -1);
-	DrawText(TextType::StageSelectTitle);
-
-	//ステージの名前を、上から並べる(いま選んでいるステージは、黄色)
-	if (_stages && _stages->GetCount() > 0)
-	{
-		const auto& list = _stages->GetList();
-		const int stageCount = _stages->GetCount();
-		const int rows = (std::min)(stageCount, stageVisibleRows);
-
-		for (int row = 0; row < rows; row++)
-		{
-			const int index = _stageScroll + row;
-			const float top = stageRowTop + (stageRowHeight + stageRowGap) * static_cast<float>(row);
-			const bool selected = (index == _stageIndex);
-
-			_uiRenderer->DrawFrame(stageRowLeft, top, stageRowWidth, stageRowHeight, 2.0f,
-				selected ? XMVectorSet(1, 1, 0, 1) : XMVectorSet(1, 1, 1, 1));
-			_uiRenderer->DrawStringCentered(list[static_cast<size_t>(index)].name,
-				stageRowLeft + stageRowWidth * 0.5f, top + stageRowHeight * 0.5f, stageRowTextScale,
-				selected ? XMVectorSet(1, 1, 0, 1) : XMVectorSet(1, 1, 1, 1),
-				XMVectorSet(0, 0, 0, 1));
-		}
-
-		//見えていない行があるときだけ、いま何番目かを出す
-		if (stageCount > stageVisibleRows)
-		{
-			_uiRenderer->DrawStringCentered(std::to_wstring(_stageIndex + 1) + L" / " + std::to_wstring(stageCount),
-				640.0f, stageCounterY, 0.3f, XMVectorSet(0.7f, 0.8f, 1.0f, 1), XMVectorSet(0, 0, 0, 1));
-		}
-	}
-	else
-	{
-		_uiRenderer->DrawStringCentered(L"ステージが ありません", 640.0f, 330.0f, 0.45f,
-			XMVectorSet(1, 1, 1, 1), XMVectorSet(0, 0, 0, 1));
-	}
-
-	DrawText(TextType::StageSelectHint);
-}
-
-void Title::DrawCharacterSelect()
-{
-	DrawPanel(PanelType::CharacterSelect, -1);
-	DrawText(TextType::CharacterSelectTitle);
-
-	//キャラクターの名前を、上から並べる(いま選んでいる人は、黄色)
-	if (_characters && _characters->GetCount() > 0)
-	{
-		const auto& list = _characters->GetList();
-		for (int i = 0; i < _characters->GetCount(); i++)
-		{
-			const float top = characterRowTop + (characterRowHeight + characterRowGap) * static_cast<float>(i);
-			const bool selected = (i == _characters->GetSelectedIndex());
-
-			_uiRenderer->DrawFrame(characterRowLeft, top, characterRowWidth, characterRowHeight, 2.0f,
-				selected ? XMVectorSet(1, 1, 0, 1) : XMVectorSet(1, 1, 1, 1));
-			_uiRenderer->DrawStringCentered(list[static_cast<size_t>(i)].name,
-				characterRowLeft + characterRowWidth * 0.5f, top + characterRowHeight * 0.5f,
-				characterRowTextScale,
-				selected ? XMVectorSet(1, 1, 0, 1) : XMVectorSet(1, 1, 1, 1),
-				XMVectorSet(0, 0, 0, 1));
-		}
-	}
-	else
-	{
-		//一覧が空(Characters.jsonがない)ときは、ステージの標準のキャラクターが出る
-		_uiRenderer->DrawStringCentered(L"キャラクターが ありません", 640.0f, 330.0f, 0.45f,
-			XMVectorSet(1, 1, 1, 1), XMVectorSet(0, 0, 0, 1));
-	}
-
-	DrawText(TextType::CharacterSelectHint);
 }

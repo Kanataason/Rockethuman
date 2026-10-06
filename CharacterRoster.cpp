@@ -1,5 +1,6 @@
 ﻿#include "CharacterRoster.h"
 
+#include <algorithm>
 #include <fstream>
 
 #ifndef NOMINMAX
@@ -92,6 +93,13 @@ const CharacterData* CharacterRoster::GetSelected() const
 	if (_characters.empty())
 		return nullptr;
 	return &_characters[static_cast<size_t>(_selectedIndex)];
+}
+
+void CharacterRoster::Select(int index)
+{
+	if (_characters.empty())
+		return;
+	_selectedIndex = (std::max)(0, (std::min)(index, GetCount() - 1));
 }
 
 void CharacterRoster::SelectNext()

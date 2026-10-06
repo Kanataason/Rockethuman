@@ -36,6 +36,9 @@ public:
 	//選んでいる人。一覧が空のときは、nullptr
 	const CharacterData* GetSelected() const;
 
+	//番号で選ぶ。範囲の外の番号は、端にそろえる
+	void Select(int index);
+
 	void SelectNext();
 	void SelectPrevious();
 

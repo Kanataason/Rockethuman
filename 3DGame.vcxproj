@@ -165,6 +165,8 @@
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="DebugController.cpp" />
     <ClCompile Include="DebugUtillity.cpp" />
+    <ClCompile Include="GameAudio.cpp" />
+    <ClCompile Include="GameHud.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
@@ -197,11 +199,17 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="UiDraw.cpp" />
+    <ClCompile Include="MenuList.cpp" />
+    <ClCompile Include="TitleMenuPage.cpp" />
+    <ClCompile Include="StageSelectPage.cpp" />
+    <ClCompile Include="CharacterSelectPage.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UIRenderer.cpp" />
     <ClCompile Include="UiLayout.cpp" />
     <ClCompile Include="PausePanel.cpp" />
+    <ClCompile Include="PowerGauge.cpp" />
     <ClCompile Include="StageRoster.cpp" />
     <ClCompile Include="ResultPanel.cpp" />
   </ItemGroup>
@@ -240,6 +248,8 @@
     <ClInclude Include="BaseCamera.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
+    <ClInclude Include="GameAudio.h" />
+    <ClInclude Include="GameHud.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Inspector.h" />
@@ -288,11 +298,18 @@
     <ClInclude Include="ThirdParty\nlohmann\json.hpp" />
     <ClInclude Include="ThirdParty\nlohmann\json_fwd.hpp" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="UiDraw.h" />
+    <ClInclude Include="MenuList.h" />
+    <ClInclude Include="TitleMenuPage.h" />
+    <ClInclude Include="StageSelectPage.h" />
+    <ClInclude Include="CharacterSelectPage.h" />
+    <ClInclude Include="TitlePage.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UiRenderer.h" />
     <ClInclude Include="UiLayout.h" />
     <ClInclude Include="PausePanel.h" />
+    <ClInclude Include="PowerGauge.h" />
     <ClInclude Include="StageRoster.h" />
     <ClInclude Include="ResultPanel.h" />
     <ClInclude Include="VectorUtility.h" />

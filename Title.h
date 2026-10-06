@@ -1,13 +1,13 @@
 ﻿#pragma once
 #include "BaseScene.h"
-#include "UiRenderer.h"
-#include "UiLayout.h"
-#include "Event.h"
+#include "TitleMenuPage.h"
+#include "StageSelectPage.h"
+#include "CharacterSelectPage.h"
 
-class InputSystem;
-class CharacterRoster;
 class StageRoster;
 
+//タイトル画面。いまどの画面(メニュー / ステージ選択 / キャラクター選択)を出しているかだけを持つ
+//入力と描画は、それぞれの画面(TitlePage)が受け持つ。Title は、画面どうしのつなぎと、ステージの開始・終了をする
 class Title : public BaseScene
 {
 public:
@@ -15,27 +15,15 @@ public:
 	void Update(float deltaTime)override;
 	void DrawUi()override;
 private:
-	//画面の状態ごとの入力(メニュー / ステージ選択 / 設定パネル)
-	void UpdateMenu();
-	void UpdateStageSelect();
-	void UpdateCharacterSelect();
-
-	void ConfirmSelected();
-	void DrawMenuItem(MenuEntry menu, bool selected);
-	//selectedIndex: パネルの中で、選んでいる行(選ぶ物がないパネルは -1)
-	void DrawPanel(PanelType typeIndex, int selectedIndex);
-	void DrawStageSelect();
-	void AdjustStageScroll();
-	void DrawCharacterSelect();
-	void DrawText(TextType type);
+	void SubscribeEvents();
 private:
-	int _selectedIndex = 0; //メニュー(セレクトステージ / オプション / エンド)で選んでいる行
-	int _stageIndex = 0; //ステージ選択で選んでいるステージの番号
-	int _stageScroll = 0; //ステージ選択で、いちばん上に見えているステージの番号
+	//画面を切り替える(開くたびに、一覧の中身と選んでいる番号を、最新に合わせる)
+	void OpenPage(TitlePage& page);
+private:
+	TitleMenuPage _menuPage;
+	StageSelectPage _stageSelectPage;
+	CharacterSelectPage _characterSelectPage;
+	TitlePage* _currentPage = nullptr;
 
-	PanelType _currentPanel = PanelType::None;
-
-	InputSystem* _input = nullptr;
-	CharacterRoster* _characters = nullptr; //選べるキャラクターと、選んでいる人(借りるだけ)
 	StageRoster* _stages = nullptr; //遊べるステージと、選んでいるステージ(借りるだけ)
 };
