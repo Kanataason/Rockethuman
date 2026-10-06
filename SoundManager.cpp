@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <exception>
+#include <random>
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -37,6 +38,20 @@ void SoundManager::Initialize(ServiceLocator& /*locator*/)
 	LoadFromJson("Asset/Data/Sound.json");
 }
 
+void SoundManager::Shutdown()
+{
+	if (_engine)
+		_engine->Suspend();   // 音のスレッドを止める。これ以降、鳴っている音の途中経過を、スレッドが触ることはない
+
+	// SoundEffectを消す前に、そこから作ったインスタンスを消す。エンジンは、いちばん最後
+	if (_bgm)
+		_bgm->Stop(true);
+	_bgm.reset();
+	_bgmClips.clear();
+	_sounds.clear();
+	_engine.reset();
+}
+
 void SoundManager::LoadFromJson(const std::string& jsonPath)
 {
 	std::ifstream file(jsonPath);
@@ -54,7 +69,9 @@ void SoundManager::LoadFromJson(const std::string& jsonPath)
 		return;
 	}
 
-	// { "SE": [ { "name": "shot", "path": "Asset/Sound/shot.wav" }, ... ], "BGM": [ ... ] }
+	// { "SE": [ { "name": "shot", "path": "Asset/Sound/shot.wav" },
+	//           { "name": "hit",  "paths": ["Asset/Sound/hit1.wav", "Asset/Sound/hit2.wav"] } ], "BGM": [ ... ] }
+	// "path"(1つ)も、"paths"(複数のグループ)も、書ける。同じ名前の行を、何行か書いても、同じグループに足される
 	for (const char* group : { "SE", "BGM" })
 	{
 		if (!root.contains(group) || !root[group].is_array())
@@ -66,14 +83,33 @@ void SoundManager::LoadFromJson(const std::string& jsonPath)
 				continue;
 
 			const std::string name = entry.value("name", "");
-			const std::wstring path = ToWide(entry.value("path", ""));
-			if (name.empty() || path.empty())
+			if (name.empty())
 				continue;
 
-			if (std::string(group) == "SE")
-				LoadSe(name, path);
-			else
-				LoadBgm(name, path);
+			// このエントリーの、ファイルのパスを、すべて集める
+			std::vector<std::string> paths;
+			if (entry.contains("path") && entry["path"].is_string())
+				paths.push_back(entry["path"].get<std::string>());
+			if (entry.contains("paths") && entry["paths"].is_array())
+			{
+				for (const auto& item : entry["paths"])
+				{
+					if (item.is_string())
+						paths.push_back(item.get<std::string>());
+				}
+			}
+
+			for (const std::string& path : paths)
+			{
+				const std::wstring widePath = ToWide(path);
+				if (widePath.empty())
+					continue;
+
+				if (std::string(group) == "SE")
+					LoadSe(name, widePath);
+				else
+					LoadBgm(name, widePath);
+			}
 		}
 	}
 }
@@ -86,7 +122,8 @@ void SoundManager::LoadSe(const std::string& name, const std::wstring& path)
 	// ファイルがない・WAV以外のときは、例外が投げられる。ゲームは止めずに、その音だけ、使えないことにする
 	try
 	{
-		_sounds[name] = std::make_unique<DirectX::SoundEffect>(_engine.get(), path.c_str());
+		// 同じ名前のグループに、音を足す(読み込めたものだけが、グループに入る)
+		_sounds[name].clips.push_back(std::make_unique<DirectX::SoundEffect>(_engine.get(), path.c_str()));
 	}
 	catch (const std::exception&)
 	{
@@ -112,10 +149,25 @@ void SoundManager::LoadBgm(const std::string& name, const std::wstring& path)
 void SoundManager::PlaySe(const std::string& name, float volume)
 {
 	auto it = _sounds.find(name);
-	if (it == _sounds.end())
+	if (it == _sounds.end() || it->second.clips.empty())
 		return;
 
-	it->second->Play(volume, 0.0f, 0.0f);
+	SeGroup& group = it->second;
+	const int count = static_cast<int>(group.clips.size());
+
+	// 2つ以上あるときは、ランダムに選ぶ。直前と同じ音は避ける(同じ音が、続くと、単調に聞こえるため)
+	int index = 0;
+	if (count > 1)
+	{
+		static std::mt19937 rng{ std::random_device{}() };
+		std::uniform_int_distribution<int> pick(0, count - 2);   // 直前の音を除いた、count-1個の中から選ぶ
+		index = pick(rng);
+		if (group.lastIndex >= 0 && index >= group.lastIndex)
+			++index;
+	}
+	group.lastIndex = index;
+
+	group.clips[static_cast<size_t>(index)]->Play(volume, 0.0f, 0.0f);
 }
 
 void SoundManager::PlayBgm(const std::string& name, float volume, bool loop)

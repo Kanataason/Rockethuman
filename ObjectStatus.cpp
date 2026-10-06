@@ -40,7 +40,6 @@ void ObjectStatus::OnCollisionEnter(Collider* other, const CollisionResult& resu
 		if (auto* ragdoll = owner->GetComponent<Ragdoll>())
 		{
 			hit.isHead = ragdoll->GetBoneName(other).find("Head") != std::string::npos;
-			ragdoll->DebugLogContact(other, result.contactPoint);   // 【調べる間だけ】得点の文字の位置の確認用
 
 			const float rootVelocityX = ragdoll->GetRootVelocity().x;
 			if (std::abs(rootVelocityX) > 0.1f)

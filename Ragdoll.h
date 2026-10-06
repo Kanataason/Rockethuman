@@ -236,6 +236,9 @@ public:
     // 発射して、静止したときに1回だけ呼ばれる
     Event<> OnSettled;
 
+    // 発射したあと、体のどこかが、空中から地面に着いた瞬間(跳ねて着地するたびに出る)
+    Event<> OnGroundHit;
+
     Ragdoll() = default;
     void SetSkeleton(std::shared_ptr<Skeleton> skeleton) { _skeleton = skeleton; }
     void SetParent(GameObject& owner) { _owner = &owner; }
@@ -337,8 +340,6 @@ public:
     // コライダーに対応するボーンの名前。このラグドールのコライダーでなければ、空文字
     std::string GetBoneName(const Collider* collider) const;
 
-    // 【調べる間だけ】当たったボーンの、物理の位置・見た目の位置・接触点を、contact_log.txt に書く
-    void DebugLogContact(const Collider* collider, const Vector3& contactPoint) const;
 private:
     void InitializeBoneLength();
     void SetLockZ(bool lock);
@@ -475,6 +476,8 @@ private:
     bool _isFlying = false;
     bool _isWaitingSettle = false;   // 発射して、静止するのを待っているか
     float _settleElapsed = 0.0f;     // 発射してからの経過時間(止まらない場合の保険に使う)
+    bool _wasGrounded = false;       // 前のフレームで、どれかのボーンが地面に着いていたか(着地の瞬間を見つける用)
+    float _groundHitCooldown = 0.0f; // 着地の通知を、連続で出さないための待ち時間
 
     // ---- 吊り下げモード ----
     int _hangingBoneIndex = -1;            // 吊る骨(_bones の番号) -1 = まだ始めていない

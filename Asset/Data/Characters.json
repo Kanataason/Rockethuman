@@ -20,9 +20,10 @@
             "name": "エルビス",
             "path": "Asset/Prefab/debu.fbx",
             "scale": 0.02,
-            "colliderScale": 1.3,
+            "colliderScale": 1.1,
             "bounceRestitution": 1.6,
             "bounceCount": 2,
+            "sounds": { "shot": "shot_elvis", "hit": "hit_elvis", "head": "head_elvis" },
             "animations": [
                 { "name": "Idle", "path": "Asset/Animation/Idle.fbx" },
                 { "name": "Walk", "path": "Asset/Animation/Walk.fbx" }

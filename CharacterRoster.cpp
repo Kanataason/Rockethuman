@@ -63,8 +63,29 @@ void CharacterRoster::Load(const std::string& jsonPath)
 			}
 		}
 
+		// "sounds": { "shot": "shot_elvis", ... }。出来事の名前 → 専用の音の名前
+		if (entry.contains("sounds") && entry["sounds"].is_object())
+		{
+			for (const auto& item : entry["sounds"].items())
+			{
+				if (item.value().is_string())
+					character.sounds[item.key()] = item.value().get<std::string>();
+			}
+		}
+
 		_characters.push_back(std::move(character));
 	}
+}
+
+std::string CharacterRoster::ResolveSoundName(const std::string& eventName) const
+{
+	if (const CharacterData* character = GetSelected())
+	{
+		const auto it = character->sounds.find(eventName);
+		if (it != character->sounds.end())
+			return it->second;
+	}
+	return eventName;
 }
 
 const CharacterData* CharacterRoster::GetSelected() const

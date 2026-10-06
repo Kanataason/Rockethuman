@@ -80,6 +80,8 @@ void GameManager::Release()
 
     _sceneManager.Release();
 
+    // 音が鳴っている最中に片付けると、終了のときに落ちることがあるので、ここで先に止める
+    _soundManager.Shutdown();
 }
 
 ServiceLocator GameManager::CreateServiceLocator() 

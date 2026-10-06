@@ -1,6 +1,5 @@
 ﻿#include "Ragdoll.h"
 #include <random>
-#include <fstream>
 #include "Skeleton.h"
 
 #include "MatrixUtility.h"
@@ -749,44 +748,6 @@ std::string Ragdoll::GetBoneName(const Collider* collider) const
     return std::string();
 }
 
-void Ragdoll::DebugLogContact(const Collider* collider, const Vector3& contactPoint) const
-{
-    const RagdollBone* hitBone = nullptr;
-    for (const auto& bone : _bones)
-    {
-        if (bone.collider.get() == collider)
-            hitBone = &bone;
-    }
-    if (!hitBone || !hitBone->rigidBody)
-        return;
-
-    // 物理: ボーンのRigidBodyの位置 と コライダーの中心
-    const Vector3 physics = hitBone->rigidBody->GetPosition();
-    const XMFLOAT3 colliderCenter = hitBone->collider->GetCenter();
-
-    // 見た目: スキニングに使うノードのGlobalTransform(オーナーの中での位置)を、ワールドに直した位置
-    const BoneNode& node = _skeleton->GetNode()[hitBone->nodeIndex];
-    const XMMATRIX ownerWorld = _owner->GetTransform().GetWorldMatrix();
-    const XMVECTOR nodeLocal = XMVectorSet(node.GlobalTransform._41, node.GlobalTransform._42, node.GlobalTransform._43, 1.0f);
-    XMFLOAT3 visual;
-    XMStoreFloat3(&visual, XMVector3TransformCoord(nodeLocal, ownerWorld));
-
-    char buffer[512];
-    sprintf_s(buffer,
-        "[Contact] bone=%s  physics=(%.2f, %.2f, %.2f)  colliderCenter=(%.2f, %.2f, %.2f)  visual=(%.2f, %.2f, %.2f)  contact=(%.2f, %.2f, %.2f)  ownerPos=(%.2f, %.2f, %.2f)\n",
-        hitBone->name.c_str(),
-        physics.x, physics.y, physics.z,
-        colliderCenter.x, colliderCenter.y, colliderCenter.z,
-        visual.x, visual.y, visual.z,
-        contactPoint.x, contactPoint.y, contactPoint.z,
-        _owner->GetTransform().Position.x, _owner->GetTransform().Position.y, _owner->GetTransform().Position.z);
-    OutputDebugStringA(buffer);
-
-    std::ofstream file("contact_log.txt", std::ios::app);
-    if (file.is_open())
-        file << buffer;
-}
-
 bool Ragdoll::AllBonesSleeping() const
 {
     for (const auto& bone : _bones)
@@ -799,18 +760,37 @@ bool Ragdoll::AllBonesSleeping() const
 
 void Ragdoll::Update(float deltaTime)
 {
-    // どれかのボーンが地面に着いたら、飛行を終える(あとは今までどおり重力で倒れる)
-    if (_isFlying)
+    // どれかのボーンが地面に着いているか
+    bool grounded = false;
+    for (const auto& bone : _bones)
     {
-        for (const auto& bone : _bones)
+        if (bone.rigidBody && bone.rigidBody->IsGrounded())
         {
-            if (bone.rigidBody && bone.rigidBody->IsGrounded())
-            {
-                SetFlying(false);
-                break;
-            }
+            grounded = true;
+            break;
         }
     }
+
+    // 地面に着いたら、飛行を終える(あとは今までどおり重力で倒れる)
+    if (_isFlying && grounded)
+        SetFlying(false);
+
+    // 発射したあと、空中から地面に着くたびに知らせる(着地の音など)
+    //   着きっぱなしのときは出さない。着いて離れてを、細かく繰り返しても、短い間に連続では出さない
+    //   発射した直後に、台に触れているだけのときも、出さない
+    if (_isWaitingSettle)
+    {
+        constexpr float minFlySeconds = 0.15f;
+        constexpr float groundHitIntervalSeconds = 0.3f;
+
+        _groundHitCooldown = (std::max)(_groundHitCooldown - deltaTime, 0.0f);
+        if (grounded && !_wasGrounded && _settleElapsed >= minFlySeconds && _groundHitCooldown <= 0.0f)
+        {
+            _groundHitCooldown = groundHitIntervalSeconds;
+            OnGroundHit.Invoke();
+        }
+    }
+    _wasGrounded = grounded;
 
     // 発射したあと、全ボーンが静止(スリープ)したら、1回だけ通知する
     if (!_isWaitingSettle)
@@ -833,6 +813,7 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
 
     _isWaitingSettle = true;
     _settleElapsed = 0.0f;
+    _groundHitCooldown = 0.0f;
 
     //寝ているBoneを起こす。飛んでいる間は、速度の上限を上げる(通常の上限だと、初速が頭打ちになる)
     for (auto& bone : _bones)

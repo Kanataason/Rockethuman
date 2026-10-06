@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "ObjectType.h"
@@ -14,6 +15,10 @@ struct CharacterData
 	float bounceRestitution = 1.0f;//地面で強く跳ねるときの反発係数。1より大きいほど、よく跳ねる
 	int bounceCount = 0;//強く跳ねられる回数。0なら、ふつうの跳ね方
 	std::vector<AnimationData> animations;// 待機などのアニメーション
+
+	// 出来事の名前("shot" "hit" "head" "clear")→ このキャラクター専用の音の名前(Sound.jsonの"name")
+	// 書いていない出来事は、標準の音(出来事の名前と同じ音)を鳴らす
+	std::unordered_map<std::string, std::string> sounds;
 };
 
 // 遊べるキャラクターの一覧と、いま選んでいるキャラクター。
@@ -37,6 +42,9 @@ public:
 	// ステージのJSONのプレイヤーの情報を、選んだキャラクターのモデル・大きさ・アニメーションに差し替える
 	// (位置は、ステージのJSONのまま)。一覧が空のときは、何もしない
 	void ApplyToPlayer(ObjectData& playerData) const;
+
+	// 出来事("shot"など)で鳴らす音の名前。選んでいるキャラクターに専用の音があれば、その名前。なければ、出来事の名前のまま
+	std::string ResolveSoundName(const std::string& eventName) const;
 
 private:
 	std::vector<CharacterData> _characters;

@@ -14,6 +14,7 @@ class Ragdoll;
 class CameraFollow;
 class TimeScale;
 class SoundManager;
+class CharacterRoster;
 
 class GameScene : public BaseScene
 {
@@ -39,6 +40,9 @@ private:
 	void DrawBonusPopup();
 	void DrawGauge();
 	void DrawAimHint();
+
+	// 出来事("shot" "hit" "head" "clear")の効果音。選んでいるキャラクター専用の音があれば、それを鳴らす
+	void PlayCharacterSe(const std::string& eventName);
 private:
 	// 的に当たった場所に出す、浮き上がって消える文字
 	struct ScorePopup
@@ -55,6 +59,7 @@ private:
 
 	Ragdoll* _ragdoll = nullptr;
 	float _launchRootX = 0.0f;   // 発射した瞬間の、体のX位置(飛距離の採点に使う)
+	bool _hasPlayedBoxHitSe = false;   // この1発で、的に当たったときのヒット音を、もう鳴らしたか
 	CameraFollow* _cameraFollow = nullptr;
 
 	// 残りの玉数が、ポンと弾むアニメーション(ラグドールが止まったとき)
@@ -78,6 +83,7 @@ private:
 	// 的に当たったときのスローモーション(倍率と、元の速さに戻るまでの実時間)
 	TimeScale* _timeScale = nullptr;
 	SoundManager* _sound = nullptr;   // 効果音とBGM(借りるだけ。ゲーム全体で1つ)
+	CharacterRoster* _characters = nullptr;   // 選んでいるキャラクター(専用の音を探すのに使う。借りるだけ)
 	float _hitSlowScale = 0.35f;
 	float _hitSlowSeconds = 1.25f;
 	float _headSlowScale = 0.2f;     // 頭ヒットは、もっと遅く、長く

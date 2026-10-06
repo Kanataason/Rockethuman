@@ -13,6 +13,7 @@
 #include "PowerZone.h"
 #include "SceneManager.h"
 #include "SoundManager.h"
+#include "CharacterRoster.h"
 
 using namespace UiInfo;
 
@@ -53,6 +54,7 @@ void GameScene::Initialize(ServiceLocator& locator)
 
 	_timeScale = locator.timeScale;
 	_sound = locator.sound;
+	_characters = locator.characters;
 	if (_sound)
 		_sound->PlayBgm("stage");   // 同じ曲が鳴っていれば、続ける(「もういちど」で、頭に戻らない)
 	_resultPanel.Initialize(locator);
@@ -81,7 +83,12 @@ void GameScene::SubscribeEvents()
 	//   少し待つ     -> ラグドールを大砲に戻して、次の1発へ
 	_ragdoll = FindGameObject<Ragdoll>();
 	if (_ragdoll)
+	{
 		_ragdoll->OnSettled.Subscribe([this]() { _roundManager.NotifySettled(); });
+
+		// 発射したあと、地面に着くたびに、ヒット音を鳴らす
+		_ragdoll->OnGroundHit.Subscribe([this]() { PlayCharacterSe("hit"); });
+	}
 
 	// カメラ: 発射したらラグドールを追いかけ、次の1発の準備ができたら最初の位置へ戻る
 	_cameraFollow = FindGameObject<CameraFollow>();
@@ -93,8 +100,14 @@ void GameScene::SubscribeEvents()
 		{
 			AddScorePopup(gain);
 
-			if (_sound)
-				_sound->PlaySe(gain.isHead ? "head" : "hit");
+			// 的に当たったときのヒット音は、1発につき、最初の1回だけ鳴らす。頭のボーナスのときは、頭の音も重ねる
+			if (!_hasPlayedBoxHitSe)
+			{
+				_hasPlayedBoxHitSe = true;
+				PlayCharacterSe("hit");
+			}
+			if (gain.isHead)
+				PlayCharacterSe("head");
 
 			// 当たった瞬間に、少し遅くする(頭ヒットは、もっと遅く)
 			if (_timeScale)
@@ -108,8 +121,8 @@ void GameScene::SubscribeEvents()
 
 	_roundManager.OnShotFired.Subscribe([this]()
 		{
-			if (_sound)
-				_sound->PlaySe("shot");
+			PlayCharacterSe("shot");
+			_hasPlayedBoxHitSe = false;
 
 			// 発射した位置を覚えておく(止まったときの飛距離の採点に使う)
 			if (_ragdoll)
@@ -144,8 +157,7 @@ void GameScene::SubscribeEvents()
 	_scoreManager.OnBonusGained.Subscribe([this](float points)
 		{
 			StartBonusPopup(points);
-			if (_sound)
-				_sound->PlaySe("clear");
+			PlayCharacterSe("clear");
 		});
 	// 玉を撃ち終えたら、いまのステージの結果を、ゲーム画面の上に出す
 	_roundManager.OnFinished.Subscribe([this]()
@@ -157,6 +169,20 @@ void GameScene::SubscribeEvents()
 	// 同じシーン(GameScene)を指定すると、JSONから作り直されるので、スコアも玉数も、的の配置も、最初に戻る
 	_resultPanel.OnRetry.Subscribe([this]() { _sceneManager->Reload(); });
 	_resultPanel.OnBackToTitle.Subscribe([this]() { _sceneManager->ChangeScene(SceneName::Title); });
+}
+
+// 出来事("shot" "hit" "head" "clear")の効果音を鳴らす。選んでいるキャラクターに専用の音があれば、それを鳴らす
+// 専用の音が、設定されていない・読み込めていないときは、標準の音(出来事の名前と同じ音)に戻す
+void GameScene::PlayCharacterSe(const std::string& eventName)
+{
+	if (!_sound)
+		return;
+
+	std::string soundName = _characters ? _characters->ResolveSoundName(eventName) : eventName;
+	if (!_sound->HasSe(soundName))
+		soundName = eventName;
+
+	_sound->PlaySe(soundName);
 }
 
 void GameScene::SetStageInfo(StageData data)
