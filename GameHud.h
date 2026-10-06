@@ -49,9 +49,9 @@ private:
 		float age = 0.0f; //出てからの秒数
 	};
 
-	UiRenderer* _uiRenderer = nullptr; //借りるだけ
-	ScoreManager* _score = nullptr; //借りるだけ(GameSceneが持っている)
-	RoundManager* _round = nullptr; //借りるだけ(GameSceneが持っている)
+	UiRenderer* _uiRenderer = nullptr; 
+	ScoreManager* _score = nullptr; 
+	RoundManager* _round = nullptr;
 
 	//残りの玉数が、ポンと弾むアニメーション(ラグドールが止まったとき)
 	Tween _shotCountPop;

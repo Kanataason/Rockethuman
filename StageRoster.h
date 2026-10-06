@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-//遊べるステージ1つぶんの情報(Asset/Data/Stages.json の1件)
+//遊べるステージ1つぶんの情報
 struct StageEntry
 {
 	std::wstring name; //選ぶ画面に出す名前
@@ -11,7 +11,6 @@ struct StageEntry
 
 //遊べるステージの一覧と、いま選んでいるステージ。
 //ゲーム全体で1つだけ持つ(「もういちど」でシーンを作り直しても、同じステージになるように、GameManagerが持つ)
-//ステージを増やすときは、Stages.json に1件足して、ステージのJSONを作るだけ(コードは触らない)
 class StageRoster
 {
 public:

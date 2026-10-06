@@ -3,7 +3,6 @@
 
 #include "Title.h"
 #include "GameScene.h"
-#include "Result.h"
 #include "StageRoster.h"
 
 
@@ -15,7 +14,6 @@ namespace
 	{
 		{SceneName::Title,[]{return std::make_unique<Title>();}},
 		{SceneName::Stage,[] {return std::make_unique<GameScene>();}},
-		{SceneName::Result,[] {return std::make_unique<Result>();}}
 	};
 }
 

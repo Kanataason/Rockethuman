@@ -8,9 +8,7 @@
 class InputSystem;
 class UiRenderer;
 
-//縦に並んだ選択肢。W/S(↑↓)で選んで、黄色の枠で、いま選んでいる行を示す
-//・項目の数が、見える行の数より多いときは、スクロールして、「2 / 5」のように、いま何番目かを出す
-//・決定(スペースなど)は、画面ごとにキーが違うので、ここでは扱わない。GetSelectedIndex で、選んでいる番号を読む
+//縦に並んだ選択肢。W/Sで選んで、黄色の枠で、いま選んでいる行を示す
 class MenuList
 {
 public:
@@ -22,7 +20,7 @@ public:
 		float height = 56.0f;
 		float gap = 10.0f; //行と行の間
 		float textScale = 0.55f;
-		int visibleRows = 4; //いちどに見える行の数
+		int visibleRows = 4; //一度に見える行の数
 		float counterY = 495.0f; //「2 / 5」を出す高さ(見えない行があるときだけ出す)
 		float emptyY = 330.0f; //項目が空のときの、メッセージの高さ
 	};

@@ -18,6 +18,7 @@ public :
 
 	void SetDevice(ID3D11Device* device);
 
+	//すでにロードされているかを確認する
 	std::shared_ptr<ModelDatas> CheckModel(const ObjectData& data);
 
 private :

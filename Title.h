@@ -6,8 +6,6 @@
 
 class StageRoster;
 
-//タイトル画面。いまどの画面(メニュー / ステージ選択 / キャラクター選択)を出しているかだけを持つ
-//入力と描画は、それぞれの画面(TitlePage)が受け持つ。Title は、画面どうしのつなぎと、ステージの開始・終了をする
 class Title : public BaseScene
 {
 public:

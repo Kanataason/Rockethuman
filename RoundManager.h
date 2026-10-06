@@ -2,11 +2,7 @@
 #include "ServiceLoacator.h"
 #include "Event.h"
 
-//1発ごとの流れ:
-//AimAngle(揺れている大砲を止めて、角度を決める)
-//-> AimPower(ゲージを止めて、威力を決めて発射)
-//-> Flying(飛んでいる) -> Result(止まって、結果を見せる) -> AimAngle...
-//玉が尽きたら Finished
+//1発ごとの流れ
 enum class RoundState
 {
 	AimAngle,
@@ -54,14 +50,14 @@ public:
 private:
 	void UpdateResultTime(float deltaTime);
 	void UpdateClearTime(float deltaTime);
+
+	//終わりにして、結果を出す(OnFinished を1回だけ呼ぶ)
+	void Finish();
 private:
 	//止まってから、次に進むまでの間(秒)
 	const float _resultSeconds = 1.5f;
 	float _clearTimer = 0.0f;
 	bool _isCleared = false; //的を全部飛ばした(終わるまで待っている)
-
-	//終わりにして、結果を出す(OnFinished を1回だけ呼ぶ)
-	void Finish();
 
 	int _shotCount = 3;
 	RoundState _state = RoundState::AimAngle;

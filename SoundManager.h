@@ -8,9 +8,6 @@
 #include "ServiceLoacator.h"
 
 //効果音(SE)とBGM。DirectXTK Audioを使うので、読み込めるのは WAV だけ
-//・Asset/Data/Sound.json の「名前 → ファイル」を、Initializeで読み込む
-//・1つの名前に、複数のファイル("paths")を持たせると、「グループ」になる。鳴らすたびに、グループの中から、ランダムに1つ選ぶ
-//・鳴らすときは、名前を指定する。名前がない・読み込みに失敗した音は、何もせず無視する(落ちない)
 class SoundManager
 {
 public:
@@ -18,7 +15,7 @@ public:
 
     void Initialize(ServiceLocator& locator);
 
-    //終了のときの後片付け。先に音のエンジンを止めてから、音のデータを消す(鳴っている最中に消すと、音のスレッドが、消えた音を触って落ちる)
+    //終了のときの後片付け。先に音のエンジンを止めてから、音のデータを消す
     //何度呼んでも安全
     void Shutdown();
 
@@ -39,7 +36,7 @@ public:
         return it != _sounds.end() && !it->second.clips.empty();
     }
 
-    //すでに同じBGMが鳴っているときは、何もしない(「もういちど」で、曲が頭に戻らないように)
+    //すでに同じBGMが鳴っているときは何もしない
     void PlayBgm(const std::string& name, float volume = 0.4f, bool loop = true);
     void StopBgm();
 

@@ -11,8 +11,6 @@ using namespace DirectX;
 
 
 //JSONのデータ(ObjectData)から、GameObjectを1つ作る
-//1. モデルの用意        -> ModelProvider
-//2. 役割ごとの組み立て  -> ObjectBuilders(Build〇〇.cpp)
 class GameObjectFactory
 {
 public:

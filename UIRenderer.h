@@ -13,8 +13,6 @@
 enum class TextAlign { Left, Center, Right };
 
 //UI描画をまとめるクラス（DirectXTK の SpriteBatch / SpriteFont を使用）
-//・座標はすべて 1280x720 の仮想解像度で指定する（Begin() で実際の画面サイズへ拡大縮小）
-//・色はストレートアルファ (r, g, b, a) で渡せばよい（内部で乗算済みアルファに変換する）
 class UiRenderer
 {
 public:
@@ -52,13 +50,11 @@ public:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> LoadTexture(const wchar_t* filePath) const;
 
     //画像を、(left, top)から width x height に引き伸ばして描く(星のアイコンなど)
-    //色は画像に掛ける。白(1,1,1,1)なら、そのままの色
     void DrawTexture(ID3D11ShaderResourceView* texture, float left, float top,
         float width, float height, DirectX::FXMVECTOR color);
 
     //ボタンの判定用:マウスの位置(ウィンドウ内のピクセル座標)が、
     //仮想解像度(1280x720)基準の矩形(left, top, width, height)の中にあるか調べる
-    //※ clientPos は InputSystem::GetMouseClientPosition() で取得したものを渡す
     bool HitTest(float left, float top, float width, float height, const POINT& clientPos) const;
 
     //3D空間の座標 → 仮想解像度上の画面座標（「頭ヒット!」をキャラの位置に出すときなどに使う）

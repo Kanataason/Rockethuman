@@ -7,8 +7,6 @@
 class GameObject;
 
 //役割(ObjectType)ごとの、コンポーネントの組み立て関数。
-//1つの役割につき1つのcppに分けている(Build〇〇.cpp)。
-//新しい役割を足すときは、ここに宣言を足し、Build〇〇.cppを作り、
 //BaseGameObjectFactory.cppの表に登録するだけでよい。
 namespace ObjectBuilders
 {

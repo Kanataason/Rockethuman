@@ -4,7 +4,6 @@
 #include <DirectXMath.h>
 
 //威力ゲージの「色の帯」と「発射の速さ」を、1か所で決める表。
-//ゲージの色(GameScene)と、発射の速さ(CannonController)が、同じ表を見るので、
 //「緑のうちは弱く、黄色は中くらい、赤は強く飛ぶ」が、必ず見た目と一致する。
 namespace PowerZone
 {
@@ -17,7 +16,6 @@ namespace PowerZone
 	};
 
 	//ゲージが0のときの発射の速さ(m/s)。
-	//RagdollTuning::kLaunchMaxVelocitySpeedより小さくする
 	inline constexpr float minSpeed = 6.0f;
 
 	inline const std::array<Zone, 3> zones =
@@ -27,7 +25,7 @@ namespace PowerZone
 		{ 1.00f, 36.0f, { 1.0f, 0.15f, 0.1f, 1.0f }, L"つよい"}, //赤: すごく飛ぶ
 	} };
 
-	//ゲージの量(0～1)がいる帯
+	//ゲージの量がいる帯
 	inline const Zone& ZoneAt(float power)
 	{
 		for (const auto& zone : zones)
@@ -38,7 +36,7 @@ namespace PowerZone
 		return zones.back();
 	}
 
-	//ゲージの量(0～1)から、発射の速さ(m/s)を求める。帯の中では直線で増え、帯の境目で途切れない
+	//ゲージの量から、発射の速さ(m/s)を求める。帯の中では直線で増え、帯の境目で途切れない
 	inline float SpeedFromPower(float power)
 	{
 		power = (std::clamp)(power, 0.0f, 1.0f);

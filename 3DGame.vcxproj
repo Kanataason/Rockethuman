@@ -278,7 +278,6 @@
     <ClInclude Include="RagdollData.h" />
     <ClInclude Include="RagdollSystem.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="Result.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="ScoreManager.h" />

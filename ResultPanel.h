@@ -12,8 +12,6 @@ class SoundManager;
 
 
 //ステージが終わったときに、ゲーム画面の上に重ねて出す結果パネル
-//暗くなる -> パネルが弾んで出る -> スコアが数え上がる -> 星が1つずつ出る -> ボタンが出る
-//「出すかどうか」「アニメーションの進み」は、このクラスが持つ(GameScene は、Show を呼ぶだけ)
 class ResultPanel
 {
 public:
@@ -33,10 +31,10 @@ public:
 
 	bool IsVisible() const { return _visible; }
 private:
-	//星の数(0～3)。スコアが、何点以上で何個か
+	//星の数 スコアが、何点以上で何個か
 	int CalculateStars(int score);
 
-	//開始から start 秒後に始まる、duration 秒のアニメーションの進み具合(0～1)
+	//開始から start 秒後に始まる、duration 秒のアニメーションの進み具合
 	float Progress(float start, float duration) const;
 
 	void DrawStars(float centerX, float centerY);
@@ -49,7 +47,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> _starOn;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> _starOff;
 
-	std::array<int, 3> _starThresholds = { 1500, 3500, 6000 }; //何も渡されなかったとき用(初期値がないと、ごみの値になる)
+	std::array<int, 3> _starThresholds = { 1500, 3500, 6000 }; //何も渡されなかったとき用
 
 	bool _oneShotClipFlag = false;
 	bool _visible = false;

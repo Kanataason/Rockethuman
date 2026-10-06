@@ -2,7 +2,6 @@
 #include <algorithm>
 
 //UIのアニメーション用。時間を0～1に変えるだけの、小さな部品
-//Update(deltaTime)で進めて、描画のときにT()やEaseOutBack(T())を読む
 struct Tween
 {
 	float time = 0.0f;

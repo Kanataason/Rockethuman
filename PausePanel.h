@@ -7,12 +7,9 @@ class InputSystem;
 class UiRenderer;
 
 //ステージ中に、ESCキーで出す、ポーズのパネル(ゲーム画面の上に重ねて出す)
-//つづける / やりなおす / タイトルへ
-//時間を止めるのは、受け取った側(GameScene)の仕事。このクラスは、「出すかどうか」「選んだもの」だけを持つ
 class PausePanel
 {
 public:
-	//「つづける」(ESCでも同じ) / 「やりなおす」 / 「タイトルへ」を選んだとき。選んだ時点で、パネルは閉じている
 	Event<> OnResume;
 	Event<> OnRetry;
 	Event<> OnBackToTitle;

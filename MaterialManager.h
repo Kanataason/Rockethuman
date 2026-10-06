@@ -17,6 +17,7 @@ public :
 
 	void Initialize();
 	void CreateDefaultMaterial();
+	//マテリアルやテクスチャのロード状態を見る
 	std::shared_ptr<Material> CheckMaterial(const std::string& path);
 	std::shared_ptr<Texture> FbxCheckTexture(const std::wstring& path);
 

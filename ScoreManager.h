@@ -48,6 +48,7 @@ public:
 private:
 	void CheckRemainingTarget();
 
+	//スコアオブジェクトに当たった時のカウントと処理
 	void AddHitTarget() { ++_hitTotalTarget; }
 	void AddTarget() { ++_totalTargetCount; }
 	void AddHit(const HitInfo& hit);
