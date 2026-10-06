@@ -4,23 +4,54 @@
             "name": "shot",
             "path": "Asset/Sound/fly.wav"
         },
-        { "name": "head",  "path": "Asset/Sound/head.wav" },
-        { "name": "clear", "path": "Asset/Sound/clear.wav" },
+        {
+            "name": "head",
+            "path": "Asset/Sound/head.wav"
+        },
+        {
+            "name": "clear",
+            "path": "Asset/Sound/clear.wav"
+        },
 
-        { "name": "hit",   "paths": [ "Asset/Sound/hit1.wav", "Asset/Sound/hit2.wav", "Asset/Sound/hit3.wav" ] },
+        {
+            "name": "hit",
+            "paths": [ "Asset/Sound/hit1.wav", "Asset/Sound/hit2.wav", "Asset/Sound/hit3.wav" ]
+        },
 
         {
             "name": "shot_elvis",
             "path": "Asset/Sound/Hfly.wav"
         },
-        { "name": "head_elvis", "path": "Asset/Sound/head_elvis.wav" },
+        {
+            "name": "head_elvis",
+            "path": "Asset/Sound/head_elvis.wav"
+        },
         {
             "name": "hit_elvis",
             "paths": [ "Asset/Sound/HHit1.wav", "Asset/Sound/HHit2.wav", "Asset/Sound/HHit3.wav" ]
+        },
+        {
+            "name": "resultHappy",
+            "path": "Asset/Sound/resultHappy.wav"
+        },
+        {
+            "name": "resultSad",
+            "path": "Asset/Sound/resultSad.wav"
         }
+
     ],
     "BGM": [
-        { "name": "title", "path": "Asset/Sound/bgm_title.wav" },
-        { "name": "stage", "path": "Asset/Sound/bgm_stage.wav" }
+        {
+            "name": "drumRoll",
+            "path": "Asset/Sound/drumRoll.wav"
+        },
+        {
+            "name": "title",
+            "path": "Asset/Sound/bgm_titleAozorakuukou.wav"
+        },
+        {
+            "name": "stage",
+            "path": "Asset/Sound/bgm_stage.wav"
+        }
     ]
 }

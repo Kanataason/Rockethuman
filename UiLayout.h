@@ -46,6 +46,7 @@ enum class PanelType
     Score,
     ShotCount,
     Result,
+    Pause,
     CannonGauge,
     None
 };

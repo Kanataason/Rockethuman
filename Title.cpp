@@ -59,9 +59,8 @@ void Title::Update(float deltaTime)
 	case PanelType::CharacterSelect:
 		UpdateCharacterSelect();
 		break;
-
 	default:
-		// 設定パネルなど: Enterで閉じる
+		// Enterで閉じる
 		if (_input->GetKeyDown(VK_RETURN) || _input->GetKeyDown(VK_ESCAPE))
 			_currentPanel = PanelType::None;
 		break;
@@ -78,7 +77,7 @@ void Title::UpdateMenu()
 	if (_input->GetKeyDown('S') || _input->GetKeyDown(VK_DOWN))
 		_selectedIndex = (_selectedIndex + 1) % MenuCount;
 
-	if (_input->GetKeyDown(VK_SPACE) || _input->GetKeyDown(VK_RETURN))
+	if (_input->GetKeyDown(VK_SPACE))
 		ConfirmSelected();
 }
 
@@ -98,7 +97,7 @@ void Title::UpdateStageSelect()
 	}
 
 	// もどる: メニューに戻る
-	if (_input->GetKeyDown(VK_RETURN) || _input->GetKeyDown(VK_ESCAPE))
+	if (_input->GetKeyDown(VK_ESCAPE) || _input->GetKeyDown(VK_RETURN))
 		_currentPanel = PanelType::None;
 }
 
@@ -130,6 +129,9 @@ void Title::ConfirmSelected()
 		// 「キャラクターセレクト」: キャラクター選択を開く
 		_currentPanel = PanelType::CharacterSelect;
 		break;
+	case TextType::End:
+		PostQuitMessage(0);
+		break;
 	default:
 		break;
 	}
@@ -159,7 +161,7 @@ void Title::DrawUi()
 		break;
 	}
 
-	_uiRenderer->DrawString(L"ロケットにんげん", 380.0f, 100.0f, 1.0f,
+	_uiRenderer->DrawString(L"ロケットにんげん", 380.0f, 40.0f, 1.0f,
 		DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 	_uiRenderer->End();
 }

@@ -6,6 +6,7 @@
 #include "ScoreManager.h"
 #include "RoundManager.h"
 #include "ResultPanel.h"
+#include "PausePanel.h"
 #include "UIRenderer.h"
 #include "UiLayout.h"
 #include "UiTween.h"
@@ -15,6 +16,7 @@ class CameraFollow;
 class TimeScale;
 class SoundManager;
 class CharacterRoster;
+class InputSystem;
 
 class GameScene : public BaseScene
 {
@@ -43,6 +45,9 @@ private:
 
 	// 出来事("shot" "hit" "head" "clear")の効果音。選んでいるキャラクター専用の音があれば、それを鳴らす
 	void PlayCharacterSe(const std::string& eventName);
+
+	// ポーズ。時間を止める(シーンの更新も物理も止まる)/ 戻す
+	void SetPaused(bool paused);
 private:
 	// 的に当たった場所に出す、浮き上がって消える文字
 	struct ScorePopup
@@ -56,10 +61,11 @@ private:
 	RoundManager _roundManager;
 	ScoreManager _scoreManager;
 	ResultPanel _resultPanel;   // 玉を撃ち終えたあとに、ゲーム画面の上に重ねて出す
+	PausePanel _pausePanel;     // ESCで出す、ポーズのパネル
+	InputSystem* _input = nullptr;
 
 	Ragdoll* _ragdoll = nullptr;
 	float _launchRootX = 0.0f;   // 発射した瞬間の、体のX位置(飛距離の採点に使う)
-	bool _hasPlayedBoxHitSe = false;   // この1発で、的に当たったときのヒット音を、もう鳴らしたか
 	CameraFollow* _cameraFollow = nullptr;
 
 	// 残りの玉数が、ポンと弾むアニメーション(ラグドールが止まったとき)
@@ -69,6 +75,9 @@ private:
 	bool _bonusActive = false;
 	float _bonusPoints = 0.0f;
 	float _bonusAge = 0.0f;   // 出てからの秒数
+
+	float _hitSeCoolDown = 0.06f;
+	float _currentHitSeTime = 0.0f;
 
 	std::vector<ScorePopup> _scorePopups;
 	Tween _comboPop;       // コンボが増えたときの弾み

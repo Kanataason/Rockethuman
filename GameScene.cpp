@@ -10,6 +10,7 @@
 #include "BaseCamera.h"
 #include "ObjectStatus.h"
 #include "TimeScale.h"
+#include "InputSystem.h"
 #include "PowerZone.h"
 #include "SceneManager.h"
 #include "SoundManager.h"
@@ -53,11 +54,14 @@ void GameScene::Initialize(ServiceLocator& locator)
 	BaseScene::Initialize(locator);
 
 	_timeScale = locator.timeScale;
+	_input = locator.input;
+	SetPaused(false);   // ポーズのまま、シーンが切り替わっても、止まったままにならないように
 	_sound = locator.sound;
 	_characters = locator.characters;
 	if (_sound)
 		_sound->PlayBgm("stage");   // 同じ曲が鳴っていれば、続ける(「もういちど」で、頭に戻らない)
 	_resultPanel.Initialize(locator);
+	_pausePanel.Initialize(locator);
 
 	auto* cannon = FindGameObject<CannonController>();
 	auto* player = FindGameObject<Player>();
@@ -99,13 +103,13 @@ void GameScene::SubscribeEvents()
 	_scoreManager.OnScoreGained.Subscribe([this](ScoreGain gain)
 		{
 			AddScorePopup(gain);
-
-			// 的に当たったときのヒット音は、1発につき、最初の1回だけ鳴らす。頭のボーナスのときは、頭の音も重ねる
-			if (!_hasPlayedBoxHitSe)
+		
+			if(_currentHitSeTime <= 0.0f)
 			{
-				_hasPlayedBoxHitSe = true;
+				_currentHitSeTime = _hitSeCoolDown;
 				PlayCharacterSe("hit");
 			}
+
 			if (gain.isHead)
 				PlayCharacterSe("head");
 
@@ -122,7 +126,6 @@ void GameScene::SubscribeEvents()
 	_roundManager.OnShotFired.Subscribe([this]()
 		{
 			PlayCharacterSe("shot");
-			_hasPlayedBoxHitSe = false;
 
 			// 発射した位置を覚えておく(止まったときの飛距離の採点に使う)
 			if (_ragdoll)
@@ -162,6 +165,7 @@ void GameScene::SubscribeEvents()
 	// 玉を撃ち終えたら、いまのステージの結果を、ゲーム画面の上に出す
 	_roundManager.OnFinished.Subscribe([this]()
 		{
+			_sound->PlayBgm("drumRoll");
 			_resultPanel.Show(static_cast<int>(_scoreManager.GetScore()));
 		});
 
@@ -169,6 +173,25 @@ void GameScene::SubscribeEvents()
 	// 同じシーン(GameScene)を指定すると、JSONから作り直されるので、スコアも玉数も、的の配置も、最初に戻る
 	_resultPanel.OnRetry.Subscribe([this]() { _sceneManager->Reload(); });
 	_resultPanel.OnBackToTitle.Subscribe([this]() { _sceneManager->ChangeScene(SceneName::Title); });
+
+	// ポーズのパネルの選択。シーンを切り替えるときは、先に時間を戻しておく
+	_pausePanel.OnResume.Subscribe([this]() { SetPaused(false); });
+	_pausePanel.OnRetry.Subscribe([this]()
+		{
+			SetPaused(false);
+			_sceneManager->Reload();
+		});
+	_pausePanel.OnBackToTitle.Subscribe([this]()
+		{
+			SetPaused(false);
+			_sceneManager->ChangeScene(SceneName::Title);
+		});
+}
+
+void GameScene::SetPaused(bool paused)
+{
+	if (_timeScale)
+		_timeScale->SetPaused(paused);
 }
 
 // 出来事("shot" "hit" "head" "clear")の効果音を鳴らす。選んでいるキャラクターに専用の音があれば、それを鳴らす
@@ -193,7 +216,24 @@ void GameScene::SetStageInfo(StageData data)
 
 void GameScene::Update(float deltaTime)
 {
+	// ポーズ中は、パネルの操作だけ受け付ける(ゲームの入力・更新は、全部止める)
+	if (_pausePanel.IsVisible())
+	{
+		_pausePanel.Update();
+		return;
+	}
+
+	// ESCでポーズ。結果パネルが出ているときは、出さない
+	if (_input && !_resultPanel.IsVisible() && _input->GetKeyDown(VK_ESCAPE))
+	{
+		_pausePanel.Open();
+		SetPaused(true);
+		return;
+	}
+
 	BaseScene::Update(deltaTime);
+
+	_currentHitSeTime -= deltaTime;
 
 	_roundManager.Update(deltaTime);
 	_scoreManager.Update(deltaTime);
@@ -219,7 +259,8 @@ void GameScene::DrawUi()
 	DrawBonusPopup();
 	DrawGauge();
 	DrawAimHint();
-	_resultPanel.Draw();   // 一番手前(出ていないときは、何もしない)
+	_resultPanel.Draw();   // (出ていないときは、何もしない)
+	_pausePanel.Draw();   // 一番手前
 
 	_uiRenderer->End();
 }

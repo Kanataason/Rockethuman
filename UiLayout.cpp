@@ -99,6 +99,14 @@ namespace UiInfo
             .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
             .items = {{TextType::None, ButtonType::None}
             }}
+        },
+        {PanelType::Pause, {
+            // 画面の中央(パネルの中心が 640,360)
+            .frame = {.left = 440.0f, .top = 170.0f, .width = 400.0f, .height = 380.0f,
+                       .thickness = 3.0f, .frameColor = { 1.0f, 1.0f, 1.0f, 1 } },
+            .fillColor = { 0.0f, 0.0f, 0.0f, 0.6f },
+            .items = {{TextType::None, ButtonType::None}
+            }}
         }
     };
 }

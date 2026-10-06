@@ -4,6 +4,7 @@
 #include <string>
 #include <Windows.h>
 
+#include "SoundManager.h"
 #include "InputSystem.h"
 #include "UIRenderer.h"
 #include "UiLayout.h"
@@ -42,6 +43,7 @@ void ResultPanel::Initialize(ServiceLocator& locator)
 {
 	_input = locator.input;
 	_uiRenderer = locator.uiRenderer;
+	_soundManager = locator.sound;
 
 	if (_uiRenderer)
 	{
@@ -69,6 +71,7 @@ void ResultPanel::Show(int finalScore)
 	_visible = true;
 	_elapsed = 0.0f;
 	_score = finalScore;
+	_oneShotClipFlag = false;
 	_starCount = CalculateStars(finalScore);
 	_selectedIndex = 0;
 }
@@ -90,6 +93,13 @@ void ResultPanel::Update(float deltaTime)
 		+ starIntervalSeconds * _starCount + buttonDelaySeconds;
 	if (_elapsed < buttonStart || !_input)
 		return;
+
+	if (!_oneShotClipFlag)
+	{
+		_soundManager->StopBgm();
+		_oneShotClipFlag = true;
+		_soundManager->PlaySe(_starCount <= 1 ? "resultSad" : "resultHappy");
+	}
 
 	if (_input->GetKeyDown('W') || _input->GetKeyDown(VK_UP))
 		_selectedIndex = (_selectedIndex + 1) % 2;

@@ -8,6 +8,8 @@
 
 class InputSystem;
 class UiRenderer;
+class SoundManager;
+
 
 // ステージが終わったときに、ゲーム画面の上に重ねて出す結果パネル
 //   暗くなる -> パネルが弾んで出る -> スコアが数え上がる -> 星が1つずつ出る -> ボタンが出る
@@ -42,12 +44,14 @@ private:
 private:
 	InputSystem* _input = nullptr;
 	UiRenderer* _uiRenderer = nullptr;
+	SoundManager* _soundManager = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> _starOn;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> _starOff;
 
 	std::array<int, 3> _starThresholds = { 1500, 3500, 6000 };   // 何も渡されなかったとき用(初期値がないと、ごみの値になる)
 
+	bool _oneShotClipFlag = false;
 	bool _visible = false;
 	float _elapsed = 0.0f;   // Show してからの秒数。アニメーションは、全部これから計算する
 	int _score = 0;
