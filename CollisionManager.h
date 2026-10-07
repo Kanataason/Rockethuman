@@ -97,6 +97,9 @@ public :
 
 	void ReleaseCollider(int id);
 
+	//登録されているコライダーすべて(床や、眠っている箱も含む)
+	const std::unordered_map<int, Collider*>& GetColliders() const { return _colliderMap; }
+
 private:
 	Collider* FindCollider(int id)
 	{

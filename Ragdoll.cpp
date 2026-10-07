@@ -875,9 +875,11 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
         const Vector3 relative = bone.rigidBody->GetPosition() - rootPosition;
         Vector3 velocity = launchVelocity + Vector::Cross(tumble, relative);
 
-        //ボーンごとのランダムな速度。腰(ルート)は動かさず、手足や頭は大きく散らす
+        //ボーンごとのランダムな速度。腰(ルート)と胴体(背骨)は動かさず、手足や頭は大きく散らす
+        //胴体の関節に、ばらばらの速度や回転を足すと、背骨が前かがみの向きに、端まで曲がったまま、飛行中ずっと固まる
         const bool isRoot = bone.parentIndex < 0;
-        if (!isRoot)
+        const bool isTrunk = bone.name.find("Spine") != std::string::npos;
+        if (!isRoot && !isTrunk)
         {
             const bool isExtremity =
                 bone.name.find("Hand") != std::string::npos ||
@@ -891,8 +893,8 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
         }
         bone.rigidBody->SetVelocity(velocity);
 
-        //ボーンごとのランダムな回転(Zまわり)
-        const Vector3 flail(0.0f, 0.0f, unit(rng));
+        //ボーンごとのランダムな回転(Zまわり)。胴体は、全身の回転だけにする(ばたつかせない)
+        const Vector3 flail = isTrunk ? Vector3(0.0f, 0.0f, 0.0f) : Vector3(0.0f, 0.0f, unit(rng));
         bone.rigidBody->SetAngularVelocity(tumble + flail * RagdollTuning::kLaunchFlailSpeed);
     }
 }

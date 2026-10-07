@@ -38,6 +38,10 @@ namespace RagdollTuning
     constexpr float angularBetaOutOfLimit = 0.6f; //制限の範囲外(強く戻す)
     constexpr float angularBeta = 0.4f; //上記以外の標準値
 
+    //可動範囲を、この角度(rad。約20度)より大きく超えたときは、少しずつではなく、一気に範囲の中へ戻す
+    //(速く飛んだときに、折れ曲がったまま固まるのを防ぐ)
+    constexpr float angularSnapAngle = 0.35f;
+
 
     //ジョイントのアンカーのずれを利用して親ボディを回転させる。
     //これにより、脚や胴体にかかる負荷によって姿勢を傾けられる。

@@ -34,8 +34,8 @@ public:
     //(デストラクタの中から呼ばれるので、コライダーの形(GetMinなど)は、触らない)
     void RemoveCollider(Collider* collider);
 
-    //生きているコライダーを外して、その近くで眠っている箱だけを起こす(的を飛ばすときなど)
-    void RemoveColliderAndWakeNear(Collider* collider);
+    //生きているコライダーを外して、下の支えを失った、眠っている箱だけを起こす(的を飛ばすときなど)
+    void RemoveColliderAndWakeUnsupported(Collider* collider);
 
     //登録時に、Joint側にも登録先を覚えさせる(Jointの所有者はRagdoll。ここは参照するだけ)
     void AddJoint(Joint* joint);
@@ -127,8 +127,13 @@ private:
     //ほとんど動いていない箱などを、スリープさせる(ラグドールのボーンは、RagdollSystemが眠らせる)
     void UpdateBodySleep(float deltaTime);
 
-    //眠っている箱などのうち、範囲(min～max。少し広げて見る)に入る物だけを起こす(下の箱が消えて、上の箱が落ちるときなどに使う)
-    void WakeSleepingBodies(const XMFLOAT3& min, const XMFLOAT3& max);
+    //眠っている箱などのうち、下に支えがない物を起こす(下の箱が消えて、上の箱が落ちるときなどに使う)
+    //起こした箱の上の箱も、支えを失うので、変化がなくなるまで繰り返す
+    void WakeUnsupportedBodies();
+
+    //この箱の下に、支えがあるか(床や眠っている箱が、真下にあり、重心が支えの範囲の中にあるか)
+    //fallingColliders: いま起こした、落ちる側の箱(支えにしない)
+    bool HasSupport(const PhysicsBody& body, const std::vector<const Collider*>& fallingColliders) const;
 private:
     float _sleepSpeed = 0.2f; //この速さ(m/s)より遅い間は、「動いていない」とみなす
     float _sleepSeconds = 0.5f; //動いていない状態が、この秒数続いたら、スリープさせる

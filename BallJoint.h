@@ -70,7 +70,8 @@ public:
 private:
     //Bの姿勢を、可動範囲内の目標へ少しずつ近づける
     //一度に目標へ合わせないのは、急な補正による跳ねを避けるようにする
-    void CorrectRotationToLimit(const Quaternion& bodyARot, const Quaternion& currentRelative, const Quaternion& limitedDelta);
+    //rejectedAngle: 範囲から、どれだけ外れているか(rad)。大きく外れているときは、一気に戻す
+    void CorrectRotationToLimit(const Quaternion& bodyARot, const Quaternion& currentRelative, const Quaternion& limitedDelta, float rejectedAngle);
 
     //範囲外へ向かう角速度を消す(速度レベル)。
     //姿勢だけ戻しても、外へ向かう角速度が残っていると、すぐまた外へ出てしまうため。

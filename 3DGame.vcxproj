@@ -122,6 +122,11 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D /E /I /Q "$(ProjectDir)Asset" "$(OutDir)Asset\"
+xcopy /Y /D /Q "$(ProjectDir)*.hlsl" "$(OutDir)"</Command>
+      <Message>Copy Asset and shader sources to the output folder</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -141,6 +146,11 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D /E /I /Q "$(ProjectDir)Asset" "$(OutDir)Asset\"
+xcopy /Y /D /Q "$(ProjectDir)*.hlsl" "$(OutDir)"</Command>
+      <Message>Copy Asset and shader sources to the output folder</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animator.cpp" />

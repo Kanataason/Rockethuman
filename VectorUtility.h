@@ -310,6 +310,13 @@ public:
 
 		//回転軸ベクトルをtwistAxis方向へ投影した成分がTwist
 		float dot = Vector::Dot(rotAxis, twistAxis);
+		const float twistLength = std::sqrt(dot * dot + delta.w * delta.w);
+		if (twistLength < 1e-4f)
+		{
+			outTwist = Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
+			outSwing = delta;
+			return;
+		}
 		Vector3 projection = twistAxis * dot;
 
 		outTwist = Quaternion(projection.x, projection.y, projection.z, delta.w);

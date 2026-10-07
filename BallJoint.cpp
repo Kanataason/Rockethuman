@@ -165,7 +165,7 @@ void BallJoint::SolveAngularConstraint()
 
     //速度を先に、姿勢を後に計算
     RemoveAngularVelocityBeyondLimit(worldRejectedAxis);
-    CorrectRotationToLimit(bodyARot, currentRelative, limitedDelta);
+    CorrectRotationToLimit(bodyARot, currentRelative, limitedDelta, rejectedAngle);
 }
 
 
@@ -256,14 +256,14 @@ float BallJoint::CalculateAngleError(const Quaternion& relativeRotation)
 }
 
 
-void BallJoint::CorrectRotationToLimit(const Quaternion& bodyARot, const Quaternion& currentRelative, const Quaternion& limitedDelta)
+void BallJoint::CorrectRotationToLimit(const Quaternion& bodyARot, const Quaternion& currentRelative, const Quaternion& limitedDelta, float rejectedAngle)
 {
     //目標の相対回転(Aから見たBの、可動範囲内の姿勢)
     Quaternion limitedRelativeRotation = _initialRelativeRotation * limitedDelta;
     limitedRelativeRotation.Normalize();
 
-    //目標へ近づける割合
-    constexpr float angularBeta = RagdollTuning::angularBeta;
+    //目標へ近づける割合。範囲を大きく超えているときは、1回で戻りきれず、折れ曲がったまま固まるので、一気に戻す(1.0)
+    const float angularBeta = (rejectedAngle > RagdollTuning::angularSnapAngle) ? 1.0f : RagdollTuning::angularBeta;
     Quaternion blendedRelativeRotation = QuaternionMath::Nlerp(currentRelative, limitedRelativeRotation, angularBeta);
     blendedRelativeRotation.Normalize();
 
@@ -283,4 +283,4 @@ void BallJoint::CorrectRotationToLimit(const Quaternion& bodyARot, const Quatern
         return;
     }
     _bodyB->SetRotation(newBodyBRot);
-}
+}

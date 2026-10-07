@@ -1,4 +1,8 @@
 ﻿#include "PhysicsSystem.h"
+
+#include <algorithm>
+#include <cfloat>
+
 #include "DebugUtility.h"
 
 #include "ConsoleUtility.h"
@@ -112,16 +116,13 @@ void PhysicsSystem::RemoveCollider(Collider* collider)
     _collisionManager.ReleaseCollider(collider->GetID());
 }
 
-void PhysicsSystem::RemoveColliderAndWakeNear(Collider* collider)
+void PhysicsSystem::RemoveColliderAndWakeUnsupported(Collider* collider)
 {
-    //生きているコライダー用(的を飛ばすときなど)。先に範囲を取ってから消して、近くの眠っている箱だけを起こす
-    const XMFLOAT3 min = collider->GetMin();
-    const XMFLOAT3 max = collider->GetMax();
-
+    //生きているコライダー用(的を飛ばすときなど)。外したあと、下の支えを失った箱だけを起こす
     RemoveCollider(collider);
 
     //消えた物を支えにしていた箱が、眠ったまま浮かないように、起こして、落ち着き直させる
-    WakeSleepingBodies(min, max);
+    WakeUnsupportedBodies();
 }
 
 void PhysicsSystem::AddJoint(Joint* joint)
@@ -158,64 +159,95 @@ void PhysicsSystem::UpdateBodySleep(float deltaTime)
     }
 }
 
-void PhysicsSystem::WakeSleepingBodies(const XMFLOAT3& min, const XMFLOAT3& max)
+//下に支えがある箱か(支えにできるのは、動いていない物: 床、眠っている箱など)
+//fallingColliders: いま起こした(落ちる側の)箱。落ちる箱は、支えにしない
+bool PhysicsSystem::HasSupport(const PhysicsBody& body, const std::vector<const Collider*>& fallingColliders) const
 {
-    //起こす対象: 眠っている、動かせる物(箱など)。ラグドールのボーンは、対象外
-    const auto isSleepingBox = [](const PhysicsBody& body)
-        {
-            return body.rigidBody && body.collider && body.ragdollBone.nodeIndex < 0
-                && body.rigidBody->IsSleeping() && !body.rigidBody->IsKinematic();
-        };
+    constexpr float maxGapBelow = 0.15f; //支えの上面より、箱の底が、これだけ浮いていても、乗っているとみなす
+    constexpr float maxSinkBelow = 0.3f; //箱が傾いたり、少しめり込んだりして、底が、これだけ下がっていても、乗っているとみなす
+    constexpr float minOverlapWidth = 0.05f; //横(XとZ)に、これ以上重なっていれば、真下にあるとみなす
+    constexpr float centerMargin = 0.05f; //重心が、支えの範囲から、これだけはみ出していても、安定とみなす
 
-    constexpr float margin = 0.3f; //消えた物の範囲を、少し広げて見る(支えにされていた箱を、確実に拾うため)
-    std::vector<PhysicsBody*> wokenBodies; //起こした箱。この上に乗っている箱を、順番に探していく
+    const XMFLOAT3 bodyMin = body.collider->GetMin();
+    const XMFLOAT3 bodyMax = body.collider->GetMax();
+    const float centerX = (bodyMin.x + bodyMax.x) * 0.5f;
+    const float centerY = (bodyMin.y + bodyMax.y) * 0.5f;
+    const float centerZ = (bodyMin.z + bodyMax.z) * 0.5f;
 
-    //1. 消えた物の範囲に、触れている箱を起こす
-    for (auto& body : _rigidBodies)
+    //支えになっている物すべての、横(XとZ)の範囲
+    float supportMinX = FLT_MAX, supportMaxX = -FLT_MAX;
+    float supportMinZ = FLT_MAX, supportMaxZ = -FLT_MAX;
+    bool hasAnySupport = false;
+
+    for (const auto& [id, other] : _collisionManager.GetColliders())
     {
-        if (!isSleepingBox(body))
+        if (!other || other == body.collider)
             continue;
 
-        const XMFLOAT3 bMin = body.collider->GetMin();
-        const XMFLOAT3 bMax = body.collider->GetMax();
-        const bool overlap =
-            bMin.x <= max.x + margin && bMax.x >= min.x - margin &&
-            bMin.y <= max.y + margin && bMax.y >= min.y - margin &&
-            bMin.z <= max.z + margin && bMax.z >= min.z - margin;
-        if (overlap)
-        {
-            body.rigidBody->SetSleeping(false);
-            wokenBodies.push_back(&body);
-        }
+        //体とカメラは、支えにしない。動いている物(落ちている最中の箱など)も、支えにしない
+        const CollisionGroup group = other->GetCollisionGroup();
+        if (group == CollisionGroup::Ragdoll || group == CollisionGroup::Camera || other->IsMoving())
+            continue;
+
+        if (std::find(fallingColliders.begin(), fallingColliders.end(), other) != fallingColliders.end())
+            continue;
+
+        const XMFLOAT3 otherMin = other->GetMin();
+        const XMFLOAT3 otherMax = other->GetMax();
+
+        //自分より下にあって、箱の底が、支えの上面のあたりにあるか
+        const float otherCenterY = (otherMin.y + otherMax.y) * 0.5f;
+        const bool isBelow = otherCenterY < centerY;
+        const bool touchesTop = bodyMin.y >= otherMax.y - maxSinkBelow && bodyMin.y <= otherMax.y + maxGapBelow;
+
+        //横に、重なっているか
+        const bool overlapsSideways =
+            bodyMin.x < otherMax.x - minOverlapWidth && bodyMax.x > otherMin.x + minOverlapWidth &&
+            bodyMin.z < otherMax.z - minOverlapWidth && bodyMax.z > otherMin.z + minOverlapWidth;
+
+        if (!isBelow || !touchesTop || !overlapsSideways)
+            continue;
+
+        hasAnySupport = true;
+        supportMinX = (std::min)(supportMinX, otherMin.x);
+        supportMaxX = (std::max)(supportMaxX, otherMax.x);
+        supportMinZ = (std::min)(supportMinZ, otherMin.z);
+        supportMaxZ = (std::max)(supportMaxZ, otherMax.z);
     }
 
-    //2. 起こした箱の上に乗っている箱を、起こす。起こした箱の上も、さらに調べる(上へ上へと伝わる)
-    //下の箱が落ちると、その上の箱も落ちるので、積み上げた壁の、下をつぶしても、上が浮かない
-    //横に並んだ箱は、起こさない(支えは、下にあるだけなので)
-    constexpr float contactGap = 0.3f; //下の箱の上面から、この距離以内なら、乗っているとみなす
-    constexpr float minOverlapWidth = 0.05f; //横(XとZ)に、これ以上重なっていれば、真上にあるとみなす
-    for (size_t i = 0; i < wokenBodies.size(); ++i)
+    if (!hasAnySupport)
+        return false;
+
+    //重心が、支えの範囲の外にあると、傾いて落ちる(半分以上はみ出して、端に乗っているだけの箱)
+    return centerX >= supportMinX - centerMargin && centerX <= supportMaxX + centerMargin &&
+        centerZ >= supportMinZ - centerMargin && centerZ <= supportMaxZ + centerMargin;
+}
+
+//眠っている箱のうち、下に支えがない箱を起こす(下の箱が消えて、上の箱が落ちるときなどに使う)
+void PhysicsSystem::WakeUnsupportedBodies()
+{
+    //起こした箱は、落ちる側なので、その上の箱は、次の周回で支えを失う。変化がなくなるまで繰り返す
+    std::vector<const Collider*> fallingColliders;
+
+    bool changed = true;
+    while (changed)
     {
-        const XMFLOAT3 lower = wokenBodies[i]->collider->GetMin();
-        const XMFLOAT3 upper = wokenBodies[i]->collider->GetMax();
+        changed = false;
 
         for (auto& body : _rigidBodies)
         {
-            if (!isSleepingBox(body))
+            //対象: 眠っている、動かせる物(箱など)。ラグドールのボーンは、対象外
+            if (!body.rigidBody || !body.collider || body.ragdollBone.nodeIndex >= 0)
+                continue;
+            if (!body.rigidBody->IsSleeping() || body.rigidBody->IsKinematic())
                 continue;
 
-            const XMFLOAT3 bMin = body.collider->GetMin();
-            const XMFLOAT3 bMax = body.collider->GetMax();
+            if (HasSupport(body, fallingColliders))
+                continue;
 
-            const bool isOnTop = bMin.y >= upper.y - contactGap && bMin.y <= upper.y + contactGap;
-            const bool overlapsSideways =
-                bMin.x < upper.x - minOverlapWidth && bMax.x > lower.x + minOverlapWidth &&
-                bMin.z < upper.z - minOverlapWidth && bMax.z > lower.z + minOverlapWidth;
-            if (isOnTop && overlapsSideways)
-            {
-                body.rigidBody->SetSleeping(false);
-                wokenBodies.push_back(&body);
-            }
+            body.rigidBody->SetSleeping(false);
+            fallingColliders.push_back(body.collider);
+            changed = true;
         }
     }
 }

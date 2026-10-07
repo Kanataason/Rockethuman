@@ -15,7 +15,7 @@ void CameraFollow::StartFollow()
 	if (!_target)
 		return;
 
-	_startRootY = _target->GetRootPosition().y;
+	_startRootY = _target->GetRootPosition().y +_offsetY;
 	_hasBeenFast = false;
 	_mode = Mode::Follow;
 }

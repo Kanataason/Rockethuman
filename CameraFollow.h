@@ -40,7 +40,9 @@ private:
 	Ragdoll* _target = nullptr;
 	Mode _mode = Mode::Idle;
 
+
 	DirectX::XMFLOAT3 _startPosition{}; //カメラの最初の位置(戻る先)
 	float _startRootY = 0.0f; //追い始めたときの、ラグドールの腰の高さ
+	float _offsetY = -2.0f;
 	bool _hasBeenFast = false; //追い始めてから、一度でも速くなったか(なったあとで、遅くなったら寄る)
 };
