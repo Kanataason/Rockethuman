@@ -53,7 +53,10 @@ float4 main(PS_IN input) : SV_TARGET
     if (Material.Unlit != 0)
         return texColor;
 
+    //光が当たらない面が、真っ黒にならないように、環境光(ambient)を足す。大きいほど、全体が明るくなる
+    const float ambient = 0.5f;
     float diffuse = saturate(dot(N, L));
-    return texColor * Light.Color * diffuse;
+    float lighting = ambient + (1.0f - ambient) * diffuse;
+    return float4(texColor.rgb * Light.Color.rgb * lighting, texColor.a);
 
 }
