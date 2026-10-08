@@ -24,6 +24,7 @@
     <ProjectGuid>{d3c84e92-f81a-428a-8932-4fe969a028ab}</ProjectGuid>
     <RootNamespace>My3DGame</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
