@@ -645,9 +645,6 @@
     <None Include="Asset\Data\TestData.json">
       <Filter>Assets\Data</Filter>
     </None>
-    <None Include="Asset\Prefab\Test.fbx">
-      <Filter>Assets\Prefab</Filter>
-    </None>
     <None Include="Asset\Material\Red.mat">
       <Filter>Assets\Material</Filter>
     </None>
@@ -655,20 +652,11 @@
       <Filter>Assets\Material</Filter>
     </None>
     <None Include="packages.config" />
-    <None Include="Asset\Prefab\TestCharacter.fbx">
-      <Filter>Assets\Prefab</Filter>
-    </None>
     <None Include="Asset\Prefab\Player.fbx">
-      <Filter>Assets\Prefab</Filter>
-    </None>
-    <None Include="Asset\Prefab\kumas.fbx">
       <Filter>Assets\Prefab</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Asset\Texture\white.png">
-      <Filter>リソース ファイル</Filter>
-    </Image>
     <Image Include="Asset\Texture\Mock\goldCrate.png">
       <Filter>リソース ファイル</Filter>
     </Image>

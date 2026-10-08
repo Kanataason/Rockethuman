@@ -345,15 +345,11 @@
     <None Include="Asset\Material\Blue.mat" />
     <None Include="Asset\Material\Red.mat" />
     <None Include="Asset\Data\TestData.json" />
-    <None Include="Asset\Prefab\kumas.fbx" />
     <None Include="Asset\Prefab\Player.fbx" />
-    <None Include="Asset\Prefab\Test.fbx" />
-    <None Include="Asset\Prefab\TestCharacter.fbx" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Asset\Texture\Mock\goldCrate.png" />
-    <Image Include="Asset\Texture\white.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
