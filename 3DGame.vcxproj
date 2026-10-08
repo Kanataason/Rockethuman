@@ -77,7 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -97,7 +97,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -113,7 +113,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -133,7 +133,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,197 +144,197 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Animator.cpp" />
-    <ClCompile Include="BallJoint.cpp" />
-    <ClCompile Include="BaseGameObjectFactory.cpp" />
-    <ClCompile Include="BuildProp.cpp" />
-    <ClCompile Include="BuildPlayer.cpp" />
-    <ClCompile Include="BuildCamera.cpp" />
-    <ClCompile Include="BuildLight.cpp" />
-    <ClCompile Include="BuildCannon.cpp" />
-    <ClCompile Include="BuildScoreObject.cpp" />
-    <ClCompile Include="ModelProvider.cpp" />
-    <ClCompile Include="BaseCamera.cpp" />
-    <ClCompile Include="BaseLight.cpp" />
-    <ClCompile Include="BaseScene.cpp" />
-    <ClCompile Include="BaseSceneLoader.cpp" />
-    <ClCompile Include="CameraController.cpp" />
-    <ClCompile Include="CameraFollow.cpp" />
-    <ClCompile Include="CannonController.cpp" />
-    <ClCompile Include="ColliderManager.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="DebugController.cpp" />
-    <ClCompile Include="DebugUtillity.cpp" />
-    <ClCompile Include="GameAudio.cpp" />
-    <ClCompile Include="GameHud.cpp" />
-    <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="HingeJoint.cpp" />
-    <ClCompile Include="Joint.cpp" />
-    <ClCompile Include="InputSystem.cpp" />
-    <ClCompile Include="JsonLoader.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="BaseSystem.cpp" />
-    <ClCompile Include="MaterialLoader.cpp" />
-    <ClCompile Include="MaterialManager.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="MeshRenderer.cpp" />
-    <ClCompile Include="ModelLoader.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="ObjectStatus.cpp" />
-    <ClCompile Include="Octree.cpp" />
-    <ClCompile Include="PhysicsSystem.cpp" />
-    <ClCompile Include="PlayerController.cpp" />
-    <ClCompile Include="Ragdoll.cpp" />
-    <ClCompile Include="RagDollSystem.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RigidBody.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="ScoreManager.cpp" />
-    <ClCompile Include="RoundManager.cpp" />
-    <ClCompile Include="TimeScale.cpp" />
-    <ClCompile Include="SoundManager.cpp" />
-    <ClCompile Include="CharacterRoster.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="UiDraw.cpp" />
-    <ClCompile Include="MenuList.cpp" />
-    <ClCompile Include="TitleMenuPage.cpp" />
-    <ClCompile Include="StageSelectPage.cpp" />
-    <ClCompile Include="CharacterSelectPage.cpp" />
-    <ClCompile Include="Title.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="UIRenderer.cpp" />
-    <ClCompile Include="UiLayout.cpp" />
-    <ClCompile Include="PausePanel.cpp" />
-    <ClCompile Include="PowerGauge.cpp" />
-    <ClCompile Include="StageRoster.cpp" />
-    <ClCompile Include="ResultPanel.cpp" />
+    <ClCompile Include="Source\Animator.cpp" />
+    <ClCompile Include="Source\BallJoint.cpp" />
+    <ClCompile Include="Source\BaseGameObjectFactory.cpp" />
+    <ClCompile Include="Source\BuildProp.cpp" />
+    <ClCompile Include="Source\BuildPlayer.cpp" />
+    <ClCompile Include="Source\BuildCamera.cpp" />
+    <ClCompile Include="Source\BuildLight.cpp" />
+    <ClCompile Include="Source\BuildCannon.cpp" />
+    <ClCompile Include="Source\BuildScoreObject.cpp" />
+    <ClCompile Include="Source\ModelProvider.cpp" />
+    <ClCompile Include="Source\BaseCamera.cpp" />
+    <ClCompile Include="Source\BaseLight.cpp" />
+    <ClCompile Include="Source\BaseScene.cpp" />
+    <ClCompile Include="Source\BaseSceneLoader.cpp" />
+    <ClCompile Include="Source\CameraController.cpp" />
+    <ClCompile Include="Source\CameraFollow.cpp" />
+    <ClCompile Include="Source\CannonController.cpp" />
+    <ClCompile Include="Source\ColliderManager.cpp" />
+    <ClCompile Include="Source\Collision.cpp" />
+    <ClCompile Include="Source\Collider.cpp" />
+    <ClCompile Include="Source\DebugController.cpp" />
+    <ClCompile Include="Source\DebugUtillity.cpp" />
+    <ClCompile Include="Source\GameAudio.cpp" />
+    <ClCompile Include="Source\GameHud.cpp" />
+    <ClCompile Include="Source\GameManager.cpp" />
+    <ClCompile Include="Source\GameObject.cpp" />
+    <ClCompile Include="Source\GameScene.cpp" />
+    <ClCompile Include="Source\HingeJoint.cpp" />
+    <ClCompile Include="Source\Joint.cpp" />
+    <ClCompile Include="Source\InputSystem.cpp" />
+    <ClCompile Include="Source\JsonLoader.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\BaseSystem.cpp" />
+    <ClCompile Include="Source\MaterialLoader.cpp" />
+    <ClCompile Include="Source\MaterialManager.cpp" />
+    <ClCompile Include="Source\Mesh.cpp" />
+    <ClCompile Include="Source\MeshRenderer.cpp" />
+    <ClCompile Include="Source\ModelLoader.cpp" />
+    <ClCompile Include="Source\ModelManager.cpp" />
+    <ClCompile Include="Source\ObjectStatus.cpp" />
+    <ClCompile Include="Source\Octree.cpp" />
+    <ClCompile Include="Source\PhysicsSystem.cpp" />
+    <ClCompile Include="Source\PlayerController.cpp" />
+    <ClCompile Include="Source\Ragdoll.cpp" />
+    <ClCompile Include="Source\RagDollSystem.cpp" />
+    <ClCompile Include="Source\Renderer.cpp" />
+    <ClCompile Include="Source\RigidBody.cpp" />
+    <ClCompile Include="Source\SceneManager.cpp" />
+    <ClCompile Include="Source\ScoreManager.cpp" />
+    <ClCompile Include="Source\RoundManager.cpp" />
+    <ClCompile Include="Source\TimeScale.cpp" />
+    <ClCompile Include="Source\SoundManager.cpp" />
+    <ClCompile Include="Source\CharacterRoster.cpp" />
+    <ClCompile Include="Source\Texture.cpp" />
+    <ClCompile Include="Source\TextureManager.cpp" />
+    <ClCompile Include="Source\Timer.cpp" />
+    <ClCompile Include="Source\UiDraw.cpp" />
+    <ClCompile Include="Source\MenuList.cpp" />
+    <ClCompile Include="Source\TitleMenuPage.cpp" />
+    <ClCompile Include="Source\StageSelectPage.cpp" />
+    <ClCompile Include="Source\CharacterSelectPage.cpp" />
+    <ClCompile Include="Source\Title.cpp" />
+    <ClCompile Include="Source\Transform.cpp" />
+    <ClCompile Include="Source\UIRenderer.cpp" />
+    <ClCompile Include="Source\UiLayout.cpp" />
+    <ClCompile Include="Source\PausePanel.cpp" />
+    <ClCompile Include="Source\PowerGauge.cpp" />
+    <ClCompile Include="Source\StageRoster.cpp" />
+    <ClCompile Include="Source\ResultPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AnimationLoader.h" />
-    <ClInclude Include="Animator.h" />
-    <ClInclude Include="BallJoint.h" />
-    <ClInclude Include="BaseLight.h" />
-    <ClInclude Include="BaseSceneLoader.h" />
-    <ClInclude Include="Animation.h" />
-    <ClInclude Include="BoxCollider.h" />
-    <ClInclude Include="CameraController.h" />
-    <ClInclude Include="CameraFollow.h" />
-    <ClInclude Include="CannonController.h" />
-    <ClInclude Include="PowerZone.h" />
-    <ClInclude Include="CapsuleCollider.h" />
-    <ClInclude Include="Collider.h" />
-    <ClInclude Include="Collision.h" />
-    <ClInclude Include="CollisionManager.h" />
-    <ClInclude Include="CollisionResult.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="ConsoleUtility.h" />
-    <ClInclude Include="DebugUtility.h" />
-    <ClInclude Include="DebugController.h" />
-    <ClInclude Include="DirectionalLight.h" />
-    <ClInclude Include="Event.h" />
-    <ClInclude Include="GameScene.h" />
-    <ClInclude Include="HingeJoint.h" />
-    <ClInclude Include="InputSystem.h" />
-    <ClInclude Include="IOnCollider.h" />
-    <ClInclude Include="Joint.h" />
-    <ClInclude Include="JsonLoader.h" />
-    <ClInclude Include="BaseGameObjectFactory.h" />
-    <ClInclude Include="ObjectBuilders.h" />
-    <ClInclude Include="ModelProvider.h" />
-    <ClInclude Include="BaseCamera.h" />
-    <ClInclude Include="BaseScene.h" />
-    <ClInclude Include="BaseSystem.h" />
-    <ClInclude Include="GameAudio.h" />
-    <ClInclude Include="GameHud.h" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Inspector.h" />
-    <ClInclude Include="ConstantBufferDatas.h" />
-    <ClInclude Include="LightObjectFactory.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="MaterialLoader.h" />
-    <ClInclude Include="MaterialManager.h" />
-    <ClInclude Include="MathUtility.h" />
-    <ClInclude Include="MatrixUtility.h" />
-    <ClInclude Include="MemoryManager.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MeshRenderer.h" />
-    <ClInclude Include="ModelInfo.h" />
-    <ClInclude Include="ModelLoader.h" />
-    <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="ObjectStatus.h" />
-    <ClInclude Include="PhysicsBody.h" />
-    <ClInclude Include="PhysicsSystem.h" />
-    <ClInclude Include="PlayerController.h" />
-    <ClInclude Include="PoolAllocator.h" />
-    <ClInclude Include="ObjectType.h" />
-    <ClInclude Include="Octree.h" />
-    <ClInclude Include="Ragdoll.h" />
-    <ClInclude Include="RagdollData.h" />
-    <ClInclude Include="RagdollSystem.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RigidBody.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="ScoreManager.h" />
-    <ClInclude Include="RoundManager.h" />
-    <ClInclude Include="TimeScale.h" />
-    <ClInclude Include="SoundManager.h" />
-    <ClInclude Include="CharacterRoster.h" />
-    <ClInclude Include="StringUtility.h" />
-    <ClInclude Include="UiTween.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="ServiceLocator.h" />
-    <ClInclude Include="Skeleton.h" />
-    <ClInclude Include="SphereCollider.h" />
-    <ClInclude Include="StateMachine.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Include\AnimationLoader.h" />
+    <ClInclude Include="Include\Animator.h" />
+    <ClInclude Include="Include\BallJoint.h" />
+    <ClInclude Include="Include\BaseLight.h" />
+    <ClInclude Include="Include\BaseSceneLoader.h" />
+    <ClInclude Include="Include\Animation.h" />
+    <ClInclude Include="Include\BoxCollider.h" />
+    <ClInclude Include="Include\CameraController.h" />
+    <ClInclude Include="Include\CameraFollow.h" />
+    <ClInclude Include="Include\CannonController.h" />
+    <ClInclude Include="Include\PowerZone.h" />
+    <ClInclude Include="Include\CapsuleCollider.h" />
+    <ClInclude Include="Include\Collider.h" />
+    <ClInclude Include="Include\Collision.h" />
+    <ClInclude Include="Include\CollisionManager.h" />
+    <ClInclude Include="Include\CollisionResult.h" />
+    <ClInclude Include="Include\Component.h" />
+    <ClInclude Include="Include\ConsoleUtility.h" />
+    <ClInclude Include="Include\DebugUtility.h" />
+    <ClInclude Include="Include\DebugController.h" />
+    <ClInclude Include="Include\DirectionalLight.h" />
+    <ClInclude Include="Include\Event.h" />
+    <ClInclude Include="Include\GameScene.h" />
+    <ClInclude Include="Include\HingeJoint.h" />
+    <ClInclude Include="Include\InputSystem.h" />
+    <ClInclude Include="Include\IOnCollider.h" />
+    <ClInclude Include="Include\Joint.h" />
+    <ClInclude Include="Include\JsonLoader.h" />
+    <ClInclude Include="Include\BaseGameObjectFactory.h" />
+    <ClInclude Include="Include\ObjectBuilders.h" />
+    <ClInclude Include="Include\ModelProvider.h" />
+    <ClInclude Include="Include\BaseCamera.h" />
+    <ClInclude Include="Include\BaseScene.h" />
+    <ClInclude Include="Include\BaseSystem.h" />
+    <ClInclude Include="Include\GameAudio.h" />
+    <ClInclude Include="Include\GameHud.h" />
+    <ClInclude Include="Include\GameManager.h" />
+    <ClInclude Include="Include\GameObject.h" />
+    <ClInclude Include="Include\Inspector.h" />
+    <ClInclude Include="Include\ConstantBufferDatas.h" />
+    <ClInclude Include="Include\LightObjectFactory.h" />
+    <ClInclude Include="Include\Material.h" />
+    <ClInclude Include="Include\MaterialLoader.h" />
+    <ClInclude Include="Include\MaterialManager.h" />
+    <ClInclude Include="Include\MathUtility.h" />
+    <ClInclude Include="Include\MatrixUtility.h" />
+    <ClInclude Include="Include\MemoryManager.h" />
+    <ClInclude Include="Include\Mesh.h" />
+    <ClInclude Include="Include\MeshRenderer.h" />
+    <ClInclude Include="Include\ModelInfo.h" />
+    <ClInclude Include="Include\ModelLoader.h" />
+    <ClInclude Include="Include\ModelManager.h" />
+    <ClInclude Include="Include\Object.h" />
+    <ClInclude Include="Include\ObjectStatus.h" />
+    <ClInclude Include="Include\PhysicsBody.h" />
+    <ClInclude Include="Include\PhysicsSystem.h" />
+    <ClInclude Include="Include\PlayerController.h" />
+    <ClInclude Include="Include\PoolAllocator.h" />
+    <ClInclude Include="Include\ObjectType.h" />
+    <ClInclude Include="Include\Octree.h" />
+    <ClInclude Include="Include\Ragdoll.h" />
+    <ClInclude Include="Include\RagdollData.h" />
+    <ClInclude Include="Include\RagdollSystem.h" />
+    <ClInclude Include="Include\Renderer.h" />
+    <ClInclude Include="Include\RigidBody.h" />
+    <ClInclude Include="Include\SceneManager.h" />
+    <ClInclude Include="Include\ScoreManager.h" />
+    <ClInclude Include="Include\RoundManager.h" />
+    <ClInclude Include="Include\TimeScale.h" />
+    <ClInclude Include="Include\SoundManager.h" />
+    <ClInclude Include="Include\CharacterRoster.h" />
+    <ClInclude Include="Include\StringUtility.h" />
+    <ClInclude Include="Include\UiTween.h" />
+    <ClInclude Include="Include\Player.h" />
+    <ClInclude Include="Include\ServiceLocator.h" />
+    <ClInclude Include="Include\Skeleton.h" />
+    <ClInclude Include="Include\SphereCollider.h" />
+    <ClInclude Include="Include\StateMachine.h" />
+    <ClInclude Include="Include\Texture.h" />
+    <ClInclude Include="Include\TextureManager.h" />
     <ClInclude Include="ThirdParty\nlohmann\json.hpp" />
     <ClInclude Include="ThirdParty\nlohmann\json_fwd.hpp" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="UiDraw.h" />
-    <ClInclude Include="MenuList.h" />
-    <ClInclude Include="TitleMenuPage.h" />
-    <ClInclude Include="StageSelectPage.h" />
-    <ClInclude Include="CharacterSelectPage.h" />
-    <ClInclude Include="TitlePage.h" />
-    <ClInclude Include="Title.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="UiRenderer.h" />
-    <ClInclude Include="UiLayout.h" />
-    <ClInclude Include="PausePanel.h" />
-    <ClInclude Include="PowerGauge.h" />
-    <ClInclude Include="StageRoster.h" />
-    <ClInclude Include="ResultPanel.h" />
-    <ClInclude Include="VectorUtility.h" />
-    <ClInclude Include="Vertex.h" />
+    <ClInclude Include="Include\Timer.h" />
+    <ClInclude Include="Include\UiDraw.h" />
+    <ClInclude Include="Include\MenuList.h" />
+    <ClInclude Include="Include\TitleMenuPage.h" />
+    <ClInclude Include="Include\StageSelectPage.h" />
+    <ClInclude Include="Include\CharacterSelectPage.h" />
+    <ClInclude Include="Include\TitlePage.h" />
+    <ClInclude Include="Include\Title.h" />
+    <ClInclude Include="Include\Transform.h" />
+    <ClInclude Include="Include\UIRenderer.h" />
+    <ClInclude Include="Include\UiLayout.h" />
+    <ClInclude Include="Include\PausePanel.h" />
+    <ClInclude Include="Include\PowerGauge.h" />
+    <ClInclude Include="Include\StageRoster.h" />
+    <ClInclude Include="Include\ResultPanel.h" />
+    <ClInclude Include="Include\VectorUtility.h" />
+    <ClInclude Include="Include\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="DebagPixelShader.hlsl">
+    <FxCompile Include="Shaders\DebagPixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="DebagVertexShader.hlsl">
+    <FxCompile Include="Shaders\DebagVertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="PixelShader.hlsl">
+    <FxCompile Include="Shaders\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="VertexShader.hlsl">
+    <FxCompile Include="Shaders\VertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -369,10 +369,10 @@
   <Target Name="CopyGameFiles" AfterTargets="Build">
     <ItemGroup>
       <GameAssetFiles Include="$(ProjectDir)Asset\**\*" />
-      <ShaderSourceFiles Include="$(ProjectDir)*.hlsl" />
+      <ShaderSourceFiles Include="$(ProjectDir)Shaders\*.hlsl" />
     </ItemGroup>
     <Message Importance="high" Text="Copy Asset and shader sources to the output folder" />
     <Copy SourceFiles="@(GameAssetFiles)" DestinationFiles="@(GameAssetFiles->'$(OutDir)Asset\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(ShaderSourceFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ShaderSourceFiles)" DestinationFolder="$(OutDir)Shaders\" SkipUnchangedFiles="true" />
   </Target>
 </Project>

@@ -172,7 +172,7 @@ bool Renderer::CompileShader()
 
     //VertexShaderをコンパイル
     HRESULT hr = D3DCompileFromFile(
-        L"VertexShader.hlsl",
+        L"Shaders/VertexShader.hlsl",
         nullptr,
         nullptr,
         "main",
@@ -189,7 +189,7 @@ bool Renderer::CompileShader()
 
     //PixelShaderをコンパイル
     hr = D3DCompileFromFile(
-        L"PixelShader.hlsl",
+        L"Shaders/PixelShader.hlsl",
         nullptr,
         nullptr,
         "main",

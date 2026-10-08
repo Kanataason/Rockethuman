@@ -73,7 +73,7 @@ void DebugDraw::CompileShader()
     ID3DBlob* psError = nullptr;
 
     HRESULT verticesHr = D3DCompileFromFile(
-        L"DebagVertexShader.hlsl", //ファイル名
+        L"Shaders/DebagVertexShader.hlsl", //ファイル名
         nullptr, //マクロ定義
         nullptr, //#includeの処理
         "main", //HLSLの関数名
@@ -102,7 +102,7 @@ void DebugDraw::CompileShader()
     }
 
     HRESULT pixelHr = D3DCompileFromFile(
-        L"DebagPixelShader.hlsl",
+        L"Shaders/DebagPixelShader.hlsl",
         nullptr,
         nullptr,
         "main",
