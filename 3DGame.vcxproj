@@ -122,11 +122,6 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
-    <PostBuildEvent>
-      <Command>xcopy /Y /D /E /I /Q "$(ProjectDir)Asset" "$(OutDir)Asset\"
-xcopy /Y /D /Q "$(ProjectDir)*.hlsl" "$(OutDir)"</Command>
-      <Message>Copy Asset and shader sources to the output folder</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -146,11 +141,6 @@ xcopy /Y /D /Q "$(ProjectDir)*.hlsl" "$(OutDir)"</Command>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
-    <PostBuildEvent>
-      <Command>xcopy /Y /D /E /I /Q "$(ProjectDir)Asset" "$(OutDir)Asset\"
-xcopy /Y /D /Q "$(ProjectDir)*.hlsl" "$(OutDir)"</Command>
-      <Message>Copy Asset and shader sources to the output folder</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animator.cpp" />
@@ -373,5 +363,15 @@ xcopy /Y /D /Q "$(ProjectDir)*.hlsl" "$(OutDir)"</Command>
       <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\directxtk_desktop_win10.2026.5.8.1\build\native\directxtk_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\directxtk_desktop_win10.2026.5.8.1\build\native\directxtk_desktop_win10.targets'))" />
+  </Target>
+  <!-- Asset とシェーダーのソースを出力フォルダへコピーする（xcopy は日本語パスで失敗するため MSBuild の Copy を使う） -->
+  <Target Name="CopyGameFiles" AfterTargets="Build">
+    <ItemGroup>
+      <GameAssetFiles Include="$(ProjectDir)Asset\**\*" />
+      <ShaderSourceFiles Include="$(ProjectDir)*.hlsl" />
+    </ItemGroup>
+    <Message Importance="high" Text="Copy Asset and shader sources to the output folder" />
+    <Copy SourceFiles="@(GameAssetFiles)" DestinationFiles="@(GameAssetFiles->'$(OutDir)Asset\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ShaderSourceFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
 </Project>

@@ -1,4 +1,5 @@
 ﻿#include "Ragdoll.h"
+#include <cmath>
 #include <random>
 #include "Skeleton.h"
 
@@ -771,8 +772,12 @@ void Ragdoll::Update(float deltaTime)
         }
     }
 
+    //発射した直後は、発射の瞬間に床へ触れていた(前の計算の結果が残っている)だけなので、地面に着いたとは、みなさない
+    //(すぐに飛行を終えると、重力トルクが戻って、飛んでいる間ずっと、体がくの字に折れる)
+    constexpr float minFlySeconds = 0.15f;
+
     //地面に着いたら、飛行を終える(あとは今までどおり重力で倒れる)
-    if (_isFlying && grounded)
+    if (_isFlying && grounded && _settleElapsed >= minFlySeconds)
         SetFlying(false);
 
     //発射したあと、空中から地面に着くたびに知らせる(着地の音など)
@@ -780,7 +785,6 @@ void Ragdoll::Update(float deltaTime)
     //発射した直後に、台に触れているだけのときも、出さない
     if (_isWaitingSettle)
     {
-        constexpr float minFlySeconds = 0.15f;
         constexpr float groundHitIntervalSeconds = 0.3f;
 
         _groundHitCooldown = (std::max)(_groundHitCooldown - deltaTime, 0.0f);

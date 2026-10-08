@@ -89,7 +89,7 @@ namespace RagdollTuning
 
     //大砲で発射して飛んでいる間だけ使う、線形速度の上限。
     //通常の上限(maxVelocitySpeed)のままだと、発射の初速がそこで頭打ちになる
-    constexpr float kLaunchMaxVelocitySpeed = 40.0f;
+    constexpr float kLaunchMaxVelocitySpeed = 80.0f;
 
 
     //重力トルク
