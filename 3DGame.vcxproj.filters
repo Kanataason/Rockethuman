@@ -228,9 +228,6 @@
     <ClCompile Include="Source\BaseCamera.cpp">
       <Filter>ソース ファイル\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BaseLight.cpp">
-      <Filter>ソース ファイル\Base</Filter>
-    </ClCompile>
     <ClCompile Include="Source\BaseScene.cpp">
       <Filter>ソース ファイル\Base</Filter>
     </ClCompile>
@@ -243,7 +240,7 @@
     <ClCompile Include="Source\InputSystem.cpp">
       <Filter>ソース ファイル\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Source\DebugUtillity.cpp">
+    <ClCompile Include="Source\DebugUtility.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Source\DebugController.cpp">

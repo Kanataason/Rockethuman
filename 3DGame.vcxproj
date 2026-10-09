@@ -155,7 +155,6 @@
     <ClCompile Include="Source\BuildScoreObject.cpp" />
     <ClCompile Include="Source\ModelProvider.cpp" />
     <ClCompile Include="Source\BaseCamera.cpp" />
-    <ClCompile Include="Source\BaseLight.cpp" />
     <ClCompile Include="Source\BaseScene.cpp" />
     <ClCompile Include="Source\BaseSceneLoader.cpp" />
     <ClCompile Include="Source\CameraController.cpp" />
@@ -165,7 +164,7 @@
     <ClCompile Include="Source\Collision.cpp" />
     <ClCompile Include="Source\Collider.cpp" />
     <ClCompile Include="Source\DebugController.cpp" />
-    <ClCompile Include="Source\DebugUtillity.cpp" />
+    <ClCompile Include="Source\DebugUtility.cpp" />
     <ClCompile Include="Source\GameAudio.cpp" />
     <ClCompile Include="Source\GameHud.cpp" />
     <ClCompile Include="Source\GameManager.cpp" />
