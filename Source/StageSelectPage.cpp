@@ -21,7 +21,7 @@ void StageSelectPage::Initialize(ServiceLocator& locator)
 	_list.Initialize(locator);
 
 	MenuList::Layout layout;
-	layout.top = 225.0f;
+	layout.top = 245.0f;
 	layout.height = 56.0f;
 	layout.textScale = 0.55f;
 	layout.visibleRows = 4;

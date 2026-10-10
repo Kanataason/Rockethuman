@@ -43,7 +43,10 @@ void Ragdoll::RegisterIgnoredCollisionPairs()
                 RagdollTuning::kIgnoreLegLegCollision && AreLegsOfDifferentSides(boneA.name, boneB.name);
 
             //ペアを設定
-            if (isAdjacent || legsOfDifferentSides)
+            //胴体どうしは1本の体なので、太くしても押し合わないようにする
+            const bool bothTrunk = IsTrunkBone(boneA.name) && IsTrunkBone(boneB.name);
+
+            if (isAdjacent || legsOfDifferentSides || bothTrunk)
                 Collision::IgnoreCollision(boneA.collider->GetID(), boneB.collider->GetID());
         }
     }
@@ -69,7 +72,11 @@ void Ragdoll::CreateBone(int boneNameIndex)
     bone.rigidBody->DisableKinematic();
 
     if (auto radiusIt = boneRadius.find(boneName); radiusIt != boneRadius.end())
-        bone.collider->SetRadius(radiusIt->second * _bodyScale * _colliderScale);
+    {
+        //腰と背骨だけ、胴体の倍率もかける(太ったキャラクターの腹に、腕や足が埋まらないように)
+        const float trunkScale = IsTrunkBone(bone.name) ? _trunkColliderScale : 1.0f;
+        bone.collider->SetRadius(radiusIt->second * _bodyScale * _colliderScale * trunkScale);
+    }
 
     if (auto massIt = boneMass.find(boneName); massIt != boneMass.end())
     {

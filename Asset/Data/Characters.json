@@ -21,6 +21,7 @@
             "path": "Asset/Prefab/debu.fbx",
             "scale": 0.02,
             "colliderScale": 1.1,
+            "trunkColliderScale": 1.5,
             "bounceRestitution": 1.6,
             "bounceCount": 2,
             "sounds": { "shot": "shot_elvis", "hit": "hit_elvis", "head": "head_elvis" },

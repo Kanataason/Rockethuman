@@ -12,6 +12,7 @@ struct CharacterData
 	std::string modelPath;//FBXのパス(ミクサモのスケルトンで作られたもの)
 	float scale = 0.01f;//モデルの大きさ(cmのモデルは0.01で、mになる)
 	float colliderScale = 1.0f;//コライダーの大きさ
+	float trunkColliderScale = 1.0f;//胴体だけのコライダーの倍率。太ったキャラクターは1より大きくする
 	float bounceRestitution = 1.0f;//地面で強く跳ねるときの反発係数。1より大きいほど、よく跳ねる
 	int bounceCount = 0;//強く跳ねられる回数。0なら、ふつうの跳ね方
 	std::vector<AnimationData> animations;//待機などのアニメーション

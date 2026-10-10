@@ -21,7 +21,7 @@ void CharacterSelectPage::Initialize(ServiceLocator& locator)
 	_list.Initialize(locator);
 
 	MenuList::Layout layout;
-	layout.top = 250.0f;
+	layout.top = 270.0f;
 	layout.height = 60.0f;
 	layout.textScale = 0.5f;
 	layout.visibleRows = 4;

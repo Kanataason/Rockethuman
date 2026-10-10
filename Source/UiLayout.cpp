@@ -18,15 +18,15 @@ namespace UiInfo
         ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}},
 
         //ステージ選択(ボタンの中心に、文字を置く)
-        {TextType::StageSelectTitle,{.text = L"ステージをえらぶ",.centerX = 640.0f,.centerY = 185.0f,.scale = 0.65f
+        {TextType::StageSelectTitle,{.text = L"ステージをえらぶ",.centerX = 640.0f,.centerY = 205.0f,.scale = 0.65f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
-        {TextType::StageSelectHint,{.text = L"W/S: えらぶ    スペース: けってい    Enter: もどる",.centerX = 640.0f,.centerY = 520.0f,.scale = 0.28f
+        {TextType::StageSelectHint,{.text = L"W/S: えらぶ    スペース: けってい    Enter: もどる",.centerX = 640.0f,.centerY = 540.0f,.scale = 0.28f
         ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}},
 
         //キャラクター選択(名前の行は、キャラクターの数だけ、Title.cppが並べる)
-        {TextType::CharacterSelectTitle,{.text = L"キャラクターをえらぶ",.centerX = 640.0f,.centerY = 185.0f,.scale = 0.55f
+        {TextType::CharacterSelectTitle,{.text = L"キャラクターをえらぶ",.centerX = 640.0f,.centerY = 205.0f,.scale = 0.55f
         ,.mainColor = { 1, 1, 1, 1 },.outlineColor = { 0, 0, 0, 1 }}},
-        {TextType::CharacterSelectHint,{.text = L"W/S: えらぶ    スペース: けってい",.centerX = 640.0f,.centerY = 535.0f,.scale = 0.28f
+        {TextType::CharacterSelectHint,{.text = L"W/S: えらぶ    スペース: けってい",.centerX = 640.0f,.centerY = 555.0f,.scale = 0.28f
         ,.mainColor = { 0.7f, 0.8f, 1.0f, 1 },.outlineColor = { 0, 0, 0, 1 }}}
     };
 
@@ -50,14 +50,14 @@ namespace UiInfo
         },
         //ステージ選択(画面の中央)。選ぶ行は、ステージの一覧(Stages.json)から作るので、itemsは空
         { PanelType::StageSelect, {
-            .frame = {.left = 340.0f, .top = 130.0f, .width = 600.0f, .height = 440.0f,
+            .frame = {.left = 340.0f, .top = 150.0f, .width = 600.0f, .height = 440.0f,
                        .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
             .fillColor = { 0.0f, 0.0f, 0.0f, 0.65f },
             .items = {} }
         },
         //キャラクター選択(画面の中央)。選ぶ行は、キャラクターの一覧から作るので、itemsは空
         { PanelType::CharacterSelect, {
-            .frame = {.left = 340.0f, .top = 130.0f, .width = 600.0f, .height = 440.0f,
+            .frame = {.left = 340.0f, .top = 150.0f, .width = 600.0f, .height = 440.0f,
                        .thickness = 2.0f, .frameColor = { 1, 1, 1, 1 } },
             .fillColor = { 0.0f, 0.0f, 0.0f, 0.65f },
             .items = {} }

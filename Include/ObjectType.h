@@ -78,6 +78,7 @@ struct ObjectData
 	DirectX::XMFLOAT3 direction = { 0,0,0 };
 	float score = 100.0f; //的の基本点(Jsonの"score"。省略時は100)
 	float colliderScale = 1.0f;
+	float trunkColliderScale = 1.0f; //胴体(腰・背骨)だけにかける、コライダーの倍率(太ったキャラクター用)
 	float bounceRestitution = 1.0f; //地面で強く跳ねるときの反発係数(プレイヤー用)
 	int bounceCount = 0; //強く跳ねられる回数。0なら、ふつう
 	bool startAsleep = true;

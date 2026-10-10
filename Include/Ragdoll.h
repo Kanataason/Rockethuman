@@ -332,6 +332,7 @@ public:
     float GetBodyScale()const { return _bodyScale; }
     float GetHipHeight()const { return _hipHeight; }
     void SetColliderScale(float scale) { _colliderScale = scale; }
+    void SetTrunkColliderScale(float scale) { _trunkColliderScale = scale; }
 
     //地面でのバウンドを強くする(よく跳ねるキャラクター用)。発射のたびに、全ボーンへ設定される
     //restitution: 強く跳ねるときの反発係数(1より大きいと、元の速さより強く跳ねる) / count: 強く跳ねられる回数
@@ -368,6 +369,12 @@ private:
     {
         return boneName.find("Leg") != std::string::npos ||
             boneName.find("Foot") != std::string::npos;
+    }
+    //胴体(腰・背骨)か
+    bool IsTrunkBone(const std::string& boneName)
+    {
+        return boneName.find("Hips") != std::string::npos ||
+            boneName.find("Spine") != std::string::npos;
     }
     bool IsLeftBone(const std::string& boneName)
     {
@@ -468,6 +475,7 @@ private:
 
     float _bodyScale = 1.0f;
     float _colliderScale = 1.0f;
+    float _trunkColliderScale = 1.0f; //腰・背骨だけにかかる倍率
     float _bounceRestitution = 1.0f;
     int _bounceCount = 0; //0 = 強く跳ねない(ふつうのキャラクター)
     float _hipHeight = 0.0f;

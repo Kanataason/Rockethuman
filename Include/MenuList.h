@@ -15,14 +15,14 @@ public:
 	struct Layout
 	{
 		float left = 490.0f; //1280x720 基準
-		float top = 225.0f;
+		float top = 245.0f;
 		float width = 300.0f;
 		float height = 56.0f;
 		float gap = 10.0f; //行と行の間
 		float textScale = 0.55f;
 		int visibleRows = 4; //一度に見える行の数
-		float counterY = 495.0f; //「2 / 5」を出す高さ(見えない行があるときだけ出す)
-		float emptyY = 330.0f; //項目が空のときの、メッセージの高さ
+		float counterY = 515.0f; //「2 / 5」を出す高さ(見えない行があるときだけ出す)
+		float emptyY = 350.0f; //項目が空のときの、メッセージの高さ
 	};
 
 	//W/S で、選んでいる行が変わったとき(引数は、新しい番号)

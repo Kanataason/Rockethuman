@@ -5,15 +5,6 @@
             "path": "Asset/Sound/fly.wav"
         },
         {
-            "name": "head",
-            "path": "Asset/Sound/head.wav"
-        },
-        {
-            "name": "clear",
-            "path": "Asset/Sound/clear.wav"
-        },
-
-        {
             "name": "hit",
             "paths": [ "Asset/Sound/hit1.wav", "Asset/Sound/hit2.wav", "Asset/Sound/hit3.wav" ]
         },
@@ -21,10 +12,6 @@
         {
             "name": "shot_elvis",
             "path": "Asset/Sound/Hfly.wav"
-        },
-        {
-            "name": "head_elvis",
-            "path": "Asset/Sound/head_elvis.wav"
         },
         {
             "name": "hit_elvis",
