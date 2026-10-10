@@ -216,4 +216,4 @@ void HingeJoint::CorrectHingeRotation(const Quaternion& bodyARot,const Quaternio
         return;
     }
     _bodyB->SetRotation(newBodyBRot);
-}
+}

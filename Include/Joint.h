@@ -47,8 +47,6 @@ public:
     //境界ぎりぎりで「範囲内/範囲外」が交互に判定されるのを防ぐための余裕
     virtual bool IsOutOfLimit(float hingeAngle) const = 0;
 
-    //Aから見たBの相対回転」から、初期姿勢を0度としたヒンジ軸まわりの符号付き角度(ラジアン)を返す
-    virtual float CalculateAngleError(const Quaternion& relativeRotation) = 0;
 
 
     //Jointの位置誤差を質量比で分配する関数

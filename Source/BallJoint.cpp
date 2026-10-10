@@ -102,16 +102,12 @@ void BallJoint::ApplyRestoringTorque()
     Quaternion currentRelative = bodyARot.Inverse() * bodyBRot;
     currentRelative.Normalize();
 
-    float swingAngle = CalculateAngleError(currentRelative);
-
-    Vector3 worldSwingAxis = bodyARot * _restRelativeRotation * swingAngle;
-    //ここが重要:「delta方向」に戻すので符号はマイナス
-    //(swingは rest->current の回転を表すので、restへ戻すには逆方向)
+    Vector3 swingVector = CalculateSwingVector(currentRelative);
+    Vector3 worldSwingVector = bodyARot * _restRelativeRotation * swingVector;
 
     Vector3 relativeAngVel = _bodyB->GetAngularVelocity() - _bodyA->GetAngularVelocity();
 
-    //ばね: swing の角度に比例して、戻す向きにかける。
-    Vector3 torque = -worldSwingAxis * (swingAngle * _stiffness) - relativeAngVel * _damping;
+    Vector3 torque = -worldSwingVector * _stiffness - relativeAngVel * _damping;
 
     //Bにかけた分の逆向きをAにもかける 
     _bodyB->AddTorque(torque);
@@ -234,7 +230,7 @@ Quaternion BallJoint::CalculateLimitedDelta(const Quaternion& swing, const Quate
 }
 
 
-float BallJoint::CalculateAngleError(const Quaternion& relativeRotation)
+Vector3 BallJoint::CalculateSwingVector(const Quaternion& relativeRotation)
 {
     //基準姿勢分を引いて、基準姿勢からの変化だけにする
     Quaternion delta = _restRelativeRotation.Inverse() * relativeRotation;
@@ -245,14 +241,15 @@ float BallJoint::CalculateAngleError(const Quaternion& relativeRotation)
     QuaternionMath::DecomposeSwingTwist(delta, _twistAxis, swing, twist);
     MakeShortestPath(swing);
 
+
     Vector3 swingAxis(swing.x, swing.y, swing.z);
     float swingAxisLength = swingAxis.Length();
 
-    //swing がほぼ0なら、軸が決まらないので、ずれ0として返す
     if (swingAxisLength <= EPSILON)
-        return 0.0f;
+        return Vector3(0.0f, 0.0f, 0.0f);
 
-    return 2.0f * atan2f(swingAxisLength, swing.w);
+    float angle = 2.0f * atan2f(swingAxisLength, swing.w);
+    return swingAxis * (angle / swingAxisLength);   // 軸(正規化)× 角度
 }
 
 

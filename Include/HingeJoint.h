@@ -10,7 +10,8 @@ public:
 	//---基底クラスのコメントを参照---------
 
 	void Solve(float deltaTime)override;
-	float CalculateAngleError(const Quaternion& relativeRotation)override ;
+	//Aから見たBの相対回転」から、初期姿勢を0度としたヒンジ軸まわりの符号付き角度(ラジアン)を返す
+	float CalculateAngleError(const Quaternion& relativeRotation);
 	bool IsOutOfLimit(float hingeAngle)const override;
 	void SolveAngularConstraint()override;
 	void ApplyRestoringTorque()override;

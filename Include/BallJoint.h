@@ -21,7 +21,7 @@ public:
     bool IsOutOfLimit(float hingeAngle)const override { return false; }
 
     //Ball ジョイントでは、ヒンジ角度の代わりに「swing の大きさ(基準姿勢からの首振りの角度)」を返す。
-    float CalculateAngleError(const Quaternion& relativeRotation)override;
+    Vector3 CalculateSwingVector(const Quaternion& relativeRotation);
 
 
     //ここからはゲッターとセッター
