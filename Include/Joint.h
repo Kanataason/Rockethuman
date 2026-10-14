@@ -97,6 +97,7 @@ public:
 
 
         //Massに応じて補正量を分配
+        //
         correctionA =
             clampedError * (invMassA / sum);
 
@@ -261,5 +262,5 @@ protected:
     Vector3 _localAnchorB;
 
     float _maxCorrection = 0.3f;
-    float _beta = 0.3f;
+    float _beta = 0.3f;//一回で直す割合
 };

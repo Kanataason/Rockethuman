@@ -171,7 +171,7 @@ private:
 
 	Vector3 Velocity{};
     Vector3 PseudoVelocity{};
-    Vector3 AngularVelocity{};
+    Vector3 AngularVelocity{};//回転方向、回転の速さradで持っている
     Vector3 Torque{};
 
 	float _mass =1.0f;//0だと衝突の計算で1/質量が無限大になりNaNになるので、既定値は1

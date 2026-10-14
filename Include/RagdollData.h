@@ -170,7 +170,6 @@ namespace RagdollTuning
 
     //慣性モーメント = 質量 * この値。
     //衝突時のインパルスによってボーンが激しく回転していた。
-    //カプセルを端を中心に回転させる場合は、おおよそ m*L*L/3。
     constexpr float kInertiaPerMass = 0.03f;
 
     //足先や手先の固定の長さ

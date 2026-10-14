@@ -457,7 +457,6 @@ public:
 	///<param name="angle"></param>
 	///<returns></returns>
 	//軸まわりに angle(ラジアン)回す回転を作る。
-	//【計算】(axis * sin(angle/2), cos(angle/2))
 	//axis は、長さ 1 に正規化してから渡すこと(正規化しないと、回転の大きさが狂う)
 	static Quaternion CreateFromAxisAngle(const Vector3& axis, float angle)
 	{

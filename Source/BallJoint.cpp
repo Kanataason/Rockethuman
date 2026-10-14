@@ -56,6 +56,8 @@ BallJoint::BallJoint(RigidBody* bodyA,
 
         //角度は初期の相対姿勢を基準にした座標系deltaで扱う。
         //そのため軸も、ワールド -> Aのローカル -> 初期姿勢基準 の順に変換して、同じ座標系にそろえる。
+        //Inverceは回転をない状態にしてから、directionを親の回転していない状態に合わせる、
+        // それを基準姿勢に合わせてそれを回転軸にする
         _twistAxis = initRotation.Inverse() * (parentRotation.Inverse() * worldBoneDirection);
         _twistAxis.Normalize();
     }
@@ -86,8 +88,8 @@ void BallJoint::Solve(float deltaTime)
     _bodyA->AddPseudoVelocity(pseudoVelocityA);
     _bodyB->AddPseudoVelocity(pseudoVelocityB);
 
-    //アンカー点の相対速度を、全部ではなく一部(この強さ)だけ消す。
-    //引数はボディの原点からアンカーまでのベクトル(ワールド座標)。
+    //アンカー点の相対速度を、全部ではなく一部だけ消す。
+    //引数はボディの原点からアンカーまでのワールドベクトル。
     constexpr float velocityConstraintStrength = RagdollTuning::velocityConstraintStrength;
     SolveAnchorVelocity(_bodyA, _bodyB,
         bodyARot * _localAnchorA, bodyBRot * _localAnchorB, velocityConstraintStrength);
