@@ -25,6 +25,14 @@ public:
 	void Update(float deltaTime)override;
 
 	void SetScore(float score) { _score = score; }
+
+	//当たったあと、飛ばずに、その場で消える(爆発する箱用)
+	void SetVanishOnHit(bool vanish) { _vanishOnHit = vanish; }
+
+	//爆風など、体以外が当たった扱いにする(得点も、同じように入る)。origin:爆心(飛ぶ向きを決める)
+	void ForceHit(const Vector3& origin);
+
+	bool IsHit() const { return _isHit; }
 	void OnCollisionEnter(Collider* other, const CollisionResult& result)override;
 private:
 	//飛んでいく動きの、状態
@@ -41,6 +49,7 @@ private:
 private:
 	Vector3 _initializePos;
 	float _score = 100.0f;
+	bool _vanishOnHit = false; //当たったら、飛ばずに消える
 	bool _isHit = false; //的は、最初に当たった1回だけ得点にする(体の部位ごとに何度も当たるため)
 
 	PhysicsSystem* _physicsSystem = nullptr;

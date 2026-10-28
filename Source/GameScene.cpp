@@ -26,6 +26,8 @@ void GameScene::Initialize(ServiceLocator& locator)
 	_audio.Initialize(locator);
 	_hud.Initialize(locator);
 	_powerGauge.Initialize(locator);
+	_effects.Initialize(locator, *this); //火花や土煙の粒を、並べておく
+	_rocketBoost.Initialize(locator);
 
 	SetCannonInfo();
 	SubscribeEvents();
@@ -44,7 +46,13 @@ void GameScene::SetCannonInfo()
 	for (const auto& obj : _objects)
 	{
 		if (auto* component = obj->GetComponent<ObjectStatus>())
+		{
 			_scoreManager.SubscribeEvent(component);
+			_explosions.AddTarget(component); //爆風を受ける的
+		}
+
+		if (auto* explosive = obj->GetComponent<Explosive>())
+			_explosions.Subscribe(explosive); //爆発する箱
 	}
 }
 
@@ -57,10 +65,22 @@ void GameScene::SubscribeEvents()
 	if (_ragdoll)
 	{
 		_ragdoll->OnSettled.Subscribe([this]() { _roundManager.NotifySettled(); });
+
+		//着地したら、土煙を出す
+		_ragdoll->OnGroundHit.Subscribe([this]()
+			{
+				constexpr float rootOffsetY = 0.5f;
+				const Vector3 root = _ragdoll->GetRootPosition();
+				_effects.Dust(DirectX::XMFLOAT3(root.x, root.y - rootOffsetY, root.z));
+			});
 	}
 
 	//出来事に、音をつなぐ(どの音を鳴らすかは、GameAudioが決める)
 	_audio.Bind(_ragdoll, _scoreManager, _roundManager);
+	_rocketBoost.Bind(_ragdoll, _roundManager, _effects); //飛んでいる間の、ロケット噴射
+	_audio.BindBoost(_rocketBoost);
+	_explosions.Bind(_ragdoll); //爆風で、人間も打ち上げる
+	_audio.BindExplosion(_explosions);
 	_powerGauge.Bind(_roundManager);
 
 	//カメラ: 発射したらラグドールを追いかけ、次の1発の準備ができたら最初の位置へ戻る
@@ -68,12 +88,34 @@ void GameScene::SubscribeEvents()
 	if (_cameraFollow)
 		_cameraFollow->SetTarget(_ragdoll);
 
+	//噴射したら、画面を揺らす
+	_rocketBoost.OnBoosted.Subscribe([this]()
+		{
+			if (_cameraFollow)
+				_cameraFollow->Shake(_boostShakeStrength, _boostShakeSeconds);
+		});
+
+	//爆発したら、火の玉を出して、画面を揺らす
+	_explosions.OnExploded.Subscribe([this](Explosion explosion)
+		{
+			_effects.Explosion(DirectX::XMFLOAT3(explosion.position.x, explosion.position.y, explosion.position.z), explosion.radius);
+			if (_cameraFollow)
+				_cameraFollow->Shake(_explosionShakeStrength, _explosionShakeSeconds);
+		});
+
 	//画面表示(スコア、残りの玉数、「+500」など)を、通知につなぐ
 	_hud.Bind(_scoreManager, _roundManager);
 
 	//点が入ったら
 	_scoreManager.OnScoreGained.Subscribe([this](ScoreGain gain)
 		{
+			//当たった場所に、火花を散らす(頭ヒットとコンボが多いほど、派手に)
+			_effects.Burst(DirectX::XMFLOAT3(gain.position.x, gain.position.y, gain.position.z), gain.isHead, gain.combo);
+
+			//画面も揺らす(頭ヒットは、強く、長く)
+			if (_cameraFollow)
+				_cameraFollow->Shake(gain.isHead ? _headShakeStrength : _hitShakeStrength, gain.isHead ? _headShakeSeconds : _hitShakeSeconds);
+
 			//当たった瞬間に、少し遅くする(頭ヒットは、もっと遅く)
 			if (_timeScale)
 			{
@@ -171,6 +213,8 @@ void GameScene::Update(float deltaTime)
 
 	_audio.Update(deltaTime);
 	_powerGauge.Update(deltaTime);
+	_rocketBoost.Update(deltaTime);
+	_explosions.Update(deltaTime);
 	_roundManager.Update(deltaTime);
 	_scoreManager.Update(deltaTime);
 	_hud.Update(deltaTime);
@@ -183,6 +227,7 @@ void GameScene::DrawUi()
 
 	_hud.Draw(_camera);
 	_powerGauge.Draw();
+	_rocketBoost.Draw(); //(噴射できるときだけ、案内を出す)
 	_resultPanel.Draw(); //(出ていないときは、何もしない)
 	_pausePanel.Draw(); //一番手前
 

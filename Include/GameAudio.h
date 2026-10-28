@@ -6,6 +6,8 @@
 class Ragdoll;
 class ScoreManager;
 class RoundManager;
+class RocketBoost;
+class ExplosionManager;
 class SoundManager;
 class CharacterRoster;
 
@@ -17,6 +19,12 @@ public:
 
 	//各システムの通知に、音をつなぐ。ragdoll は、なくてもよい(nullptr)
 	void Bind(Ragdoll* ragdoll, ScoreManager& score, RoundManager& round);
+
+	//ロケット噴射の音(いまは、発射の音を流用している)
+	void BindBoost(RocketBoost& boost);
+
+	//爆発の音(いまは、ヒットの音を流用している)
+	void BindExplosion(ExplosionManager& explosions);
 
 	//当たり音の間引きの時間を進める
 	void Update(float deltaTime);

@@ -909,6 +909,18 @@ void Ragdoll::Launch(const Vector3& direction,float speed)
         bone.rigidBody->SetAngularVelocity(tumble + flail * RagdollTuning::kLaunchFlailSpeed);
     }
 }
+void Ragdoll::ApplyBoost(const Vector3& velocityChange)
+{
+    for (auto& bone : _bones)
+    {
+        //吊られている骨(動かせない骨)は、動かさない
+        if (!bone.rigidBody || bone.rigidBody->IsKinematic())
+            continue;
+
+        bone.rigidBody->SetVelocity(bone.rigidBody->GetVelocity() + velocityChange);
+    }
+}
+
 void Ragdoll::SetLockZ(bool lock)
 {
     for (auto& bone : _bones)

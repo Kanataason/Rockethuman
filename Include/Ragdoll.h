@@ -315,6 +315,9 @@ public:
     //向きは正規化済み、
     void Launch(const Vector3& direction,float speed);
 
+    //全ボーンに、同じ速さを足す(ロケット噴射)。骨どうしの相対的な速さが変わらないので、体がばらけない
+    void ApplyBoost(const Vector3& velocityChange);
+
     //発射されて、まだ着地していないか
     bool IsFlying() const { return _isFlying; }
 

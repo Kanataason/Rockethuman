@@ -1,0 +1,19 @@
+﻿#pragma once
+#include "Component.h"
+#include "CollisionResult.h"
+
+class Collider;
+
+class Explosive : public Component
+{
+public:
+	void Initialize(ServiceLocator& locator);
+	void Update(float deltaTime);
+
+	void OnCollisionEnter(
+		Collider* other,
+		const CollisionResult& result);
+private:
+	const float _strangth = 0.5f;
+	const float _radius = 2.0f;
+};

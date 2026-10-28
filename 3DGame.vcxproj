@@ -154,6 +154,7 @@
     <ClCompile Include="Source\BuildLight.cpp" />
     <ClCompile Include="Source\BuildCannon.cpp" />
     <ClCompile Include="Source\BuildScoreObject.cpp" />
+    <ClCompile Include="Source\BuildEffect.cpp" />
     <ClCompile Include="Source\ModelProvider.cpp" />
     <ClCompile Include="Source\BaseCamera.cpp" />
     <ClCompile Include="Source\BaseScene.cpp" />
@@ -184,6 +185,11 @@
     <ClCompile Include="Source\ModelLoader.cpp" />
     <ClCompile Include="Source\ModelManager.cpp" />
     <ClCompile Include="Source\ObjectStatus.cpp" />
+    <ClCompile Include="Source\EffectParticle.cpp" />
+    <ClCompile Include="Source\EffectSystem.cpp" />
+    <ClCompile Include="Source\RocketBoost.cpp" />
+    <ClCompile Include="Source\Explosive.cpp" />
+    <ClCompile Include="Source\ExplosionManager.cpp" />
     <ClCompile Include="Source\Octree.cpp" />
     <ClCompile Include="Source\PhysicsSystem.cpp" />
     <ClCompile Include="Source\PlayerController.cpp" />
@@ -269,6 +275,11 @@
     <ClInclude Include="Include\ModelManager.h" />
     <ClInclude Include="Include\Object.h" />
     <ClInclude Include="Include\ObjectStatus.h" />
+    <ClInclude Include="Include\EffectParticle.h" />
+    <ClInclude Include="Include\EffectSystem.h" />
+    <ClInclude Include="Include\RocketBoost.h" />
+    <ClInclude Include="Include\Explosive.h" />
+    <ClInclude Include="Include\ExplosionManager.h" />
     <ClInclude Include="Include\PhysicsBody.h" />
     <ClInclude Include="Include\PhysicsSystem.h" />
     <ClInclude Include="Include\PlayerController.h" />

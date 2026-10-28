@@ -1,0 +1,5 @@
+{
+    "texture": "Asset/Texture/default.png",
+    "unlit": true,
+    "color": [ 1.0, 0.9, 0.25, 1 ]
+}

@@ -3,6 +3,7 @@
 
 #include "GameObject.h"
 #include "ObjectStatus.h"
+#include "Explosive.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"
 #include "BoxCollider.h"
@@ -12,6 +13,15 @@ void ObjectBuilders::BuildScoreObject(GameObject& obj, const ObjectData& data, c
 {
     auto status = obj.AddComponent<ObjectStatus>();
     status->SetScore(data.score); //JSONの"score"(省略時は100)
+
+    //爆発する箱: 当たったら、飛ばずに消えて、爆発する
+    if (data.explosive)
+    {
+        status->SetVanishOnHit(true);
+        auto explosive = obj.AddComponent<Explosive>();
+        explosive->Configure(data.explosionRadius, data.explosionPower);
+    }
+
     auto meshRenderer = obj.AddComponent<MeshRenderer>();
     meshRenderer->SetModel(model);
 

@@ -186,6 +186,9 @@
     <ClCompile Include="Source\BuildScoreObject.cpp">
       <Filter>ソース ファイル\factory</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BuildEffect.cpp">
+      <Filter>ソース ファイル\factory</Filter>
+    </ClCompile>
     <ClCompile Include="Source\ModelProvider.cpp">
       <Filter>ソース ファイル\factory</Filter>
     </ClCompile>
@@ -274,6 +277,21 @@
       <Filter>ソース ファイル\Base</Filter>
     </ClCompile>
     <ClCompile Include="Source\ObjectStatus.cpp">
+      <Filter>ソース ファイル\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EffectParticle.cpp">
+      <Filter>ソース ファイル\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EffectSystem.cpp">
+      <Filter>ソース ファイル\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RocketBoost.cpp">
+      <Filter>ソース ファイル\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Explosive.cpp">
+      <Filter>ソース ファイル\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ExplosionManager.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameHud.cpp">
@@ -546,6 +564,21 @@
       <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
     <ClInclude Include="Include\ObjectStatus.h">
+      <Filter>ヘッダー ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EffectParticle.h">
+      <Filter>ヘッダー ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EffectSystem.h">
+      <Filter>ヘッダー ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\RocketBoost.h">
+      <Filter>ヘッダー ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Explosive.h">
+      <Filter>ヘッダー ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ExplosionManager.h">
       <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
     <ClInclude Include="Include\ScoreManager.h">

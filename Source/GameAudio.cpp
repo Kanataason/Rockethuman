@@ -1,4 +1,6 @@
 ﻿#include "GameAudio.h"
+#include "RocketBoost.h"
+#include "ExplosionManager.h"
 
 #include "Ragdoll.h"
 #include "ScoreManager.h"
@@ -39,6 +41,16 @@ void GameAudio::Bind(Ragdoll* ragdoll, ScoreManager& score, RoundManager& round)
 			if (_sound)
 				_sound->PlayBgm("drumRoll");
 		});
+}
+
+void GameAudio::BindBoost(RocketBoost& boost)
+{
+	boost.OnBoosted.Subscribe([this]() { PlayCharacterSe("shot"); });
+}
+
+void GameAudio::BindExplosion(ExplosionManager& explosions)
+{
+	explosions.OnExploded.Subscribe([this](Explosion) { PlayCharacterSe("hit"); });
 }
 
 void GameAudio::Update(float deltaTime)

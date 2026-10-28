@@ -138,6 +138,7 @@ void HingeJoint::RemovePerpendicularAngularVelocity(const Vector3& worldHingeAxi
     Vector3 relativeAngularVelocity = angularVelocityB - angularVelocityA;
 
     //相対角速度から軸方向の成分を引くと、軸に垂直な成分だけが残る
+    //消したい水平方向の値だけを取り出して、それを最後のセット時に消す
     Vector3 perpendicularAngularVelocity =
         relativeAngularVelocity - worldHingeAxis * Vector::Dot(relativeAngularVelocity, worldHingeAxis);
 
@@ -167,15 +168,15 @@ void HingeJoint::RemoveAngularVelocityBeyondLimit(float hingeAngle, const Vector
 
     if (movingFurtherOutOfLimit)
     {
-        float invMassA = 1.0f / _bodyA->GetMass();
-        float invMassB = 1.0f / _bodyB->GetMass();
-        float sum = invMassA + invMassB;
+        float invInertiaA = _bodyA->IsKinematic() ? 0.0f : 1.0f / _bodyA->GetInertia();
+        float invInertiaB = _bodyB->IsKinematic() ? 0.0f : 1.0f / _bodyB->GetInertia();
+        float sum = invInertiaA + invInertiaB;
 
         if (sum > 0.0f)
         {
             Vector3 velCorrection = worldHingeAxis * angVelAlongAxis;
-            _bodyB->SetAngularVelocity(_bodyB->GetAngularVelocity() - velCorrection * (invMassB / sum));
-            _bodyA->SetAngularVelocity(_bodyA->GetAngularVelocity() + velCorrection * (invMassA / sum));
+            _bodyB->SetAngularVelocity(_bodyB->GetAngularVelocity() - velCorrection * (invInertiaB / sum));
+            _bodyA->SetAngularVelocity(_bodyA->GetAngularVelocity() + velCorrection * (invInertiaA / sum));
         }
     }
 }

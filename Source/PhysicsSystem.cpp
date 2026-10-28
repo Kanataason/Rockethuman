@@ -8,6 +8,16 @@
 #include "ConsoleUtility.h"
 #include "GameObject.h"
 
+namespace
+{
+    //胴体のボーンか(全身で跳ねるきっかけになるのは、これだけ。手足や頭は、きっかけにならない)
+    bool IsTrunkBone(const std::string& name)
+    {
+        return name == "mixamorig:Hips" || name == "mixamorig:Spine" ||
+            name == "mixamorig:Spine1" || name == "mixamorig:Spine2";
+    }
+}
+
 //地面との接触。地面は動かないので、自分の速度だけを変える。
 static void ApplyGroundContactImpulse(RigidBody& body, const Vector3& contactPoint, const Vector3& normal)
 {
@@ -274,7 +284,7 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
 
 
         //ragdoll全体の重心を使って、ルート(腰)に重力トルクを加える。これで全体が倒れる。
-        _ragdollSystem.ApplyRootGravityTorque(_rigidBodies, subDeltaTime);
+        //_ragdollSystem.ApplyRootGravityTorque(_rigidBodies, subDeltaTime);
 
 
         //前のサブステップの疑似速度(位置補正用)とトルクを消す。
@@ -464,6 +474,7 @@ void PhysicsSystem::SolveJoints(float subDeltaTime)
             {
                 if (body && !body->IsKinematic())
                 {
+                    //位置をすぐに更新する
                     ApplyPseudoVelocityToPosition(*body, subDeltaTime);
                     body->ClearPseudoVelocity();
                 }
@@ -480,16 +491,6 @@ void PhysicsSystem::SolveJoints(float subDeltaTime)
     for (auto it = _jointList.rbegin(); it != _jointList.rend(); ++it)
     {
         solveJointImmediate(*it);
-    }
-}
-
-namespace
-{
-    //胴体のボーンか(全身で跳ねるきっかけになるのは、これだけ。手足や頭は、きっかけにならない)
-    bool IsTrunkBone(const std::string& name)
-    {
-        return name == "mixamorig:Hips" || name == "mixamorig:Spine" ||
-            name == "mixamorig:Spine1" || name == "mixamorig:Spine2";
     }
 }
 
@@ -580,6 +581,7 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
     //接触点で、めり込む向きの速度を線形+角速度で打ち消す
     const float groundAngularDamp =
         std::pow(RagdollTuning::kGroundAngularDampPerFrame, subDeltaTime / deltaTime);
+
     rigidBody.SetAngularVelocity(rigidBody.GetAngularVelocity() * groundAngularDamp);
 
     //先に衝突のインパルスを加える(ここで跳ね返る速度が決まる)。
@@ -596,8 +598,6 @@ void PhysicsSystem::ResolveGroundContact(PhysicsBody& body, const CollisionResul
 
     //バウンド: しきい値を超えた分だけ、反発係数をかけて、地面から離れる向きの速度を足す。
     //接触点のインパルスだけでは、当たった位置のずれのぶんが回転に逃げて、ほとんど跳ねないので、
-    //ボーンの中心の速度に、直接足している
-    //体ぜんたいで「ぴょん」と跳ねる設定のとき(キャラクター固有)は、胴体が地面に当たったときだけ、全身をまとめて跳ねさせる
     //(手足や頭が当たっただけでは、全身は跳ねない)。跳ねたら、このボーンの、ふつうのバウンドは足さない
     if (_hopCountLeft > 0 && IsTrunkBone(body.ragdollBone.name))
     {

@@ -15,7 +15,8 @@ static const std::unordered_map<ObjectType, ObjectBuilder> _objectBuilders =
     { ObjectType::Camera,      &ObjectBuilders::BuildCamera },
     { ObjectType::Light,       &ObjectBuilders::BuildLight },
     { ObjectType::Cannon,      &ObjectBuilders::BuildCannon },
-    { ObjectType::ScoreObject, &ObjectBuilders::BuildScoreObject }
+    { ObjectType::ScoreObject, &ObjectBuilders::BuildScoreObject },
+    { ObjectType::Effect,      &ObjectBuilders::BuildEffect }
 };
 
 //ObjectDataからGameObjectを1つ生成する

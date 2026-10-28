@@ -27,10 +27,15 @@ void CameraFollow::ReturnToStart()
 
 void CameraFollow::Update(float deltaTime)
 {
+	auto& position = GetOwner()->GetTransform().Position;
+
+	//前のフレームに足した揺れを、先に取り除く(揺れが、追いかけの計算に混ざらないように)
+	position.x -= _shakeOffset.x;
+	position.y -= _shakeOffset.y;
+	_shakeOffset = { 0.0f, 0.0f };
+
 	if (_mode == Mode::Idle)
 		return;
-
-	auto& position = GetOwner()->GetTransform().Position;
 
 	DirectX::XMFLOAT3 goal = _startPosition;
 	float sharpness = _returnSharpness;
@@ -81,4 +86,30 @@ void CameraFollow::Update(float deltaTime)
 			_mode = Mode::Idle;
 		}
 	}
+
+	//揺れ(だんだん弱くなる)を足す
+	if (_shakeAge < _shakeSeconds)
+	{
+		_shakeAge += deltaTime;
+		const float strength = _shakeStrength * (std::max)(1.0f - _shakeAge / _shakeSeconds, 0.0f);
+		std::uniform_real_distribution<float> distribution(-strength, strength);
+		_shakeOffset = { distribution(_shakeRandom), distribution(_shakeRandom) };
+		position.x += _shakeOffset.x;
+		position.y += _shakeOffset.y;
+	}
+}
+
+void CameraFollow::Shake(float strength, float seconds)
+{
+	if (seconds <= 0.0f)
+		return;
+
+	//すでに揺れているときは、いまの揺れより強いときだけ、上書きする
+	const float remaining = (_shakeAge < _shakeSeconds) ? _shakeStrength * (1.0f - _shakeAge / _shakeSeconds) : 0.0f;
+	if (strength < remaining)
+		return;
+
+	_shakeStrength = strength;
+	_shakeSeconds = seconds;
+	_shakeAge = 0.0f;
 }

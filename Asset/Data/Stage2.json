@@ -53,7 +53,7 @@
             "type": "Prop",
             "material": "background",
             "position": [ 0, 10, 20 ],
-            "scale": [ 200, 60, 0.1 ]
+            "scale": [ 200, 100, 0.1 ]
         },
         {
             "attribute": "File",

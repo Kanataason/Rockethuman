@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <DirectXMath.h>
+#include <random>
 
 #include "Component.h"
 
@@ -18,6 +19,9 @@ public:
 	void StartFollow();
 
 	void ReturnToStart();
+
+	//画面を揺らす。strength:最初の揺れの大きさ(m) / seconds:揺れが収まるまでの秒数(だんだん弱くなる)
+	void Shake(float strength, float seconds);
 private:
 	enum class Mode
 	{
@@ -45,4 +49,11 @@ private:
 	float _startRootY = 0.0f; //追い始めたときの、ラグドールの腰の高さ
 	float _offsetY = -2.0f;
 	bool _hasBeenFast = false; //追い始めてから、一度でも速くなったか(なったあとで、遅くなったら寄る)
+
+	//画面の揺れ。毎フレーム、前の揺れを取り除いてから、新しい揺れを足す(追いかけの計算に、混ざらないように)
+	DirectX::XMFLOAT2 _shakeOffset{ 0.0f, 0.0f };
+	float _shakeStrength = 0.0f;
+	float _shakeSeconds = 0.0f;
+	float _shakeAge = 0.0f;
+	std::mt19937 _shakeRandom{ std::random_device{}() };
 };

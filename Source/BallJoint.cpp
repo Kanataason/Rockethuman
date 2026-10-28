@@ -195,7 +195,7 @@ void BallJoint::RemoveAngularVelocityBeyondLimit(const Vector3& worldRejectedAxi
     _bodyB->SetAngularVelocity(angularVelocityB - velocityToRemove * (invInertiaB / invInertiaSum));
     _bodyA->SetAngularVelocity(angularVelocityA + velocityToRemove * (invInertiaA / invInertiaSum));
 }
-
+    
 
 Quaternion BallJoint::CalculateLimitedDelta(const Quaternion& swing, const Quaternion& twist)const
 {

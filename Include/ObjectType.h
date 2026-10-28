@@ -18,6 +18,7 @@ enum class ObjectType //Jsonでstring->typeに変換する
 	Prop,//見た目と当たり判定だけの置き物
 	Cannon,
 	ScoreObject,
+	Effect,//エフェクトの粒(光る小さな箱)。見た目だけで、物理は持たない
 	None
 };
 
@@ -82,6 +83,11 @@ struct ObjectData
 	float bounceRestitution = 1.0f; //地面で強く跳ねるときの反発係数(プレイヤー用)
 	int bounceCount = 0; //強く跳ねられる回数。0なら、ふつう
 	bool startAsleep = true;
+
+	//爆発する箱(Jsonの "explosive")。当たると爆発して、半径(m)の中の的を吹き飛ばし、人間を打ち上げる
+	bool explosive = false;
+	float explosionRadius = 4.0f;
+	float explosionPower = 14.0f; //人間を打ち上げる速さ(m/s)
 
 	//同じ物を並べる指定(Jsonの"count"と"step")。XYZの各方向に、何個ずつ、どれだけ離して並べるか
 	DirectX::XMINT3 repeatCount = { 1, 1, 1 };

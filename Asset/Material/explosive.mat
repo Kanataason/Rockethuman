@@ -1,0 +1,5 @@
+{
+    "texture": "Asset/Texture/Mock/crate.png",
+    "unlit": true,
+    "color": [ 1.0, 0.25, 0.2, 1 ]
+}

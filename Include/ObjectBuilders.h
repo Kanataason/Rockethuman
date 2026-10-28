@@ -16,4 +16,5 @@ namespace ObjectBuilders
 	void BuildLight(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
 	void BuildCannon(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
 	void BuildScoreObject(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
+	void BuildEffect(GameObject& obj, const ObjectData& data, const std::shared_ptr<ModelDatas>& model);
 }

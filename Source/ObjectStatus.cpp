@@ -51,6 +51,26 @@ void ObjectStatus::OnCollisionEnter(Collider* other, const CollisionResult& resu
 	OnSendScore.Invoke(hit);
 }
 
+void ObjectStatus::ForceHit(const Vector3& origin)
+{
+	if (_isHit)
+		return;
+
+	_isHit = true;
+
+	const auto& position = GetOwner()->GetTransform().Position;
+
+	HitInfo hit;
+	hit.baseScore = _score;
+	hit.position = Vector3(position.x, position.y, position.z);
+
+	//爆心から離れる向きへ飛ぶ
+	const float directionX = (position.x >= origin.x) ? 1.0f : -1.0f;
+	InitializeFly(directionX);
+
+	OnSendScore.Invoke(hit);
+}
+
 void ObjectStatus::InitializeFly(float directionX)
 {
 	//飛ぶ速さと回転を決める(毎回少しずつ違う)。2Dの見た目なので、奥(Z)には飛ばさない
@@ -84,6 +104,14 @@ void ObjectStatus::UpdateFly(float deltaTime)
 		{
 			if (auto* collider = GetOwner()->GetComponent<Collider>())
 				_physicsSystem->RemoveColliderAndWakeUnsupported(collider);
+		}
+
+		//爆発する箱は、飛ばずに、その場で消える
+		if (_vanishOnHit)
+		{
+			transform.Scale = { 0.0f, 0.0f, 0.0f };
+			_flyState = FlyState::Done;
+			return;
 		}
 
 		_baseScale = transform.Scale;

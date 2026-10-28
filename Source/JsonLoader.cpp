@@ -181,6 +181,9 @@ ObjectData JsonLoader::LoadGameObjectData(const json& root)
 	data.materialName = LoadMaterial(root);
 	data.score = root.value("score", data.score);
 	data.startAsleep = root.value("asleep", true);
+	data.explosive = root.value("explosive", false);
+	data.explosionRadius = root.value("explosionRadius", data.explosionRadius);
+	data.explosionPower = root.value("explosionPower", data.explosionPower);
 	LoadRepeat(root, data);
 	
 	LoadAnimationPath(root,data.animationDatas);
