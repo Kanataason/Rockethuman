@@ -57,7 +57,7 @@ void HingeJoint::ApplyRestoringTorque()
 
     //角度のずれを比例して逆方向に戻す
     float torqueScalar =
-        -twistAngle * _stiffness - relativeAngVelAlongAxis * _damping;
+        -(twistAngle - _restAngle) * _stiffness - relativeAngVelAlongAxis * _damping;
 
     Vector3 torque = worldAxis * torqueScalar; 
 

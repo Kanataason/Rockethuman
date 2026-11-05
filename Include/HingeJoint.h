@@ -37,6 +37,9 @@ public:
 		_damping = damping;
 	}
 
+	//復元トルクで戻る先の角度設定関数(度)。0 = 基準姿勢(まっすぐ)。飛行中だけ、少し曲げた姿勢にするのに使う
+	void SetRestAngle(float degrees)override { _restAngle = XMConvertToRadians(degrees); }
+
 	//回転軸設定関数
 	void SetAxis(const Vector3& axis)override { _hingeAxis = axis; };
 private:
@@ -57,6 +60,7 @@ private:
 	float _maxAngle = 0.0f;
 
 	float _stiffness = 1.0f;
+	float _restAngle = 0.0f; //復元トルクで戻る先の角度(ラジアン)
 	float _damping = 0.5f;
 
 	Quaternion _initialRelativeRotation{};

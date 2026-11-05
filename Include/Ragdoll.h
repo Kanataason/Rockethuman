@@ -160,6 +160,51 @@ namespace RagdollData
     { "mixamorig:RightForeArm", { 0.0f, 0.6f } },
     };
 
+    inline std::unordered_map<std::string, std::pair<float, float>> flightStiffnessTable =
+    {
+       // { ω(rad/s), ζ }   k = 慣性*ω^2,  c = 2*ζ*慣性*ω
+       { "mixamorig:Spine",  { 12.0f, 1.0f } },
+    { "mixamorig:Spine1", { 12.0f, 1.0f } },
+    { "mixamorig:Spine2", { 12.0f, 1.0f } },
+    { "mixamorig:Head",   { 10.0f, 0.8f } },
+
+    { "mixamorig:LeftArm",     { 4.0f, 0.8f } },
+    { "mixamorig:RightArm",    { 4.0f, 0.8f } },
+    { "mixamorig:LeftUpLeg",   { 4.0f, 0.8f } },
+    { "mixamorig:RightUpLeg",  { 4.0f, 0.8f } },
+
+    { "mixamorig:LeftFoot",  { 5.0f, 0.6f } },
+    { "mixamorig:RightFoot", { 5.0f, 0.6f } },
+    { "mixamorig:LeftHand",  { 5.0f, 0.6f } },
+    { "mixamorig:RightHand", { 5.0f, 0.6f } },
+
+    { "mixamorig:LeftLeg",     { 8.0f, 0.7f } },
+    { "mixamorig:RightLeg",    { 8.0f, 0.7f } },
+    { "mixamorig:LeftForeArm",  { 8.0f, 0.7f } },
+    { "mixamorig:RightForeArm", { 8.0f, 0.7f } },
+    };
+
+    //飛行中の姿勢：腕。基準姿勢(Tポーズ)の骨を、真下へ、この角度(度)だけ回した姿勢へ戻る
+    //(0なら、Tポーズ。大きいほど、腕が下がる。マイナスで、上げる)
+    inline std::unordered_map<std::string, float> flightDropTable =
+    {
+        { "mixamorig:LeftArm",  50.0f },
+        { "mixamorig:RightArm", 50.0f },
+           { "mixamorig:LeftFoot",  30.0f },
+    { "mixamorig:RightFoot", 30.0f },
+    { "mixamorig:LeftHand",  30.0f },   
+    { "mixamorig:RightHand", 30.0f },
+    };
+
+    //飛行中の姿勢：ヒンジ(肘・膝)。この角度(度)だけ曲げた姿勢へ戻る(0 = まっすぐ)
+    inline std::unordered_map<std::string, float> flightBendTable =
+    {
+        { "mixamorig:LeftForeArm",  30.0f },
+        { "mixamorig:RightForeArm", 30.0f },
+        { "mixamorig:LeftLeg",      25.0f },
+        { "mixamorig:RightLeg",     25.0f },
+    };
+
     //第一引数が最低角度、２が最大角度、３が回転軸
     inline std::unordered_map<std::string, HingeLimit> hingeLimits =
     {
@@ -425,6 +470,17 @@ private:
     //テーブルにあれば、ジョイントの硬さ(stiffness)を設定する。
     void ApplyJointStiffness(RagdollBone& child);
 
+    //空中専用のテーブルを作って、設定する
+    void ApplyFlightStiffness(RagdollBone& child);
+
+    //飛行中の姿勢(戻る先)を設定する / 基準姿勢(Tポーズ、まっすぐ)に戻す
+    void ApplyFlightPose(RagdollBone& child);
+    void ResetRestPose(RagdollBone& child);
+
+    //飛行中、手足の骨の横方向の速さを、空気で遅らせる(手足が進行方向と反対へ流れる)
+    void ApplyLimbAirDrag(float deltaTime);
+    //基準姿勢でこの骨が向いている方向を、真下へ degrees(度)だけ回す回転。この骨のローカル座標で返す
+    Quaternion ComputeDropRotation(const RagdollBone& bone, float degrees) const;
     //ヒンジ,1軸の回転だけを許すジョイントを生成する
     void CreateHingeJoint(RagdollBone& parentBone, RagdollBone& child, const auto& hingeLimit);
 

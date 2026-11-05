@@ -350,6 +350,114 @@ void Ragdoll::ApplyJointStiffness(RagdollBone& child)
     if (stiffnessIt != stiffnessTable.end())
         child.joint->SetStiffness(stiffnessIt->second.first, stiffnessIt->second.second);
 }
+
+void Ragdoll::ApplyFlightStiffness(RagdollBone& child)
+{
+    const auto it = flightStiffnessTable.find(child.name);
+    if (it == flightStiffnessTable.end())
+        return;                                  // 表にない骨は、通常のまま
+
+    const float inertia = child.rigidBody->GetInertia();
+    const float frequency = it->second.first;
+    const float dampingRatio = it->second.second;
+
+    // 慣性に比例させる（体が大きくても、同じ戻り方になる）
+    const float stiffness = inertia * frequency * frequency;
+    const float damping = 2.0f * dampingRatio * inertia * frequency;
+
+    child.joint->SetStiffness(stiffness, damping); 
+}
+
+void Ragdoll::ApplyFlightPose(RagdollBone& child)
+{
+    //発射のたびに、戻る先を少しずらす(左右の腕や脚も、別々にずれる)。0で、毎回同じ姿勢
+    static std::mt19937 rng{ std::random_device{}() };
+    std::uniform_real_distribution<float> unit(-1.0f, 1.0f);
+    const float jitter = RagdollTuning::kFlightPoseJitterDeg * unit(rng);
+
+    //腕など(ボールジョイント): Tポーズの骨を、真下へ回した姿勢へ戻る
+    if (const auto dropIt = flightDropTable.find(child.name); dropIt != flightDropTable.end())
+        child.joint->SetRestRotation(child.initialRelativeRotation * ComputeDropRotation(child, dropIt->second + jitter));
+
+    //肘・膝(ヒンジ): 曲げた姿勢へ戻る。逆向きには曲がらないよう、0度未満にはしない
+    if (const auto bendIt = flightBendTable.find(child.name); bendIt != flightBendTable.end())
+        child.joint->SetRestAngle((std::max)(bendIt->second + jitter, 0.0f));
+}
+
+void Ragdoll::ResetRestPose(RagdollBone& child)
+{
+    //着地したら、戻る先を、基準姿勢に戻す(脱力の、通常の値と合わせて、もとの動きになる)
+    child.joint->SetRestRotation(child.initialRelativeRotation);
+    child.joint->SetRestAngle(0.0f);
+}
+
+Quaternion Ragdoll::ComputeDropRotation(const RagdollBone& bone, float degrees) const
+{
+    const Quaternion identity(0.0f, 0.0f, 0.0f, 1.0f);
+    if (!_skeleton)
+        return identity;
+
+    const auto& nodes = _skeleton->GetNode();
+    const BoneNode& node = nodes[bone.nodeIndex];
+
+    //この骨の基準姿勢の回転(モデルの座標)
+    Quaternion bindRotation = QuaternionMath::fromF4ToQ4(
+        MatrixUtility::GetTransform<MatrixUtility::ReturnTransform::Rotation>(node.BindGlobalTransform));
+
+    //この骨の、最初の子(例: 肩 -> 肘)を探す
+    const int boneIndex = static_cast<int>(&bone - _bones.data());
+    int childBoneIndex = -1;
+    for (size_t i = 0; i < _bones.size(); ++i)
+    {
+        if (_bones[i].parentIndex == boneIndex)
+        {
+            childBoneIndex = static_cast<int>(i);
+            break;
+        }
+    }
+
+    //基準姿勢で、この骨が向いている方向(モデルの座標)
+    Vector3 direction(0.0f, 0.0f, 0.0f);
+    if (childBoneIndex >= 0)
+    {
+        //子がいる骨(肩など): 次の関節へ向かう方向
+        const BoneNode& childNode = nodes[_bones[childBoneIndex].nodeIndex];
+        direction = Vector3(
+            childNode.BindGlobalTransform._41 - node.BindGlobalTransform._41,
+            childNode.BindGlobalTransform._42 - node.BindGlobalTransform._42,
+            childNode.BindGlobalTransform._43 - node.BindGlobalTransform._43);
+    }
+    else if (bone.parentIndex >= 0)
+    {
+        //子のいない末端の骨(手・足): カプセルと同じ、骨のローカルY軸の向き。親から離れる向きにそろえる
+        const BoneNode& parentNode = nodes[_bones[bone.parentIndex].nodeIndex];
+        const Vector3 fromParent(
+            node.BindGlobalTransform._41 - parentNode.BindGlobalTransform._41,
+            node.BindGlobalTransform._42 - parentNode.BindGlobalTransform._42,
+            node.BindGlobalTransform._43 - parentNode.BindGlobalTransform._43);
+
+        direction = bindRotation * Vector3(0.0f, 1.0f, 0.0f);
+        if (Vector::Dot(direction, fromParent) < 0.0f)
+            direction = Vector3(-direction.x, -direction.y, -direction.z);
+    }
+
+    if (direction.Length() < EPSILON)
+        return identity;
+    direction.Normalize();
+
+    //骨の向きを、真下へ近づける軸(向き x 真下)。左右で、符号を気にしなくてよい
+    Vector3 axis = Vector::Cross(direction, Vector3(0.0f, -1.0f, 0.0f));
+    if (axis.Length() < EPSILON)
+        return identity; //すでに、真下を向いている
+    axis.Normalize();
+
+    //その軸(モデルの座標)を、この骨の基準姿勢のローカル座標へ直す
+    const Vector3 localAxis = bindRotation.Inverse() * axis;
+
+    return QuaternionMath::CreateFromAxisAngle(localAxis, XMConvertToRadians(degrees));
+}
+
+
 void Ragdoll::CreateHingeJoint(RagdollBone& parentBone, RagdollBone& child, const auto& hingeLimit)
 {
     child.joint = std::make_unique<HingeJoint>(
@@ -727,8 +835,23 @@ void Ragdoll::SetFlying(bool flying)
 
     //自由落下中は重力がトルクを生まないので、飛んでいる間だけ止める(止めないと体がくの字に折れる)
     for (auto& bone : _bones)
+    {
+        if (bone.joint)
+        {
+            if (_isFlying)
+            {
+                ApplyFlightStiffness(bone);
+                ApplyFlightPose(bone);
+            }
+            else
+            {
+                ApplyJointStiffness(bone);
+                ResetRestPose(bone);
+            }
+        }
         if (bone.rigidBody)
             bone.rigidBody->SetUseGravityTorque(!flying);
+    }
 }
 
 Vector3 Ragdoll::GetRootPosition() const
@@ -766,8 +889,56 @@ bool Ragdoll::AllBonesSleeping() const
     return true;
 }
 
+void Ragdoll::ApplyLimbAirDrag(float deltaTime)
+{
+    const float dragRatio = 1.0f - std::exp(-RagdollTuning::kLimbAirDrag * deltaTime);
+
+    for (size_t i = 0; i < _bones.size(); ++i)
+    {
+        RagdollBone& bone = _bones[i];
+        if (!bone.rigidBody || bone.rigidBody->IsKinematic())
+            continue;
+
+        //重い脚(UpLeg・Leg)は対象にしない。かけると、腰が遅れて、くの字に折れる
+        const bool isLimb =
+            bone.name.find("Arm") != std::string::npos ||
+            bone.name.find("Hand") != std::string::npos ||
+            bone.name.find("Foot") != std::string::npos;
+        if (!isLimb)
+            continue;
+
+        //骨の向き: 最初の子(肩なら肘)へ向かう方向。子がいない末端(手・足)は、親から離れる方向
+        Vector3 axis(0.0f, 0.0f, 0.0f);
+        bool found = false;
+        for (size_t j = 0; j < _bones.size(); ++j)
+        {
+            if (_bones[j].parentIndex == static_cast<int>(i) && _bones[j].rigidBody)
+            {
+                axis = _bones[j].rigidBody->GetPosition() - bone.rigidBody->GetPosition();
+                found = true;
+                break;
+            }
+        }
+        if (!found && bone.parentIndex >= 0 && _bones[bone.parentIndex].rigidBody)
+            axis = bone.rigidBody->GetPosition() - _bones[bone.parentIndex].rigidBody->GetPosition();
+
+        const float length = axis.Length();
+        if (length < EPSILON)
+            continue;
+        axis = axis * (1.0f / length);
+
+        //骨に沿った速さは残し、横向きの速さだけを減らす
+        const Vector3 velocity = bone.rigidBody->GetVelocity();
+        const Vector3 sideVelocity = velocity - axis * Vector::Dot(velocity, axis);
+        bone.rigidBody->SetVelocity(velocity - sideVelocity * dragRatio);
+    }
+}
+
 void Ragdoll::Update(float deltaTime)
 {
+    if (_isFlying)
+        ApplyLimbAirDrag(deltaTime);
+
     //どれかのボーンが地面に着いているか
     bool grounded = false;
     for (const auto& bone : _bones)

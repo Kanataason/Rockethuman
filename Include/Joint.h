@@ -194,6 +194,9 @@ public:
     virtual void SetStiffness(float stiffness, float damping) {}
     virtual void SetRestRotation(const Quaternion& restRot) {};
 
+    //復元トルクで戻る先の角度(度)。ヒンジ(肘・膝)用。基準姿勢が0度。ボールジョイントでは、何もしない
+    virtual void SetRestAngle(float degrees) {}
+
     virtual void SetTwistDirectionWorld(const Vector3& dir) {}
 
     RigidBody* GetBodyA() { return _bodyA; };

@@ -5,6 +5,7 @@
             "path": "Asset/Prefab/Dancing.fbx",
             "scale": 0.01,
             "colliderScale": 1.05,
+            "trunkColliderScale": 1.2,
             "animations": [
                 {
                     "name": "Idle",

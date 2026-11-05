@@ -195,7 +195,7 @@ namespace RagdollTuning
     constexpr float kLaunchTumbleSpeed = 6.0f; //吹き飛んでいる間の全身の回転速度(rad/s)
 
     //ボーンごとに追加するランダムな回転速度(rad/s)。手足をばたつかせるために使用する。
-    constexpr float kLaunchFlailSpeed = 6.0f;
+    constexpr float kLaunchFlailSpeed = 3.0f; //以前は6.0。大きいと、手足が、すぐ関節の限界に届いて、そこに張りつく
 
     //---- 大砲で発射するときの、ランダム性(ぐちゃぐちゃ度) ----
     //値を大きくするほど、毎回の飛び方がばらつく。0にすると、そのランダム性は無くなる
@@ -204,8 +204,17 @@ namespace RagdollTuning
     constexpr float kLaunchTumbleJitter = 0.5f; //全身の回転速度の±割合(0.5 = 0.5倍～1.5倍)
     constexpr float kLaunchSpinReverseChance = 0.25f; //回転が逆向きになる確率(0～1)
     constexpr float kLaunchScatterSpeed = 2.5f; //ボーンごとに足す、ランダムな速度(m/s)
-    constexpr float kLaunchExtremityScatterScale = 2.0f; //頭・手・足を、何倍に散らすか
+    constexpr float kLaunchExtremityScatterScale = 1.2f; //頭・手・足を、何倍に散らすか(以前は2.0)
 
+    //飛行中の姿勢(戻る先)に足す、発射ごとのランダムな角度の±度。大きいと、限界角に近づいて張り付く
+    constexpr float kFlightPoseJitterDeg = 10.0f;
+
+    //---- 飛行中の、手足の空気抵抗 ----
+    //骨の横方向の速さだけを、空気で遅らせる(細い棒が風を受ける形)。遅れた手足は、関節に引かれて、進行方向と反対へ流れる
+    //(上昇中は足の方へ垂れ、落下中は頭の方へ上がる)
+    //0で無効。速さに比例してかかるので、数十m/sで飛ぶ間は、小さい値でも強く効く(3.0だと、飛距離が落ち、体がくねって、腰が折れた)
+    //大きいと、手足が体に巻き付くようにたたまれる。小さいと、効果が見えない(0.2～0.5くらいから試す)
+    constexpr float kLimbAirDrag = 0.3f; //1秒あたりの減衰の強さ(1/s)
 
     //休止(ragdollが倒れて静止したら止める)(RagdollSystem)
 
