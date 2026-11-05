@@ -4,6 +4,8 @@ C++ と DirectX 11 で作った、2.5D の物理破壊アクションです。
 大砲に詰めた人間(ラグドール)を撃ち出して、ステージにある的を飛ばします。
 物理演算(ラグドール、ジョイント、衝突判定)は、ライブラリを使わず、自作しています。
 
+**プレイ動画：** https://youtu.be/g_y1NJwdxVs
+個人制作 / 2026年7月〜10月(約2か月半)/ 田中 達也
 
 ## 遊び方
 
@@ -14,6 +16,7 @@ C++ と DirectX 11 で作った、2.5D の物理破壊アクションです。
 | キャラクター選択 | W / S: 選ぶ　スペース / Enter / ESC: 閉じる |
 | ステージ中 | スペース: 角度を決める → スペース: 威力を決めて発射 |
 | ステージ中 | ESC: ポーズ(つづける / やりなおす / タイトルへ) |
+| 飛んでいる間 | スペース: ロケット噴射(1発に1回)　W / S を押しながら: 噴射の向きを上下に曲げる |
 
 1. 大砲の角度が、左右に揺れます。スペースで止めます。
 2. 威力のゲージが、上下します(緑: よわい / 黄: ふつう / 赤: つよい)。スペースで止めると、発射します。
@@ -26,6 +29,7 @@ C++ と DirectX 11 で作った、2.5D の物理破壊アクションです。
 - 頭が的に当たると +500 点
 - 飛んだ距離 1m ごとに 10 点
 - 的をすべて飛ばすと、残った玉の数に応じて、クリアボーナス
+- 赤い箱に当たると爆発して、周りの的が連鎖して飛ぶ(飛んだ的は、それぞれ得点)
 
 ## ビルド
 
@@ -37,6 +41,7 @@ C++ と DirectX 11 で作った、2.5D の物理破壊アクションです。
 ### 手順
 
 ```bash
+git clone https://github.com/Kanataason/Rockethuman.git
 ```
 
 vcpkg を、まだ入れていなければ、入れます(`integrate install` は、1回だけです)。
@@ -48,7 +53,7 @@ bootstrap-vcpkg.bat
 vcpkg integrate install
 ```
 
-1. `3DGame.sln` を、Visual Studio で開きます。
+1. `RocketNingen.sln` を、Visual Studio で開きます。
 2. 構成を **x64** の **Debug** か **Release** にして、ビルドします(Ctrl + Shift + B)。
 3. 実行します(F5)。
 
@@ -64,6 +69,7 @@ vcpkg integrate install
   - ステージ中:`GameAudio`(音)、`GameHud`(表示)、`PowerGauge`(ゲージ)
   - タイトル:`TitleMenuPage`、`StageSelectPage`、`CharacterSelectPage`、共通の `MenuList`
 - **データ駆動**:ステージ・キャラクター・音は、JSONに追記するだけで、増やせます
+- **飛行中の操作とエフェクト**:ロケット噴射、爆発する箱、火花・炎・画面の揺れ(`RocketBoost`、`ExplosionManager`、`EffectSystem`)
 
 ### ステージ・キャラクター・音を足す
 
@@ -90,7 +96,8 @@ vcpkg integrate install
 - 背景やオブジェクトの画像:生成AI
 - フォント:(出どころを書く)
 
-
-## ライセンス
-
-<!-- 自分のコードの、ライセンスを書く。素材は、それぞれの規約に従う -->
+Mixamo のキャラクターとアニメーションは、規約によりリポジトリに含めていません。
+ビルドして動かす場合は、Mixamo(https://www.mixamo.com/)から取得し、
+Asset/Prefab と Asset/Animation に同じファイル名で置いてください。
+- `Asset/Prefab/Player.fbx`、`Asset/Prefab/debu.fbx`、`Asset/Prefab/Dancing.fbx`
+- `Asset/Animation/Idle.fbx`、`Asset/Animation/Walk.fbx`
