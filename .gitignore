@@ -4,3 +4,10 @@ packages/
 *.vcxproj.user
 
 vcpkg_installed/
+
+# Mixamo assets (not redistributable)
+Asset/Prefab/Player.fbx
+Asset/Prefab/debu.fbx
+Asset/Prefab/Dancing.fbx
+Asset/Animation/Idle.fbx
+Asset/Animation/Walk.fbx
